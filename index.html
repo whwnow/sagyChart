@@ -11,7 +11,14 @@
 	<script type="text/javascript" src="src/sagyChart.js"></script>
 	<script type="text/javascript">
 		$(function(){
-
+			$("#go").click(function(){
+				eval($("#texteval").val());
+			});
+			$("#texteval").on("keyup",function(e){
+				if(e.keyCode===13&&e.ctrlKey){
+					eval($("#texteval").val());
+				}
+			})
 		});
 	</script>
 </head>
@@ -19,8 +26,7 @@
 <div id="container">
 	<div id="chartA"></div>
 	</br>
-	<textarea>
-	</textarea>
+	<textarea id="texteval">alert(1)</textarea>
 	<input type="button" id="go" value="run"/>
 </div>
 </body>

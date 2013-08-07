@@ -300,7 +300,7 @@
 				marginLeft: 110,
 				//marginTop: 110,
 				spacingLeft: 0,
-				renderTo: this.options.container,
+				//renderTo: this.options.container,
 				height: 650,
 				//marginBottom: 240,
 				//marginRight:100,
@@ -469,11 +469,11 @@
 
 	/**
 	 * 异步工具部分
-	 * @return {AsynTool} 异步工具实例
+	 * @return {EventProxy} 异步工具实例
 	 */
-	var AsynTool = function() {
-		if (!(this instanceof AsynTool)) {
-			return AsynTool();
+	var EventProxy = function() {
+		if (!(this instanceof EventProxy)) {
+			return EventProxy();
 		}
 		this._fired = {};
 		this._callbacks = {};
@@ -537,7 +537,7 @@
 		};
 		proxy.addListener("all", _all);
 	};
-	extend(AsynTool.prototype, {
+	extend(EventProxy.prototype, {
 		addListener: function(ev, callback) {
 			this._callbacks = this._callbacks || {};
 			this._callbacks[ev] = this._callbacks[ev] || [];
