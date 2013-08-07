@@ -4,67 +4,24 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<title></title>
 	<link rel="stylesheet" type="text/css" href="style.css">
-	<link href="http://192.168.100.19:81/EmsUI/Css/EmsUI-1.0.0.css" rel="stylesheet" type="text/css" />
-	<script src="http://192.168.100.19:81/EmsUI/Scripts/jquery-1.7.2.min.js" type="text/javascript"></script>
-	<script src="http://192.168.100.19:81/EmsUI/Scripts/EmsUI-1.0.0.js" type="text/javascript"></script>
-	<script type="text/javascript" src="avalon.js"></script>
-	<script type="text/javascript" src="highcharts.src.js"></script>
-	<script type="text/javascript" src="persagyChart.js"></script>
+	<link rel="stylesheet" type="text/css" href="tools/EmsUI-1.0.0.css" />
+	<script type="text/javascript" src="tools/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="tools/EmsUI-1.0.0.js"></script>
+	<script type="text/javascript" src="tools/highcharts.src.js"></script>
+	<script type="text/javascript" src="src/sagyChart.js"></script>
 	<script type="text/javascript">
 		$(function(){
 
 		});
-    });
-		var im_version = "0.0.1",
-		im_obj = {},
-		im_string = im_obj.toString,
-		im_hasOwn = im_obj.hasOwnProperty;
-	function merge() {
-var i,
-			len = arguments.length,
-			ret = arguments[0] || {},
-			doCopy = function(copy, original) {
-				var value, oldVal, key;
-
-				if (typeof copy !== 'object') {
-					copy = {};
-				}
-
-				for (key in original) {
-					if (im_hasOwn.call(original, key) && im_hasOwn.call(copy, key)) {
-						value = original[key];
-						oldVal = copy[key];
-						if (im_string.call(value) !== im_string.call(oldVal)) continue;
-						if (value && typeof value === 'object' && Object.prototype.toString.call(value) !== '[object Array]' && typeof value.nodeType !== 'number') {
-							copy[key] = doCopy(copy[key] || {}, value);
-
-						} else {
-							copy[key] = original[key];
-						}
-					}
-				}
-				return copy;
-			};
-		for (i = 1; i < len; i++) {
-			ret = doCopy(ret, arguments[i]);
-		}
-
-		return ret;
-	}
-	var a={a:1,b:2},
-	b={b:1,a:{a:{a:2}}};
-	console.log(merge(a,b));
 	</script>
 </head>
 <body>
 <div id="container">
-	<div>
-		<div id="chartA"></div>
+	<div id="chartA"></div>
 	</br>
-		<textarea style="height:300px;width:80%">
-		</textarea>
-		<input type="button" id="go" value="run"/>
-	</div>
+	<textarea>
+	</textarea>
+	<input type="button" id="go" value="run"/>
 </div>
 </body>
 </html>

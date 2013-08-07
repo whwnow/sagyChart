@@ -8,10 +8,14 @@
 }
 #container>div {
     background: #eee;
-    margin-bottom: 20px;
-    height: 400px;
+    /*margin-bottom: 20px;*/
+    height: 500px;
     border-radius:  2px 0px 2px 0px;
     -webkit-box-shadow: 2px 2px 5px #999;
+}
+textarea{
+    height:300px;
+    width:80%;
 }
 #go{
     height: 100px;
