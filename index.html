@@ -5,12 +5,14 @@
 	<title></title>
 	<link rel="stylesheet" type="text/css" href="style.css">
 	<link rel="stylesheet" type="text/css" href="tools/EmsUI-1.0.0.css" />
-	<script type="text/javascript" src="tools/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="tools/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="tools/jquery.mobile-1.1.1.min.js"></script>
 	<script type="text/javascript" src="tools/EmsUI-1.0.0.js"></script>
 	<script type="text/javascript" src="tools/highcharts.src.js"></script>
 	<script type="text/javascript" src="src/sagyChart.js"></script>
 	<script type="text/javascript">
 		$(function(){
+			eval($("#texteval").val());
 			$("#go").click(function(){
 				eval($("#texteval").val());
 			});
@@ -26,7 +28,7 @@
 <div id="container">
 	<div id="chartA"></div>
 	</br>
-	<textarea id="texteval">alert(1)</textarea>
+	<textarea id="texteval"> sagyChart("chartA");</textarea>
 	<input type="button" id="go" value="run"/>
 </div>
 </body>

@@ -1,11 +1,13 @@
-(function(win, doc) {
+(function(window, undefined) {
 	//some global variable
 	var im_version = "0.0.1",
 		im_obj = {},
 		im_string = im_obj.toString,
 		im_hasOwn = im_obj.hasOwnProperty,
-		createEle = doc.createElement;
-	//doc.createElement("div")
+
+		document = window.document,
+		createEle = document.createElement;
+	//document.createElement("div")
 	//setAttribute("className", "t")
 	var sagyChart = function() {
 		var args = arguments,
@@ -133,13 +135,13 @@
 		renderTo: "",
 		resourcePath: "/Images/sagyChart/",
 		subline: {
-			enable: true,
+			enabled: true,
 			lines: [{
 				color: "#87B6FE",
 				name: "参考值"
 			}, {
 				color: "#87B6FE",
-				name: "参考值"
+				name: "报警值"
 			}]
 		},
 		isConvertUnit: true,
@@ -431,22 +433,50 @@
 		constructor: sagyChart,
 		init: function(userOptions, callback) {
 			var options,
-				chartId = generateID(),
-				sublineId = generateID(),
+				sublineId,
 				checkboxId = generateID(),
 				boxDiv,
 				chartDiv,
 				sublineDiv,
+				i,
+				list,
+				templist = [],
 				checkboxDiv;
+
 			options = merge(defaultOptions, userOptions);
-			boxDiv = doc.getElementById(options.renderTo);
+			boxDiv = document.getElementById(options.renderTo);
 			if (!boxDiv) {
-				error("can't find the element! maybe a wrong id has been set!");
+				error("give a wrong dom id!");
 				return;
 			}
-
-			chartDiv = createEle("div");
-			chartDiv.setAttribute("id", id);
+			//appendChild
+			if (options.subline.enabled) {
+				sublineDiv = document.createElement("div");
+				sublineId = generateID();
+				sublineDiv.setAttribute("id", sublineId);
+				sublineDiv.style.height = "52px";
+				sublineDiv.style.width = "252px"
+				sublineDiv.style.float = "right";
+				boxDiv.appendChild(sublineDiv);
+				list = options.subline.lines;
+				for (i = 0; i < list.length; i++) {
+					templist.push([i, list[i].name]);
+				};
+				$("#" + sublineId).ComboBox({
+					list: templist,
+					enableMobile: true,
+					comboBox: {
+						width: 252, //定义ComboBox边框宽度
+						height: 52,
+					},
+					defaultOption: "请选择辅助线",
+					callback: function(item) {
+						console.log(item);
+					}
+				})
+			}
+			//chartDiv = createEle("div");
+			//chartDiv.setAttribute("id", id);
 			//1.创建dom.id
 			//2.辅助线dom
 			//3.
@@ -464,160 +494,7 @@
 		}
 	};
 	sagyChart.fn.init.prototype = sagyChart.fn;
-
-
-
-	/**
-	 * 异步工具部分
-	 * @return {EventProxy} 异步工具实例
-	 */
-	var EventProxy = function() {
-		if (!(this instanceof EventProxy)) {
-			return EventProxy();
-		}
-		this._fired = {};
-		this._callbacks = {};
-	};
-
-	var _assign = function(eventName1, eventName2, cb, once) {
-		var proxy = this,
-			length,
-			i = 0,
-			argsLength = arguments.length,
-			bind,
-			_all,
-			callback,
-			events,
-			isOnce,
-			times = 0,
-			flag = {};
-		if (argsLength < 3) {
-			return proxy;
-		}
-		events = Array.prototype.slice.apply(arguments, [0, argsLength - 2]);
-		callback = arguments[argsLength - 2];
-		isOnce = arguments[argsLength - 1];
-
-		if (!isFunction(callback)) {
-			return proxy;
-		}
-
-		length = events.length;
-		bind = function(key) {
-			var method = isOnce ? "once" : "bind";
-			proxy[method](key, function(data) {
-				proxy._fired[key] = proxy._fired[key] || {};
-				proxy._fired[key].data = data;
-				if (!flag[key]) {
-					flag[key] = true;
-					times++;
-				}
-			});
-		};
-
-		for (i = 0; i < length; i++) {
-			bind(events[i]);
-		};
-
-		_all = function(event) {
-			if (times < length) {
-				return;
-			}
-			if (!flag[event]) {
-				return;
-			}
-			var data = [];
-			for (i = 0; i < length; i++) {
-				data.push(proxy._fired[events[i]].data);
-			};
-			if (isOnce) {
-				proxy.removeListener("all", _all);
-			}
-			callback.call(null, data);
-		};
-		proxy.addListener("all", _all);
-	};
-	extend(EventProxy.prototype, {
-		addListener: function(ev, callback) {
-			this._callbacks = this._callbacks || {};
-			this._callbacks[ev] = this._callbacks[ev] || [];
-			this._callbacks[ev].pash(callback);
-			return this;
-		},
-		removeListener: function(ev, callback) {
-			var calls = this._callbacks,
-				list
-				i,
-				l;
-			if (!ev) {
-				this._callbacks = {};
-			} else if (calls) {
-				if (!callback) {
-					calls[ev] = [];
-				} else {
-					list = calls[ev];
-					if (!list) {
-						return this;
-					}
-					l = list.length;
-					for (i = 0; i < l; i++) {
-						if (callback === list[i]) {
-							list[i] = null;
-							break;
-						}
-					}
-				}
-			}
-			return this;
-		},
-		trigger: function(eventName, data) {
-			var list,
-				ev,
-				callback,
-				args,
-				i,
-				l;
-			var both = 2;
-			var calls = this._callbacks;
-			while (both--) {
-				ev = both ? eventName : "all";
-				list = calls[ev];
-				if (list) {
-					for (i = 0, l = list.length; i < l; i++) {
-						if (!(callback = list[i])) {
-							list.slice(i, 1);
-							i--;
-							j--;
-						} else {
-							args = both ? Array.prototype.slice.call(arguments, 1) : arguments;
-							callback.apply(this, args);
-						}
-					}
-				}
-			}
-			return this;
-		},
-		once: function(ev, callback) {
-			var proxy = this;
-			var wrapper = function() {
-				callback.apply(proxy, arguments);
-				proxy.removeListener(ev, wrapper);
-			}
-			proxy.addListener(ev, wrapper);
-			return proxy;
-		},
-		all: function(eventName1, eventName2, callback) {
-			var args = Array.prototype.concat.apply([], arguments);
-			args.push(true);
-			_assign.apply(this, args);
-			return this;
-		},
-		removeAll: function(event) {
-			return this.removeListener(event);
-		}
-	});
-	EventProxy.prototype.on = EventProxy.prototype.addListener;
-	EventProxy.prototype.fire = EventProxy.prototype.trigger;
-	EventProxy.prototype.unbind = EventProxy.prototype.removeListener;
-
-})(window, document);
+	if (typeof window === "object" && typeof window.document === "object") {
+		window.sagyChart = sagyChart;
+	}
+})(window);

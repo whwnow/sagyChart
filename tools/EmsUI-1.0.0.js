@@ -13,7 +13,8 @@
     $.ComboBox = function (target, opt) {
         opt = $.extend(true, {
             list: [],
-            speed: 200, //动画速度            
+            speed: 200, //动画速度  
+            maxLength: null,
             comboBox: {
                 width: "auto",  //定义ComboBox边框宽度
                 height: 52,
@@ -98,7 +99,7 @@
                 '<div class="sz"></div>' +
             '</div>' +
             //列表部分
-            '<div class="combo_list" speed="' + opt.speed + '">' +
+            '<div class="combo_list" speed="' + opt.speed + '"  style="' + ( opt.maxLength > opt.list.length && opt.maxLength ? ("height:" + opt.comboBoxItem.height * opt.maxLength) + "px; overflow-y:auto; overflow-x:hidden;" : "") + ' ">' +
                 '<ul ' + (isKo ? 'data-bind="foreach:' + opt.dataBind.itemsSource + '"' : '') + '>' +
                    (isKo ? '<li style="line-height:' + opt.comboBoxItem.font.lineHeight + 'px; height:' + opt.comboBoxItem.height + 'px; font-size:'
                     + opt.comboBoxItem.font.fontSize + 'px; color:' + opt.comboBoxItem.font.color + ';" data-bind="click:function(item){$parent.' + opt.dataBind.selectedChanged + '($parent.' + opt.dataBind.itemsSource + '()[$index()])}"><span data-bind="attr:{itemid:' + opt.dataBind.selectedValuePath + '},text:' + opt.dataBind.displayNamePath + '">' + '</span></li>' : itemList) +
@@ -120,15 +121,15 @@
                 $(target).find('li span').width($(target).width() - 20);
                 $(target).find('.cb_title').width($(target).width() - 40);
             } else {
-               
-                    function serachWidth(){
-                        if (clw.width()) {
-                            $(taget).width(clw.width() + 10).find('.cb_title').width(clw.width() - 70);
-                        } else {
-                            setTimeout(serachWidth, 100);
-                        }
+
+                function serachWidth() {
+                    if (clw.width()) {
+                        $(taget).width(clw.width() + 10).find('.cb_title').width(clw.width() - 70);
+                    } else {
+                        setTimeout(serachWidth, 100);
                     }
-                    setTimeout(serachWidth, 100);
+                }
+                setTimeout(serachWidth, 100);
             }
         } else {
             if (opt.comboBox.width !== "auto") {
@@ -138,7 +139,7 @@
             }
             opt.complete();
         }
-
+        clw.hide();
         //注册ComboBox动作
         registerSilder(target, opt, isKo);
     }
@@ -232,7 +233,7 @@
         }, opt);
 
         //生成按钮样式
-        $(target).addClass('ui_btn ui_btn_style' + opt.btnType).attr('data-role','none').append(opt.content);
+        $(target).addClass('ui_btn ui_btn_style' + opt.btnType).attr('data-role', 'none').append(opt.content);
         drawBtnStyle(opt._target, opt);
     };
 
@@ -302,7 +303,7 @@ $("rect,g,svg,canvas").live("mousedown", function (e) {
     di.removeClass('drop_rotate');
 });
 
-;(function ($) {
+; (function ($) {
     jQuery.fn.extend({
         "disable": function () {
             $(this).attr('disabled', 'disabled');
