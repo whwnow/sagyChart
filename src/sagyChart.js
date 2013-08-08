@@ -15,7 +15,8 @@
 			callback = args[1];
 		if (isString(options)) {
 			options = {
-				renderTo: args[0]
+				renderTo: args[0],
+				template: "a"
 			};
 			// args = Array.prototype.slice.call(args, 1);
 		}
@@ -428,59 +429,77 @@
 
 	function setData() {}
 
+	function initSublineNode(options, parentNode) {
+		var sublineId = generateID(),
+			sublineDiv,
+			i,
+			list,
+			templist = [];
+		sublineDiv = document.createElement("div");
+		sublineDiv.setAttribute("id", sublineId);
+		sublineDiv.style.height = "52px";
+		sublineDiv.style.width = "252px"
+		sublineDiv.style.float = "right";
+		parentNode.appendChild(sublineDiv);
+		list = options.lines;
+		for (i = 0; i < list.length; i++) {
+			templist.push([i, list[i].name]);
+		};
+		$("#" + sublineId).ComboBox({
+			list: templist,
+			//enableMobile: true,
+			comboBox: {
+				width: 252, //定义ComboBox边框宽度
+				height: 52,
+			},
+			defaultOption: "请选择辅助线",
+			callback: function(item) {
+				console.log(item);
+			}
+		});
+		options.comboRef = $("#" + sublineId);
+	}
+
+	function initChartNode() {
+
+	}
 	sagyChart.fn = sagyChart.prototype = {
 		sagyChart: im_version,
 		constructor: sagyChart,
 		init: function(userOptions, callback) {
 			var options,
-				sublineId,
-				checkboxId = generateID(),
-				boxDiv,
-				chartDiv,
-				sublineDiv,
+				boxNode,
 				i,
 				list,
 				templist = [],
-				checkboxDiv;
-
+				chartOption;
+			if (isString(userOptions.template)) {
+				chartOption = defaultTemplate[userOptions.template];
+				userOptions.chartOption = chartOption;
+			}
 			options = merge(defaultOptions, userOptions);
-			boxDiv = document.getElementById(options.renderTo);
-			if (!boxDiv) {
+			boxNode = document.getElementById(options.renderTo);
+			if (!boxNode) {
 				error("give a wrong dom id!");
 				return;
 			}
 			//appendChild
 			if (options.subline.enabled) {
-				sublineDiv = document.createElement("div");
-				sublineId = generateID();
-				sublineDiv.setAttribute("id", sublineId);
-				sublineDiv.style.height = "52px";
-				sublineDiv.style.width = "252px"
-				sublineDiv.style.float = "right";
-				boxDiv.appendChild(sublineDiv);
-				list = options.subline.lines;
-				for (i = 0; i < list.length; i++) {
-					templist.push([i, list[i].name]);
-				};
-				$("#" + sublineId).ComboBox({
-					list: templist,
-					enableMobile: true,
-					comboBox: {
-						width: 252, //定义ComboBox边框宽度
-						height: 52,
-					},
-					defaultOption: "请选择辅助线",
-					callback: function(item) {
-						console.log(item);
-					}
-				})
+				initSubline(options.subline, boxNode);
 			}
+
+
 			//chartDiv = createEle("div");
 			//chartDiv.setAttribute("id", id);
 			//1.创建dom.id
 			//2.辅助线dom
 			//3.
+			this.options = options;
 			this.info = {};
+
+			if (isFunction(callback)) {
+				callback.call(this);
+			}
 		},
 		refresh: function(option, callback) {
 
