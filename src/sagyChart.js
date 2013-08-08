@@ -162,9 +162,6 @@
 	var svg_xText, svg_xRect, svg_yText, svg_yRect;
 
 	var func_pointMouseover = function() {
-		var defaultOpt = defaultOptions,
-			params = defaultOpt.ajaxParam;
-		//BuildingCompare.mouseoverItem = this;
 		var chart = this.series.chart;
 		if (svg_xText && svg_yText) {
 			svg_xText.destroy();
