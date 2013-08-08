@@ -460,8 +460,19 @@
 		options.comboRef = $("#" + sublineId);
 	}
 
-	function initChartNode() {
-
+	function initChartNode(options, parentNode) {
+		var chartId = generateID(),
+			chartDiv,
+			i,
+			list,
+			templist = [];
+		chartDiv = document.createElement("div");
+		chartDiv.setAttribute("id", chartId);
+		chartDiv.style.height = "100%";
+		chartDiv.style.width = "100%"
+		parentNode.appendChild(chartDiv);
+		options.chart.renderTo=chartId;
+		return new Highcharts.Chart(options);
 	}
 	sagyChart.fn = sagyChart.prototype = {
 		sagyChart: im_version,
@@ -469,9 +480,7 @@
 		init: function(userOptions, callback) {
 			var options,
 				boxNode,
-				i,
-				list,
-				templist = [],
+				chart,
 				chartOption;
 			if (isString(userOptions.template)) {
 				chartOption = defaultTemplate[userOptions.template];
@@ -480,15 +489,15 @@
 			options = merge(defaultOptions, userOptions);
 			boxNode = document.getElementById(options.renderTo);
 			if (!boxNode) {
-				error("give a wrong dom id!");
+				error("given a wrong dom id!");
 				return;
 			}
 			//appendChild
 			if (options.subline.enabled) {
-				initSubline(options.subline, boxNode);
+				initSublineNode(options.subline, boxNode);
 			}
 
-
+			chart = initChartNode(options.chartOption, boxNode);
 			//chartDiv = createEle("div");
 			//chartDiv.setAttribute("id", id);
 			//1.创建dom.id
