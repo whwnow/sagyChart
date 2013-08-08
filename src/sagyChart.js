@@ -163,13 +163,17 @@
 
 	var func_pointMouseover = function() {
 		var chart = this.series.chart;
-		if (svg_xText && svg_yText) {
-			svg_xText.destroy();
-			svg_xRect.destroy();
-			svg_yText.destroy();
-			svg_yRect.destroy();
+		if (chart.svg_xText && chart.svg_yText) {
+			chart.svg_xText.destroy();
+			chart.svg_xRect.destroy();
+			chart.svg_yText.destroy();
+			chart.svg_yRect.destroy();
+			chart.svg_xText = null;
+			chart.svg_xRect = null;
+			chart.svg_yText = null;
+			chart.svg_yRect = null;
 		}
-		svg_yRect = chart.renderer.image(defaultOpt.resourcePath + "panel_Y.png", chart.plotLeft - 80, this.plotY + chart.plotTop - 21, 80, 50).attr({
+		chart.svg_yRect = chart.renderer.image(chart.resourcePath + "panel_Y.png", chart.plotLeft - 80, this.plotY + chart.plotTop - 21, 80, 50).attr({
 			fill: "white",
 			zIndex: 99
 		}).add();
@@ -177,41 +181,41 @@
 		var yfontsize = Math.min(32, Math.max(22, parseInt(120 / yStr.length)));
 		var yfontsizepx = yfontsize + "px";
 		var xString = null;
-		svg_yText = chart.renderer.text(yStr, chart.plotLeft - 42, this.plotY + chart.plotTop + parseFloat(yfontsize) / 2).attr({
+		chart.svg_yText = chart.renderer.text(yStr, chart.plotLeft - 42, this.plotY + chart.plotTop + parseFloat(yfontsize) / 2).attr({
 			zIndex: 100,
 			"text-anchor": "middle"
 		}).css({
 			color: "white",
 			fontSize: yfontsizepx
 		}).add();
-		svg_xRect = chart.renderer.image(defaultOpt.resourcePath + "panel_X.png", chart.plotLeft + this.plotX - 52, chart.plotTop + chart.plotHeight, 102, 60).attr({
+		chart.svg_xRect = chart.renderer.image(chart.resourcePath + "panel_X.png", chart.plotLeft + this.plotX - 52, chart.plotTop + chart.plotHeight, 102, 60).attr({
 			fill: "white",
 			zIndex: 99
 		}).add();
-		switch (AnalyseChart.timeType) {
+		switch (chart.timeType) {
 			case 1:
-				var instance = AnalyseChart.instance();
-				if (instance.currentTimeMax != "") {
-					if ((instance.currentTimeMax - instance.currentTimeMin) / 86400000 > 7) {
-						xString = Highcharts.dateFormat("%m.%d", this.x);
-					} else {
-						xString = Highcharts.dateFormat("%H:%M", this.x);
-					}
-				} else {
-					xString = Highcharts.dateFormat("%H:%M", this.x);
-				}
+				// var instance = AnalyseChart.instance();
+				// if (instance.currentTimeMax != "") {
+				// 	if ((instance.currentTimeMax - instance.currentTimeMin) / 86400000 > 7) {
+				// 		xString = Highcharts.dateFormat("%m.%d", this.x);
+				// 	} else {
+				// 		xString = Highcharts.dateFormat("%H:%M", this.x);
+				// 	}
+				// } else {
+				// 	xString = Highcharts.dateFormat("%H:%M", this.x);
+				// }
 				break;
 			case 2:
-				var instance = AnalyseChart.instance();
-				if (instance.currentTimeMax != "") {
-					if ((instance.currentTimeMax - instance.currentTimeMin) / 86400000 > 7) {
-						xString = Highcharts.dateFormat("%m.%d", this.x);
-					} else {
-						xString = Highcharts.dateFormat("%H:%M", this.x);
-					}
-				} else {
-					xString = Highcharts.dateFormat("%H:%M", this.x);
-				}
+				// var instance = AnalyseChart.instance();
+				// if (instance.currentTimeMax != "") {
+				// 	if ((instance.currentTimeMax - instance.currentTimeMin) / 86400000 > 7) {
+				// 		xString = Highcharts.dateFormat("%m.%d", this.x);
+				// 	} else {
+				// 		xString = Highcharts.dateFormat("%H:%M", this.x);
+				// 	}
+				// } else {
+				// 	xString = Highcharts.dateFormat("%H:%M", this.x);
+				// }
 				break;
 			case 3:
 				xString = Highcharts.dateFormat("%m.%d", this.x);
@@ -220,7 +224,7 @@
 				xString = Highcharts.dateFormat("%m", this.x);
 				break;
 		}
-		svg_xText = chart.renderer.text(xString, chart.plotLeft + this.plotX, chart.plotTop + chart.plotHeight + 45).attr({
+		chart.svg_xText = chart.renderer.text(xString, chart.plotLeft + this.plotX, chart.plotTop + chart.plotHeight + 45).attr({
 			zIndex: 100,
 			"text-anchor": "middle"
 		}).css({
@@ -232,59 +236,63 @@
 	};
 
 	var func_pointMouseout = function() {
-		var params = defaultOptions.ajaxParam;
-		if (svg_xText && svg_yText) {
-			svg_xText.destroy();
-			svg_xRect.destroy();
-			svg_yText.destroy();
-			svg_yRect.destroy();
+		var chart = this.series.chart;
+		if (chart.svg_xText && chart.svg_yText) {
+			chart.svg_xText.destroy();
+			chart.svg_xRect.destroy();
+			chart.svg_yText.destroy();
+			chart.svg_yRect.destroy();
+			chart.svg_xText = null;
+			chart.svg_xRect = null;
+			chart.svg_yText = null;
+			chart.svg_yRect = null;
 		}
 	};
 
 	var func_tickPositioner = function() {
-		var params = defaultOptions.ajaxParam;
-		if ((AnalyseChart.timeType == 4 || AnalyseChart.timeType == 3) && this.chart.series[0].xData.length < 30) {
-			return this.chart.series[0].xData;
-		} else if (AnalyseChart.timeType == 1 && this.chart.series[0].xData.length < 15) {
-			return this.chart.series[0].xData;
+		var chart = this.chart;
+		if ((chart.timeType == 4 || chart.timeType == 3) && chart.series[0].xData.length < 30) {
+			return chart.series[0].xData;
+		} else if (chart.timeType == 1 && chart.series[0].xData.length < 15) {
+			return chart.series[0].xData;
 		} else {
 			return null;
 		}
 	};
 
 	var func_axisFormatter = function() {
-		var params = defaultOptions.ajaxParam;
-		instance = AnalyseChart.instance(),
-		result = null,
-		dateObj = new Date(this.value),
-		hour = dateObj.getHours(),
-		day = dateObj.getDate(),
-		month = dateObj.getMonth(),
-		isRepeat = false;
-		switch (AnalyseChart.timeType) {
-			case 1:
-				if (instance.currentTimeMax != "") {
-					if ((instance.currentTimeMax - instance.currentTimeMin) / 86400000 > 7) {
-						result = (month + 1) + "." + day;
-					} else {
-						result = hour % 2 == 0 ? hour : "";
-					}
-				} else {
-					result = hour % 2 == 0 ? hour : "";
-				}
-				break;
-			case 2:
-				result = (month + 1) + "." + day;
-				break;
-			case 3:
-				result = (month + 1) + "." + day;
-				break;
-			case 4:
-				result = month + 1;
-				break;
-		};
-		if (this.isFirst && result == 0) result = "";
-		return result.toString();
+		// var params = defaultOptions.ajaxParam;
+		// instance = AnalyseChart.instance(),
+		// result = null,
+		// dateObj = new Date(this.value),
+		// hour = dateObj.getHours(),
+		// day = dateObj.getDate(),
+		// month = dateObj.getMonth(),
+		// isRepeat = false;
+		// switch (AnalyseChart.timeType) {
+		// 	case 1:
+		// 		if (instance.currentTimeMax != "") {
+		// 			if ((instance.currentTimeMax - instance.currentTimeMin) / 86400000 > 7) {
+		// 				result = (month + 1) + "." + day;
+		// 			} else {
+		// 				result = hour % 2 == 0 ? hour : "";
+		// 			}
+		// 		} else {
+		// 			result = hour % 2 == 0 ? hour : "";
+		// 		}
+		// 		break;
+		// 	case 2:
+		// 		result = (month + 1) + "." + day;
+		// 		break;
+		// 	case 3:
+		// 		result = (month + 1) + "." + day;
+		// 		break;
+		// 	case 4:
+		// 		result = month + 1;
+		// 		break;
+		// };
+		// if (this.isFirst && result == 0) result = "";
+		// return result.toString();
 	};
 
 	var defaultTemplate = {
@@ -468,7 +476,7 @@
 		chartDiv.style.height = "100%";
 		chartDiv.style.width = "100%"
 		parentNode.appendChild(chartDiv);
-		options.chart.renderTo=chartId;
+		options.chart.renderTo = chartId;
 		return new Highcharts.Chart(options);
 	}
 	sagyChart.fn = sagyChart.prototype = {
