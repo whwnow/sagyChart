@@ -146,16 +146,22 @@
 			}]
 		},
 		isConvertUnit: true,
-		ajaxParameter: {
-			timeType: 1,
-			timeOrCount: 24,
-			endTime: new Date - 0,
-			building: "",
-			equipment: "",
-			energyType: 1,
-			functionType: 0,
-			formula: "",
-			isPerMeter: false
+		ajaxOption: {
+			url: "",
+			transferData: {
+				// timeType: 1,
+				// timeOrCount: 24,
+				// endTime: new Date - 0,
+				// building: "",
+				// equipment: "",
+				// energyType: 1,
+				// functionType: 0,
+				// formula: "",
+				// isPerMeter: false,
+			},
+			index: 0,
+			callback: null,
+			pointHandler: null
 		}
 	};
 
@@ -308,7 +314,7 @@
 				marginLeft: 110,
 				//marginTop: 110,
 				spacingLeft: 0,
-				//renderTo: this.options.container,
+				renderTo: "chart_container",
 				height: 650,
 				//marginBottom: 240,
 				//marginRight:100,
@@ -483,7 +489,8 @@
 		sagyChart: im_version,
 		constructor: sagyChart,
 		init: function(userOptions, callback) {
-			var options,
+			var sagy = this,
+				options,
 				boxNode,
 				chart,
 				chartOption;
@@ -491,11 +498,11 @@
 				chartOption = defaultTemplate[userOptions.template];
 				userOptions.chartOption = chartOption;
 			}
+
 			options = merge(defaultOptions, userOptions);
 			boxNode = document.getElementById(options.renderTo);
 			if (!boxNode) {
 				error("given a wrong dom id!");
-				return;
 			}
 			//appendChild
 			if (options.subline.enabled) {
@@ -508,19 +515,53 @@
 			//1.创建dom.id
 			//2.辅助线dom
 			//3.
-			this.options = options;
-			this.info = {};
+			sagy.options = options;
+			sagy.info = {
+				chart: chart
+			};
 
 			if (isFunction(callback)) {
-				callback.call(this);
+				callback.call(sagy);
 			}
 		},
-		refresh: function(option, callback) {
+		refresh: function(userOption, callback) {
+			var sagy = this,
+				options = sagy.options.ajaxOption,
+				_userOption,
+				_callback;
+			_userOption = userOption.transferData ? userOption : {
+				transferData: userOption
+			};
+			extend(options, _userOption);
+			_callback = callback ? callback : options.callback;
+			$.ajax({
+				type: "POST",
+				datatype: "json",
+				data: options.transferData,
+				url: options.url,
+				success: function(json, textStatus) {
+					sagy.setChartData(json, options.index, options.pointHandler);
+				},
+				error: function() {
+					log("ajax:" + options.url + " error!");
+				},
+				// status: 200
+				// statusText: "OK"
+				complete: function(e) {
+					if (isFunction(_callback)) {
+						var status = e.statusText === "OK" ? true : false;
+						_callback.call(sagy, status);
+					}
+				}
+			})
+		},
+		setChartData:function(){
 
 		},
 		destroy: function() {
 
 		},
+
 		//测试redraw能否重绘宽度
 		redraw: function() {
 

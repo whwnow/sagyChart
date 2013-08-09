@@ -11,7 +11,7 @@
 	<script type="text/javascript" src="src/sagyChart.js"></script>
 	<script type="text/javascript">
 		$(function(){
-			eval($("#texteval").val());
+			eval("sagyChart('chartA');");
 			$("#go").click(function(){
 				eval($("#texteval").val());
 			});
@@ -27,7 +27,7 @@
 <div id="container">
 	<div id="chartA"></div>
 	</br>
-	<textarea id="texteval"> sagyChart("chartA");</textarea>
+	<textarea id="texteval"></textarea>
 	<input type="button" id="go" value="run"/>
 </div>
 </body>
