@@ -4,7 +4,11 @@
 		im_obj = {},
 		im_string = im_obj.toString,
 		im_hasOwn = im_obj.hasOwnProperty,
-		document = window.document;
+		document = window.document,
+		MINUTE=3600,
+		HOUR=MINUTE*60,
+		DAY=HOUR*24,
+		WEEK=DAY*7;
 	//document.createElement("div")
 	//setAttribute("className", "t")
 	var sagyChart = function() {
@@ -91,45 +95,11 @@
 		}
 
 		return ret;
-		// var i,
-		// 	len = arguments.length,
-		// 	ret = arguments[0] || {},
-		// 	doCopy = function(copy, original) {
-		// 		var value, oldVal, key;
-
-		// 		if (typeof copy !== "object") {
-		// 			copy = {};
-		// 		}
-
-		// 		for (key in original) {
-		// 			if (im_hasOwn.call(original, key) && im_hasOwn.call(copy, key)) {
-		// 				value = original[key];
-		// 				oldVal = copy[key];
-		// 				if (im_string.call(value) !== im_string.call(oldVal)) continue;
-		// 				if (value && typeof value === "object" && Object.prototype.toString.call(value) !== "[object Array]" && typeof value.nodeType !== "number") {
-		// 					copy[key] = doCopy(copy[key] || {}, value);
-
-		// 				} else {
-		// 					copy[key] = original[key];
-		// 				}
-		// 			}
-		// 		}
-		// 		return copy;
-		// 	};
-		// for (i = 1; i < len; i++) {
-		// 	ret = doCopy(ret, arguments[i]);
-		// }
-
-		// return ret;
 	}
 
-
-	//defaultOptions
 	var defaultOptions = {
 		template: "a",
-		chartOption: {
-
-		},
+		chartOption: {},
 		renderTo: "",
 		resourcePath: "/Images/sagyChart/",
 		subline: {
@@ -161,8 +131,6 @@
 			pointHandler: null
 		}
 	};
-
-	var svg_xText, svg_xRect, svg_yText, svg_yRect;
 
 	var func_pointMouseover = function() {
 		var chart = this.series.chart;
@@ -468,6 +436,13 @@
 		options.comboRef = $("#" + sublineId);
 	}
 
+	/**
+	 * initialise Highcharts' dom node
+	 * @param   options
+	 * @param   parentNode
+	 * @return {Highchart} chart obj
+	 */
+
 	function initChartNode(options, parentNode) {
 		var chartId = generateID(),
 			chartDiv,
@@ -481,6 +456,17 @@
 		parentNode.appendChild(chartDiv);
 		options.chart.renderTo = chartId;
 		return new Highcharts.Chart(options);
+	}
+
+	//todo 数据库是整点么??
+	function calculateTimeType(milliseconds) {
+		switch (true) {
+			case milliseconds <= 3600 * 10:
+				return 1;
+			case milliseconds > 3600 * 10 && milliseconds <= 3600 * 60:
+				return 2;
+			case milliseconds >3600*60&&milliseconds<=3600*
+		}
 	}
 	sagyChart.fn = sagyChart.prototype = {
 		sagyChart: im_version,
@@ -498,20 +484,16 @@
 
 			options = merge(defaultOptions, userOptions);
 			boxNode = document.getElementById(options.renderTo);
+
 			if (!boxNode) {
 				error("given a wrong dom id!");
 			}
-			//appendChild
+
 			if (options.subline.enabled) {
 				initSublineNode(options.subline, boxNode);
 			}
 
 			chart = initChartNode(options.chartOption, boxNode);
-			//chartDiv = createEle("div");
-			//chartDiv.setAttribute("id", id);
-			//1.创建dom.id
-			//2.辅助线dom
-			//3.
 			sagy.options = options;
 			sagy.info = {
 				chart: chart
@@ -539,6 +521,7 @@
 				url: options.url,
 				success: function(json, textStatus) {
 					if (json && json.length !== 0) {
+						sagy.chart.timeType = options.transferData.
 						sagy.setChartData(json, options.index, options.pointHandler);
 					} else {
 						log(options.url + " return null");
@@ -585,18 +568,26 @@
 					}
 					point = pointHandler.call(point, sagy.options.transferData);
 				}
+				point.y = Math.round(point.y * 100) / 100;
 				list.push(point);
 			};
 			index = index > series.length ? series.length - 1 : index;
 			series[index].setDate(list);
 		},
-		destroy: function() {},
+		destroy: function() {
+			var sagy = this;
+			sagy.chart.destroy();
+			document.getElementById(options.renderTo).innerHTML = "";
+
+		},
 		//测试redraw能否重绘宽度
 		redraw: function() {
 
 		}
 	};
 	sagyChart.fn.init.prototype = sagyChart.fn;
+
+
 	if (typeof window === "object" && typeof window.document === "object") {
 		window.sagyChart = sagyChart;
 	}
