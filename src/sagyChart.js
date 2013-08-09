@@ -4,9 +4,7 @@
 		im_obj = {},
 		im_string = im_obj.toString,
 		im_hasOwn = im_obj.hasOwnProperty,
-
-		document = window.document,
-		createEle = document.createElement;
+		document = window.document;
 	//document.createElement("div")
 	//setAttribute("className", "t")
 	var sagyChart = function() {
@@ -18,7 +16,6 @@
 				renderTo: args[0],
 				template: "a"
 			};
-			// args = Array.prototype.slice.call(args, 1);
 		}
 		return new sagyChart.fn.init(options, callback);
 	};
@@ -28,11 +25,11 @@
 	}
 
 	function isArray(arr) {
-		return Object.prototype.toString.call(arr) === "[object Array]";
+		return im_string.call(arr) === "[object Array]";
 	}
 
 	function isFunction(func) {
-		return Object.prototype.toString.call(func) === "[object Function]";
+		return im_string.call(func) === "[object Function]";
 	}
 
 	function generateID() {
@@ -78,7 +75,7 @@
 					if (original.hasOwnProperty(key)) {
 						value = original[key];
 
-						if (value && typeof value === 'object' && Object.prototype.toString.call(value) !== '[object Array]' && typeof value.nodeType !== 'number') {
+						if (value && typeof value === 'object' && im_string.call(value) !== '[object Array]' && typeof value.nodeType !== 'number') {
 							copy[key] = doCopy(copy[key] || {}, value);
 
 						} else {
@@ -519,6 +516,7 @@
 			sagy.info = {
 				chart: chart
 			};
+			sagy.chart = chart;
 
 			if (isFunction(callback)) {
 				callback.call(sagy);
@@ -540,7 +538,11 @@
 				data: options.transferData,
 				url: options.url,
 				success: function(json, textStatus) {
-					sagy.setChartData(json, options.index, options.pointHandler);
+					if (json && json.length !== 0) {
+						sagy.setChartData(json, options.index, options.pointHandler);
+					} else {
+						log(options.url + " return null");
+					}
 				},
 				error: function() {
 					log("ajax:" + options.url + " error!");
@@ -555,13 +557,40 @@
 				}
 			})
 		},
-		setChartData:function(){
+		setChartData: function(json, index, pointHandler) {
+			var sagy = this,
+				series = sagy.chart.series,
+				xArray = json.xDate,
+				yArray = json.yData,
+				len = xArray.length,
+				i,
+				list = [],
+				point,
+				min = Math.min.apply(Math, yData),
+				max = Math.max.apply(Math, yData),
+				findLastData = true;
 
+			for (i = len - 1; i >= 0; i--) {
+				point = {};
+				point.x = xArray[i];
+				point.y = yArray[i];
+				if (isFunction(pointHandler)) {
+					point.isMin = point.y === min;
+					point.isMax = point.y === max;
+					if (point.y && findLastData) {
+						findLastData = false;
+						point.isLast = true;
+					} else {
+						point.isLast = false;
+					}
+					point = pointHandler.call(point, sagy.options.transferData);
+				}
+				list.push(point);
+			};
+			index = index > series.length ? series.length - 1 : index;
+			series[index].setDate(list);
 		},
-		destroy: function() {
-
-		},
-
+		destroy: function() {},
 		//测试redraw能否重绘宽度
 		redraw: function() {
 
