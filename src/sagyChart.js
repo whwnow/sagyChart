@@ -5,10 +5,10 @@
 		im_string = im_obj.toString,
 		im_hasOwn = im_obj.hasOwnProperty,
 		document = window.document,
-		MINUTE=3600,
-		HOUR=MINUTE*60,
-		DAY=HOUR*24,
-		WEEK=DAY*7;
+		MINUTE = 3600,
+		HOUR = MINUTE * 60,
+		DAY = HOUR * 24,
+		WEEK = DAY * 7;
 	//document.createElement("div")
 	//setAttribute("className", "t")
 	var sagyChart = function() {
@@ -459,13 +459,19 @@
 	}
 
 	//todo 数据库是整点么??
+
 	function calculateTimeType(milliseconds) {
 		switch (true) {
-			case milliseconds <= 3600 * 10:
+			case milliseconds <= 10 * MINUTE:
 				return 1;
-			case milliseconds > 3600 * 10 && milliseconds <= 3600 * 60:
+			case milliseconds > 10 * MINUTE && milliseconds <= HOUR:
 				return 2;
-			case milliseconds >3600*60&&milliseconds<=3600*
+			case milliseconds > HOUR && milliseconds <= DAY:
+				return 3;
+			case milliseconds > DAY && milliseconds <= WEEK:
+				return 4;
+			case milliseconds > WEEK && milliseconds < WEEK * 5:
+				return 5;
 		}
 	}
 	sagyChart.fn = sagyChart.prototype = {
