@@ -533,7 +533,6 @@
 				url: options.url,
 				success: function(json, textStatus) {
 					if (json && json.length !== 0) {
-						sagy.chart.timeType = options.transferData.
 						sagy.setChartData(json, options.index, options.pointHandler);
 					} else {
 						log(options.url + " return null");
