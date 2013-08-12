@@ -330,7 +330,6 @@
 					x: true,
 					dashStyle: "ShortDash",
 					width: 1
-					//zIndex: 10
 				}, {
 					y: true,
 					dashStyle: "ShortDash",
@@ -349,7 +348,6 @@
 				gridLineDashStyle: "longDash",
 				gridLineWidth: 1,
 				type: "datetime",
-				//showFirstLabel: false,
 				title: {
 					text: null
 				},
@@ -363,10 +361,6 @@
 					formatter: func_axisFormatter
 				},
 				offset: 25,
-				//startOnTick: true,
-				//endOnTick: true,
-				//minPadding: 0,
-				//maxPadding: 0,
 				lineWidth: 0,
 				tickPositioner: func_tickPositioner
 			},
@@ -396,9 +390,7 @@
 			},
 			series: [{
 				turboThreshold: 200000,
-				//name: "用电量",
 				type: "column",
-				//id: "dataseries",
 				color: "columnColor",
 				data: [],
 				connectNulls: false,
@@ -573,13 +565,12 @@
 				min = Math.min.apply(Math, yData),
 				max = Math.max.apply(Math, yData),
 				findLastData = true;
-			//calculateTimeType
 			//todo
 			//验证数字
-			//if (xArray[0] && xArray[1]) {
+
 			chart.timeType = calculateTimeType(xArray[1] - xArray[0]);
 			chart.recentLength = y.xArray.length;
-			//}
+
 			for (i = len - 1; i >= 0; i--) {
 				point = {};
 				point.x = xArray[i];
@@ -604,6 +595,8 @@
 		destroy: function() {
 			var sagy = this;
 			sagy.chart.destroy();
+			sagy.chart = null;
+			sagy.info = {};
 			document.getElementById(options.renderTo).innerHTML = "";
 
 		},
