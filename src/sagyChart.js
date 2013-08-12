@@ -151,7 +151,7 @@
 		var yStr = this.y.formatStr();
 		var yfontsize = Math.min(32, Math.max(22, parseInt(120 / yStr.length)));
 		var yfontsizepx = yfontsize + "px";
-		var xString = null;
+		var xString;
 		chart.svg_yText = chart.renderer.text(yStr, chart.plotLeft - 42, this.plotY + chart.plotTop + parseFloat(yfontsize) / 2).attr({
 			zIndex: 100,
 			"text-anchor": "middle"
@@ -165,33 +165,22 @@
 		}).add();
 		switch (chart.timeType) {
 			case 1:
-				// var instance = AnalyseChart.instance();
-				// if (instance.currentTimeMax != "") {
-				// 	if ((instance.currentTimeMax - instance.currentTimeMin) / 86400000 > 7) {
-				// 		xString = Highcharts.dateFormat("%m.%d", this.x);
-				// 	} else {
-				// 		xString = Highcharts.dateFormat("%H:%M", this.x);
-				// 	}
-				// } else {
-				// 	xString = Highcharts.dateFormat("%H:%M", this.x);
-				// }
+				xString = Highcharts.dateFormat("%H:%M", this.x);
 				break;
 			case 2:
-				// var instance = AnalyseChart.instance();
-				// if (instance.currentTimeMax != "") {
-				// 	if ((instance.currentTimeMax - instance.currentTimeMin) / 86400000 > 7) {
-				// 		xString = Highcharts.dateFormat("%m.%d", this.x);
-				// 	} else {
-				// 		xString = Highcharts.dateFormat("%H:%M", this.x);
-				// 	}
+				// if (chart.recentLength > 100) {
+				// 	xString = Highcharts.dateFormat("%m.%d", this.x);
 				// } else {
 				// 	xString = Highcharts.dateFormat("%H:%M", this.x);
 				// }
+				// break;
+				xString = Highcharts.dateFormat("%H:%M", this.x);
 				break;
 			case 3:
+			case 4:
 				xString = Highcharts.dateFormat("%m.%d", this.x);
 				break;
-			case 4:
+			case 5:
 				xString = Highcharts.dateFormat("%m", this.x);
 				break;
 		}
@@ -222,16 +211,38 @@
 
 	var func_tickPositioner = function() {
 		var chart = this.chart;
-		if ((chart.timeType == 4 || chart.timeType == 3) && chart.series[0].xData.length < 30) {
-			return chart.series[0].xData;
-		} else if (chart.timeType == 1 && chart.series[0].xData.length < 15) {
-			return chart.series[0].xData;
-		} else {
-			return null;
+		switch (chart.timeType) {
+			case 1:
+				if (chart.recentLength < 15) {
+					return chart.series[0].xData;
+				}
+			case 3:
+			case 4:
+				if (chart.recentLength < 30) {
+					return chart.series[0].xData;
+				}
+			default:
+				return null;
 		}
 	};
 
 	var func_axisFormatter = function() {
+		var chart = this.chart;
+		switch (chart.timeType) {
+			case 1:
+				xString = Highcharts.dateFormat("%H:%M", this.x);
+				break;
+			case 2:
+				xString = Highcharts.dateFormat("%H:%M", this.x);
+				break;
+			case 3:
+			case 4:
+				xString = Highcharts.dateFormat("%m.%d", this.x);
+				break;
+			case 5:
+				xString = Highcharts.dateFormat("%m", this.x);
+				break;
+		}
 		// var params = defaultOptions.ajaxParam;
 		// instance = AnalyseChart.instance(),
 		// result = null,
@@ -458,7 +469,8 @@
 		return new Highcharts.Chart(options);
 	}
 
-	//todo 数据库是整点么??
+	//todo 
+	//数据库是整点么??
 
 	function calculateTimeType(milliseconds) {
 		switch (true) {
@@ -470,8 +482,10 @@
 				return 3;
 			case milliseconds > DAY && milliseconds <= WEEK:
 				return 4;
-			case milliseconds > WEEK && milliseconds < WEEK * 5:
+			case milliseconds > WEEK:
 				return 5;
+			default:
+				return 2;
 		}
 	}
 	sagyChart.fn = sagyChart.prototype = {
@@ -548,7 +562,8 @@
 		},
 		setChartData: function(json, index, pointHandler) {
 			var sagy = this,
-				series = sagy.chart.series,
+				chart = sagy.chart,
+				series = chart.series,
 				xArray = json.xDate,
 				yArray = json.yData,
 				len = xArray.length,
@@ -558,7 +573,13 @@
 				min = Math.min.apply(Math, yData),
 				max = Math.max.apply(Math, yData),
 				findLastData = true;
-
+			//calculateTimeType
+			//todo
+			//验证数字
+			//if (xArray[0] && xArray[1]) {
+			chart.timeType = calculateTimeType(xArray[1] - xArray[0]);
+			chart.recentLength = y.xArray.length;
+			//}
 			for (i = len - 1; i >= 0; i--) {
 				point = {};
 				point.x = xArray[i];
