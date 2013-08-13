@@ -1,4 +1,5 @@
 (function(window, undefined) {
+	//7.7 for fun~
 	//some global variable
 	var im_version = "0.0.1",
 		im_obj = {},
