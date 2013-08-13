@@ -97,6 +97,15 @@
 		return ret;
 	}
 
+	function Point(x, y) {
+		this.x = x;
+		this.y = y;
+		this.isMin = false;
+		this.isMax = false;
+		this.isLast = false;
+		this.color = "";
+	}
+
 	var defaultOptions = {
 		template: "a",
 		chartOption: {},
@@ -512,9 +521,11 @@
 
 			chart = initChartNode(options.chartOption, boxNode);
 			sagy.options = options;
-			sagy.info = {
-				chart: chart
-			};
+			//todo what should be in info
+
+			// sagy.info = {
+			// 	chart: chart
+			// };
 			sagy.chart = chart;
 
 			if (isFunction(callback)) {
@@ -529,7 +540,9 @@
 			_userOption = userOption.transferData ? userOption : {
 				transferData: userOption
 			};
-			extend(options, _userOption);
+			if (userOption) {
+				extend(options, _userOption);
+			}
 			_callback = callback ? callback : options.callback;
 			$.ajax({
 				type: "POST",
@@ -576,9 +589,7 @@
 			chart.recentLength = y.xArray.length;
 
 			for (i = len - 1; i >= 0; i--) {
-				point = {};
-				point.x = xArray[i];
-				point.y = yArray[i];
+				point = new Point(xArray[i], yArray[i]);
 				if (isFunction(pointHandler)) {
 					point.isMin = point.y === min;
 					point.isMax = point.y === max;
@@ -604,9 +615,10 @@
 			document.getElementById(options.renderTo).innerHTML = "";
 
 		},
-		//测试redraw能否重绘宽度
 		redraw: function() {
-
+			var sagy = this;
+			sagy.chart = new Highcharts.Chart(sagy.options.chartOption);
+			sagy.refresh();
 		}
 	};
 	sagyChart.fn.init.prototype = sagyChart.fn;
