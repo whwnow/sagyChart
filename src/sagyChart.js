@@ -227,22 +227,29 @@
 	};
 
 	var func_axisFormatter = function() {
-		var chart = this.chart;
+		var chart = this.chart,
+			prev = chart.prev || "",
+			result;
 		switch (chart.timeType) {
 			case 1:
-				xString = Highcharts.dateFormat("%H:%M", this.x);
+				result = Highcharts.dateFormat("%H:%M", this.value);
 				break;
 			case 2:
-				xString = Highcharts.dateFormat("%H:%M", this.x);
+				result = Highcharts.dateFormat("%H:%M", this.value);
 				break;
 			case 3:
 			case 4:
-				xString = Highcharts.dateFormat("%m.%d", this.x);
+				result = Highcharts.dateFormat("%m.%d", this.value);
 				break;
 			case 5:
-				xString = Highcharts.dateFormat("%m", this.x);
+				result = Highcharts.dateFormat("%m", this.value);
 				break;
 		}
+		chart.prev = result;
+		if (result === prev) {
+			result = "";
+		}
+		return result;
 		// var params = defaultOptions.ajaxParam;
 		// instance = AnalyseChart.instance(),
 		// result = null,
@@ -405,8 +412,6 @@
 		},
 		b: {}
 	};
-
-	function setData() {}
 
 	function initSublineNode(options, parentNode) {
 		var sublineId = generateID(),
@@ -605,6 +610,7 @@
 		}
 	};
 	sagyChart.fn.init.prototype = sagyChart.fn;
+
 
 
 	if (typeof window === "object" && typeof window.document === "object") {
