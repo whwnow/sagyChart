@@ -178,12 +178,6 @@
 				xString = Highcharts.dateFormat("%H:%M", this.x);
 				break;
 			case 2:
-				// if (chart.recentLength > 100) {
-				// 	xString = Highcharts.dateFormat("%m.%d", this.x);
-				// } else {
-				// 	xString = Highcharts.dateFormat("%H:%M", this.x);
-				// }
-				// break;
 				xString = Highcharts.dateFormat("%H:%M", this.x);
 				break;
 			case 3:
@@ -221,19 +215,23 @@
 
 	var func_tickPositioner = function() {
 		var chart = this.chart;
+		var result;
 		switch (chart.timeType) {
 			case 1:
 				if (chart.recentLength < 15) {
-					return chart.series[0].xData;
+					result = chart.series[0].xData;
 				}
+				break;
 			case 3:
 			case 4:
 				if (chart.recentLength < 30) {
-					return chart.series[0].xData;
+					result = chart.series[0].xData;
 				}
+				break;
 			default:
-				return null;
+				result = null;
 		}
+		return result;
 	};
 
 	var func_axisFormatter = function() {
@@ -269,27 +267,6 @@
 		// month = dateObj.getMonth(),
 		// isRepeat = false;
 		// switch (AnalyseChart.timeType) {
-		// 	case 1:
-		// 		if (instance.currentTimeMax != "") {
-		// 			if ((instance.currentTimeMax - instance.currentTimeMin) / 86400000 > 7) {
-		// 				result = (month + 1) + "." + day;
-		// 			} else {
-		// 				result = hour % 2 == 0 ? hour : "";
-		// 			}
-		// 		} else {
-		// 			result = hour % 2 == 0 ? hour : "";
-		// 		}
-		// 		break;
-		// 	case 2:
-		// 		result = (month + 1) + "." + day;
-		// 		break;
-		// 	case 3:
-		// 		result = (month + 1) + "." + day;
-		// 		break;
-		// 	case 4:
-		// 		result = month + 1;
-		// 		break;
-		// };
 		// if (this.isFirst && result == 0) result = "";
 		// return result.toString();
 	};
@@ -392,7 +369,6 @@
 				title: {
 					text: null
 				},
-				offset: 10,
 				lineWidth: 0,
 				labels: {
 					align: "right",
@@ -432,13 +408,13 @@
 		sublineDiv = document.createElement("div");
 		sublineDiv.setAttribute("id", sublineId);
 		sublineDiv.style.height = "52px";
-		sublineDiv.style.width = "252px"
+		sublineDiv.style.width = "252px";
 		sublineDiv.style.float = "right";
 		parentNode.appendChild(sublineDiv);
 		list = options.lines;
 		for (i = 0; i < list.length; i++) {
 			templist.push([i, list[i].name]);
-		};
+		}
 		$("#" + sublineId).ComboBox({
 			list: templist,
 			//enableMobile: true,
@@ -470,7 +446,7 @@
 		chartDiv = document.createElement("div");
 		chartDiv.setAttribute("id", chartId);
 		chartDiv.style.height = "100%";
-		chartDiv.style.width = "100%"
+		chartDiv.style.width = "100%";
 		parentNode.appendChild(chartDiv);
 		options.chart.renderTo = chartId;
 		return new Highcharts.Chart(options);
@@ -525,7 +501,7 @@
 			//todo what should be in info
 
 			// sagy.info = {
-			// 	chart: chart
+			//	chart: chart
 			// };
 			sagy.chart = chart;
 
@@ -568,7 +544,7 @@
 						_callback.call(sagy, status);
 					}
 				}
-			})
+			});
 		},
 		setChartData: function(json, index, pointHandler) {
 			var sagy = this,
@@ -580,14 +556,14 @@
 				i,
 				list = [],
 				point,
-				min = Math.min.apply(Math, yData),
-				max = Math.max.apply(Math, yData),
+				min = Math.min.apply(Math, json.yData),
+				max = Math.max.apply(Math, json.yData),
 				findLastData = true;
 			//todo
 			//验证数字
 
 			chart.timeType = calculateTimeType(xArray[1] - xArray[0]);
-			chart.recentLength = y.xArray.length;
+			chart.recentLength = xArray.length;
 
 			for (i = len - 1; i >= 0; i--) {
 				point = new Point(xArray[i], yArray[i]);
@@ -604,7 +580,7 @@
 				}
 				point.y = Math.round(point.y * 100) / 100;
 				list.push(point);
-			};
+			}
 			index = index > series.length ? series.length - 1 : index;
 			series[index].setDate(list);
 		},
@@ -613,7 +589,7 @@
 			sagy.chart.destroy();
 			sagy.chart = null;
 			sagy.info = {};
-			document.getElementById(options.renderTo).innerHTML = "";
+			document.getElementById(sagy.options.renderTo).innerHTML = "";
 
 		},
 		redraw: function() {
