@@ -46,7 +46,7 @@
 	}
 
 	function log(obj) {
-		window.console && console.log(obj);
+		console.log(obj);
 	}
 
 	function extend(a, b) {
@@ -122,7 +122,11 @@
 				name: "报警值"
 			}]
 		},
-		isConvertUnit: true,
+		convertUnit: {
+			enabled:true,
+			consistent:false,
+			baseUnit:"kWh"
+		},
 		ajaxOption: {
 			url: "",
 			transferData: {
@@ -144,25 +148,18 @@
 
 	var func_pointMouseover = function() {
 		var chart = this.series.chart;
-		if (chart.svg_xText && chart.svg_yText) {
-			chart.svg_xText.destroy();
-			chart.svg_xRect.destroy();
-			chart.svg_yText.destroy();
-			chart.svg_yRect.destroy();
-			chart.svg_xText = null;
-			chart.svg_xRect = null;
-			chart.svg_yText = null;
-			chart.svg_yRect = null;
+		if (chart.hoverPoint) {
+			func_pointMouseout.call(this);
 		}
 		chart.svg_yRect = chart.renderer.image(chart.resourcePath + "panel_Y.png", chart.plotLeft - 80, this.plotY + chart.plotTop - 21, 80, 50).attr({
 			fill: "white",
 			zIndex: 99
 		}).add();
-		var yStr = this.y.formatStr();
-		var yfontsize = Math.min(32, Math.max(22, parseInt(120 / yStr.length)));
+		var yStr = formatStr(this.y);
+		var yfontsize = yStr.length > 4 ? 24 : 30;
 		var yfontsizepx = yfontsize + "px";
 		var xString;
-		chart.svg_yText = chart.renderer.text(yStr, chart.plotLeft - 42, this.plotY + chart.plotTop + parseFloat(yfontsize) / 2).attr({
+		chart.svg_yText = chart.renderer.text(yStr, chart.plotLeft - 42, this.plotY + chart.plotTop + yfontsize / 2).attr({
 			zIndex: 100,
 			"text-anchor": "middle"
 		}).css({
@@ -195,13 +192,12 @@
 			color: "white",
 			fontSize: "32px"
 		}).add();
-
-		return false;
+		chart.hoverPoint = this;
 	};
 
 	var func_pointMouseout = function() {
 		var chart = this.series.chart;
-		if (chart.svg_xText && chart.svg_yText) {
+		if (chart.svg_xText) {
 			chart.svg_xText.destroy();
 			chart.svg_xRect.destroy();
 			chart.svg_yText.destroy();
@@ -211,6 +207,7 @@
 			chart.svg_yText = null;
 			chart.svg_yRect = null;
 		}
+		chart.hoverPoint = null;
 	};
 
 	var func_tickPositioner = function() {
@@ -258,17 +255,6 @@
 			result = "";
 		}
 		return result;
-		// var params = defaultOptions.ajaxParam;
-		// instance = AnalyseChart.instance(),
-		// result = null,
-		// dateObj = new Date(this.value),
-		// hour = dateObj.getHours(),
-		// day = dateObj.getDate(),
-		// month = dateObj.getMonth(),
-		// isRepeat = false;
-		// switch (AnalyseChart.timeType) {
-		// if (this.isFirst && result == 0) result = "";
-		// return result.toString();
 	};
 
 	var defaultTemplate = {
@@ -399,6 +385,31 @@
 		b: {}
 	};
 
+	function formatStr(val) {
+		var num = parseFloat(val);
+		var decimal, isMinus = false,
+			resultStr;
+		if (!isNaN(num)) {
+			if (num < 0) {
+				isMinus = true;
+				num *= -1;
+			}
+			decimal = num >= 10000 ? 1 : num >= 1000 ? 10 : num >= 100 ? 100 : num >= 10 ? 1000 : 10000;
+			num = Math.round(num * decimal) / decimal;
+			if (num >= 100000) {
+				resultStr = num.toExponential(1);
+			} else {
+				resultStr = num.toString();
+			}
+			if (isMinus) {
+				resultStr = "-" + resultStr;
+			}
+			return resultStr;
+		} else {
+			return "";
+		}
+	}
+
 	function initSublineNode(options, parentNode) {
 		var sublineId = generateID(),
 			sublineDiv,
@@ -451,9 +462,6 @@
 		options.chart.renderTo = chartId;
 		return new Highcharts.Chart(options);
 	}
-
-	//todo 
-	//数据库是整点么??
 
 	function calculateTimeType(milliseconds) {
 		switch (true) {
