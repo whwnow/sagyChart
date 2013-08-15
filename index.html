@@ -4,6 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<title></title>
 	<link rel="stylesheet" type="text/css" href="style.css">
+	<link rel="stylesheet" type="text/css" href="sagyChart.css">
 	<link rel="stylesheet" type="text/css" href="tools/EmsUI-1.0.0.css" />
 	<script type="text/javascript" src="tools/jquery-1.7.2.min.js"></script>
 	<script type="text/javascript" src="tools/EmsUI-1.0.0.js"></script>
@@ -24,11 +25,18 @@
 	</script>
 </head>
 <body>
-<div id="container">
-	<div id="chartA"></div>
-	</br>
-	<textarea id="texteval"></textarea>
-	<input type="button" id="go" value="run"/>
-</div>
+	<div class="sagyChart_sublime_container">
+		<div class="sagyChart_sublime_left">
+			<input class="sagyChart_sublime_left_input" type="text" data-role="none"/>
+			<span class="sagyChart_sublime_left_span">111</span>
+		</div>
+		<img class="sagyChart_sublime_right" src="./images/bj_del.png" />
+	</div>
+	<div id="container">
+		<div id="chartA"></div>
+		</br>
+		<textarea id="texteval"></textarea>
+		<input type="button" id="go" value="run"/>
+	</div>
 </body>
 </html>
