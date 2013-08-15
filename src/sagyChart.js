@@ -1,7 +1,7 @@
 (function(window, undefined) {
 	//7.7 for fun~
 	//some global variable
-	var im_version = "0.0.1",
+	var im_version = "0.0.5",
 		im_obj = {},
 		im_string = im_obj.toString,
 		im_hasOwn = im_obj.hasOwnProperty,
@@ -166,7 +166,7 @@
 			fill: "white",
 			zIndex: 99
 		}).add();
-		var yStr = formatStr(this.y);
+		var yStr = numFormat(this.y);
 		var yfontsize = yStr.length > 4 ? 24 : 30;
 		var yfontsizepx = yfontsize + "px";
 		var xString;
@@ -396,7 +396,7 @@
 		b: {}
 	};
 
-	function formatStr(val) {
+	function numFormat(val) {
 		var num = parseFloat(val);
 		var decimal, isMinus = false,
 			resultStr;
@@ -677,10 +677,12 @@
 		};
 	};
 
-	function convertUnitOne() {
+	// function convertUnitOne() {
 
-	}
+	// }
 
+	sagyChart.numFormat = numFormat;
+	sagyChart.version=im_version;
 
 	if (typeof window === "object" && typeof window.document === "object") {
 		window.sagyChart = sagyChart;
