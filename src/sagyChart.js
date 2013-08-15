@@ -9,7 +9,16 @@
 		MINUTE = 3600,
 		HOUR = MINUTE * 60,
 		DAY = HOUR * 24,
-		WEEK = DAY * 7;
+		WEEK = DAY * 7,
+		math = Math,
+		mathRound = math.round,
+		mathRandom = math.random,
+		mathFloor = math.floor,
+		mathCeil = math.ceil,
+		mathMax = math.max,
+		mathMin = math.min,
+		mathAbs = math.abs,
+		mathPow = math.pow;
 	//document.createElement("div")
 	//setAttribute("className", "t")
 	var sagyChart = function() {
@@ -38,7 +47,7 @@
 	}
 
 	function generateID() {
-		return "sagy" + Math.random().toString(36).substring(2, 6); // + Math.random().toString(36).substring(2, 15)
+		return "sagy" + mathRandom().toString(36).substring(2, 6); // + Math.random().toString(36).substring(2, 15)
 	}
 
 	function error(msg) {
@@ -123,9 +132,10 @@
 			}]
 		},
 		convertUnit: {
-			enabled:true,
-			consistent:false,
-			baseUnit:"kWh"
+			enabled: true,
+			consistent: false,
+			baseUnit: "kWh",
+			convertedUnit: "kWh"
 		},
 		ajaxOption: {
 			url: "",
@@ -395,7 +405,7 @@
 				num *= -1;
 			}
 			decimal = num >= 10000 ? 1 : num >= 1000 ? 10 : num >= 100 ? 100 : num >= 10 ? 1000 : 10000;
-			num = Math.round(num * decimal) / decimal;
+			num = mathRound(num * decimal) / decimal;
 			if (num >= 100000) {
 				resultStr = num.toExponential(1);
 			} else {
@@ -564,8 +574,8 @@
 				i,
 				list = [],
 				point,
-				min = Math.min.apply(Math, json.yData),
-				max = Math.max.apply(Math, json.yData),
+				min = mathMin.apply(math, json.yData),
+				max = mathMax.apply(math, json.yData),
 				findLastData = true;
 			//todo
 			//验证数字
@@ -586,7 +596,7 @@
 					}
 					point = pointHandler.call(point, sagy.options.transferData);
 				}
-				point.y = Math.round(point.y * 100) / 100;
+				point.y = mathRound(point.y * 100) / 100;
 				list.push(point);
 			}
 			index = index > series.length ? series.length - 1 : index;
@@ -608,6 +618,49 @@
 	};
 	sagyChart.fn.init.prototype = sagyChart.fn;
 
+	function convertUnitArr(arr, baseUnit) {
+		var max = mathMax.apply(math, arr),
+			baseUnitObj = unitDocs[baseUnit],
+			convertUnit = baseUnit,
+			len = max < 0 ? -1 : 0,
+			temp = max,
+			ratio,
+			i,
+			templist,
+			result;
+		if (!baseUnitObj) {
+			return {
+				data: arr,
+				unit: baseUnit
+			};
+		}
+		ratio = baseUnitObj.ratio;
+		while (temp >= ratio * 10) {
+			temp = temp / ratio;
+			if (unitDocs[baseUnitObj.higherLevel]) {
+				convertUnit = unitDocs[baseUnitObj.higherLevel];
+				len++;
+			} else {
+				break;
+			}
+		}
+
+		for (i = 0; i < arr.length; i++) {
+			if (arr[i] === null) {
+				templist.push(null);
+			} else {
+				templist.push(arr[i] * mathPow(ratio, len));
+			}
+		}
+		return {
+			data: templist,
+			unit: convertUnit
+		};
+	}
+
+	function convertUnitOne() {
+
+	}
 
 
 	if (typeof window === "object" && typeof window.document === "object") {
