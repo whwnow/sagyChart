@@ -134,8 +134,9 @@
 		convertUnit: {
 			enabled: true,
 			consistent: false,
-			baseUnit: "kWh",
-			convertedUnit: "kWh"
+			//baseUnit: "kWh",
+			//convertedUnit: null,
+			//convertedLen: null
 		},
 		ajaxOption: {
 			url: "",
@@ -518,9 +519,11 @@
 			sagy.options = options;
 			//todo what should be in info
 
-			// sagy.info = {
-			//	chart: chart
-			// };
+			sagy.info = {
+				chart: chart,
+				unit: null,
+				length: 0
+			};
 			sagy.chart = chart;
 
 			if (isFunction(callback)) {
@@ -559,7 +562,7 @@
 				complete: function(e) {
 					if (isFunction(_callback)) {
 						var status = e.statusText === "OK" ? true : false;
-						_callback.call(sagy, status);
+						_callback.call(sagy.info, status);
 					}
 				}
 			});
@@ -567,6 +570,7 @@
 		setChartData: function(json, index, pointHandler) {
 			var sagy = this,
 				chart = sagy.chart,
+				options = sagy.options,
 				series = chart.series,
 				xArray = json.xDate,
 				yArray = json.yData,
@@ -576,13 +580,20 @@
 				point,
 				min = mathMin.apply(math, json.yData),
 				max = mathMax.apply(math, json.yData),
-				findLastData = true;
+				findLastData = true,
+				temp;
 			//todo
-			//验证数字
+			//如果要换单位,需要传单位过来
+
 
 			chart.timeType = calculateTimeType(xArray[1] - xArray[0]);
 			chart.recentLength = xArray.length;
 
+			if (options.convertUnit.enabled) {
+				temp = sagy.convertUnitArr(json.yData, json.unit);
+				sagy.info.unit = temp.unit;
+				yData = temp.data;
+			}
 			for (i = len - 1; i >= 0; i--) {
 				point = new Point(xArray[i], yArray[i]);
 				if (isFunction(pointHandler)) {
@@ -618,8 +629,9 @@
 	};
 	sagyChart.fn.init.prototype = sagyChart.fn;
 
-	function convertUnitArr(arr, baseUnit) {
-		var max = mathMax.apply(math, arr),
+	sagyChart.fn.convertUnitArr = function(arr, baseUnit) {
+		var options = this.options.convertUnit,
+			max = mathMax.apply(math, arr),
 			baseUnitObj = unitDocs[baseUnit],
 			convertUnit = baseUnit,
 			len = max < 0 ? -1 : 0,
@@ -645,6 +657,13 @@
 			}
 		}
 
+		if (options.consistent && options.convertedUnit) {
+			convertUnit = options.convertedUnit;
+			len = options.convertedLen;
+		} else {
+			options.convertedUnit = convertUnit;
+			options.convertedLen = len;
+		}
 		for (i = 0; i < arr.length; i++) {
 			if (arr[i] === null) {
 				templist.push(null);
@@ -656,7 +675,7 @@
 			data: templist,
 			unit: convertUnit
 		};
-	}
+	};
 
 	function convertUnitOne() {
 
