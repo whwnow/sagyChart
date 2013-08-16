@@ -677,9 +677,26 @@
 		};
 	};
 
-	// function convertUnitOne() {
+	function Subline(){
+		this.options=options;
+		this.init.apply(this,arguments);
+	}
 
-	// }
+	Subline.prototype={
+		constructor: Subline,
+		init:function(){
+
+		},
+		show:function(){
+
+		},
+		hide:function(){
+
+		},
+		adjust:function(){
+
+		}
+	};
 
 	sagyChart.numFormat = numFormat;
 	sagyChart.version=im_version;
