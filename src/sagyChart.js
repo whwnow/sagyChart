@@ -707,8 +707,12 @@
 			each(lines, function(i, item) {
 				if (item.renderTo) {
 					item.node = document.getElementById(item.renderTo);
+				} else {
+					item.node = subline.node;
 				}
 			});
+			subline.sagy = sagy;
+			subline.options = options;
 			subline.lines = lines;
 			subline.showed = {};
 		},
@@ -736,7 +740,7 @@
 		hide: function(index) {
 			var args = arguments,
 				subline = this,
-				yAxis = subline.chart.yAxis,
+				yAxis = subline.sagy.chart.yAxis,
 				showed = subline.showed;
 			index = ~~index;
 			subline.node.style.display = "none";
@@ -749,11 +753,43 @@
 			var args = arguments,
 				subline = this,
 				lines = subline.lines,
-				showed = subline.showed;
+				showed = subline.showed,
+				deviation = subline.options.deviation,
+				chart = subline.sagy.chart,
+				yAxises = chart.yAxis,
+				yAxis;
 			each(showed, function(key, item) {
-
+				yAxis = yAxises[~~item.index];
+				yAxis.removePlotLine(key);
 			});
-
+			each(showed, function(key, item) {
+				var path,
+					top,
+					node,
+					plotSvg;
+				yAxis = yAxises[~~item.index];
+				yAxis.addPlotLine({
+					color: item.color,
+					dashStyle: "Solid",
+					width: 2,
+					value: item.value,
+					id: key,
+					zIndex: 99
+				});
+				plotSvg = yAxis.plotLinesAndBands[yAxis.plotLinesAndBands.length - 1].svgElem;
+				plotSvg.shadow(true);
+				if (item.node) {
+					node = item.node;
+					if (item.value > yAxis.max) {
+						top = chart.plotTop;
+						node.style.top = (top - node.clientHeight / 2 + deviation) + "px";
+					} else {
+						path = plotSvg.d;
+						top = path.split(" ", 3)[2];
+						node.style.top = (top - node.clientHeight / 2 + deviation) + "px";
+					}
+				}
+			});
 		}
 	};
 
