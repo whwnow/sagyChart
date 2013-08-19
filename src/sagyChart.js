@@ -110,10 +110,6 @@
 	function Point(x, y) {
 		this.x = x;
 		this.y = y;
-		this.isMin = false;
-		this.isMax = false;
-		this.isLast = false;
-		this.color = "";
 	}
 
 	var defaultOptions = {
@@ -124,12 +120,16 @@
 		subline: {
 			enabled: true,
 			lines: [{
+				value: 0,
 				color: "#87B6FE",
 				name: "参考值"
 			}, {
+				value: 0,
 				color: "#87B6FE",
 				name: "报警值"
-			}]
+			}],
+			renderTo: "",
+			deviation:0
 		},
 		convertUnit: {
 			enabled: true,
@@ -493,18 +493,18 @@
 	sagyChart.fn = sagyChart.prototype = {
 		sagyChart: im_version,
 		constructor: sagyChart,
-		init: function(userOptions, callback) {
+		init: function(userOption, callback) {
 			var sagy = this,
 				options,
 				boxNode,
 				chart,
 				chartOption;
-			if (isString(userOptions.template)) {
-				chartOption = defaultTemplate[userOptions.template];
-				userOptions.chartOption = chartOption;
+			if (isString(userOption.template)) {
+				chartOption = defaultTemplate[userOption.template];
+				userOption.chartOption = chartOption;
 			}
 
-			options = merge(defaultOptions, userOptions);
+			options = merge(defaultOptions, userOption);
 			boxNode = document.getElementById(options.renderTo);
 
 			if (!boxNode) {
@@ -512,19 +512,14 @@
 			}
 
 			if (options.subline.enabled) {
-				initSublineNode(options.subline, boxNode);
+				sagy.subline = sagy.info.subline = new Subline(sagy, options.subline);
 			}
 
 			chart = initChartNode(options.chartOption, boxNode);
 			sagy.options = options;
 			//todo what should be in info
 
-			sagy.info = {
-				chart: chart,
-				unit: null,
-				length: 0
-			};
-			sagy.chart = chart;
+			sagy.chart = sagy.info.chart = chart;
 
 			if (isFunction(callback)) {
 				callback.call(sagy);
@@ -551,7 +546,7 @@
 					if (json && json.length !== 0) {
 						sagy.setChartData(json, options.index, options.pointHandler);
 					} else {
-						log(options.url + " return null");
+						log("ajax:" + options.url + " return null");
 					}
 				},
 				error: function() {
@@ -578,22 +573,29 @@
 				i,
 				list = [],
 				point,
-				min = mathMin.apply(math, json.yData),
-				max = mathMax.apply(math, json.yData),
+				min,
+				max,
 				findLastData = true,
-				temp;
-			//todo
-			//如果要换单位,需要传单位过来
+				temp,
+				sublines;
 
 
 			chart.timeType = calculateTimeType(xArray[1] - xArray[0]);
 			chart.recentLength = xArray.length;
-
+			//如果要换单位,需要传单位过来
 			if (options.convertUnit.enabled) {
 				temp = sagy.convertUnitArr(json.yData, json.unit);
 				sagy.info.unit = temp.unit;
-				yData = temp.data;
+				json.yData = temp.data;
 			}
+
+			if (options.subline.enabled) {
+				sublines = merge(options.lines, json.lines);
+				options.subline.lines = sublines;
+			}
+
+			min = mathMin.apply(math, json.yData);
+			max = mathMax.apply(math, json.yData);
 			for (i = len - 1; i >= 0; i--) {
 				point = new Point(xArray[i], yArray[i]);
 				if (isFunction(pointHandler)) {
@@ -677,29 +679,32 @@
 		};
 	};
 
-	function Subline(){
-		this.options=options;
-		this.init.apply(this,arguments);
+	function Subline() {
+		this.init.apply(this, arguments);
 	}
 
-	Subline.prototype={
+	Subline.prototype = {
 		constructor: Subline,
-		init:function(){
+		init: function(sagy, options) {
+			var subline = this;
+			var lineNode = subline.node = document.getElementById(options.renderTo);
+			subline.height=lineNode.clientHeight;
+			subline.lines=options.lines;
 
 		},
-		show:function(){
+		show: function() {
+			
+		},
+		hide: function() {
 
 		},
-		hide:function(){
-
-		},
-		adjust:function(){
+		adjust: function() {
 
 		}
 	};
 
 	sagyChart.numFormat = numFormat;
-	sagyChart.version=im_version;
+	sagyChart.version = im_version;
 
 	if (typeof window === "object" && typeof window.document === "object") {
 		window.sagyChart = sagyChart;
