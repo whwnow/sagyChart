@@ -46,6 +46,10 @@
 		return im_string.call(func) === "[object Function]";
 	}
 
+	function isNumber(n) {
+		return typeof n === 'number';
+	}
+
 	function generateID() {
 		return "sagy" + mathRandom().toString(36).substring(2, 6); // + Math.random().toString(36).substring(2, 15)
 	}
@@ -56,6 +60,30 @@
 
 	function log(obj) {
 		console.log(obj);
+	}
+
+	function each(obj, callback) {
+		var value,
+			i = 0,
+			length = obj.length;
+		if (isArray(obj)) {
+			for (; i < length; i++) {
+				value = callback.call(obj[i], i, obj[i]);
+
+				if (value === false) {
+					break;
+				}
+			}
+		} else {
+			for (i in obj) {
+				value = callback.call(obj[i], i, obj[i]);
+
+				if (value === false) {
+					break;
+				}
+			}
+		}
+		return obj;
 	}
 
 	function extend(a, b) {
@@ -129,7 +157,7 @@
 				name: "报警值"
 			}],
 			renderTo: "",
-			deviation:0
+			deviation: 0
 		},
 		convertUnit: {
 			enabled: true,
@@ -544,8 +572,9 @@
 				url: options.url,
 				success: function(json, textStatus) {
 					if (json && json.length !== 0) {
-						sagy.setChartData(json, options.index, options.pointHandler);
+						sagy.setData(json, options.index, options.pointHandler);
 					} else {
+						sagy.clearData(index);
 						log("ajax:" + options.url + " return null");
 					}
 				},
@@ -562,7 +591,7 @@
 				}
 			});
 		},
-		setChartData: function(json, index, pointHandler) {
+		setData: function(json, index, pointHandler) {
 			var sagy = this,
 				chart = sagy.chart,
 				options = sagy.options,
@@ -577,8 +606,9 @@
 				max,
 				findLastData = true,
 				temp,
-				sublines;
-
+				sublines,
+				lenSeries,
+				j;
 
 			chart.timeType = calculateTimeType(xArray[1] - xArray[0]);
 			chart.recentLength = xArray.length;
@@ -612,8 +642,21 @@
 				point.y = mathRound(point.y * 100) / 100;
 				list.push(point);
 			}
-			index = index > series.length ? series.length - 1 : index;
-			series[index].setDate(list);
+			index = index > lenSeries || index < lenSeries * -1 ? lenSeries - 1 : index;
+			j = +index + (index < 0 ? lenSeries : 0);
+			series[j].setDate(list);
+		},
+		clearData: function(index, isDeep) {
+			var series = this.chart.series,
+				lenSeries = series.length,
+				j;
+			index = index > lenSeries || index < lenSeries * -1 ? lenSeries - 1 : index;
+			j = +index + (index < 0 ? lenSeries : 0);
+			if (isDeep) {
+				series[j].destroy();
+			} else {
+				series[j].setDate(null);
+			}
 		},
 		destroy: function() {
 			var sagy = this;
@@ -688,17 +731,40 @@
 		init: function(sagy, options) {
 			var subline = this;
 			var lineNode = subline.node = document.getElementById(options.renderTo);
-			subline.height=lineNode.clientHeight;
-			subline.lines=options.lines;
-
+			subline.height = lineNode.clientHeight;
+			subline.lines = options.lines;
+			subline.showed = {};
 		},
 		show: function() {
-			
+			var args = arguments,
+				subline = this,
+				lines = subline.lines,
+				showed = subline.showed;
+			subline.node.style.display = "block";
+			if (args.length === 0) {
+				each(lines, function(i, item) {
+					showed["line" + i] = item;
+				});
+			} else if (isNumber(args[0])) {
+				each(args, function(i) {
+					showed["line" + i] = lines[i];
+				});
+			} else {
+				each(args, function(i, item) {
+					showed["line" + i] = merge(lines[i], item);
+				});
+			}
+			subline.adjust.apply(subline, args);
 		},
 		hide: function() {
+			subline.node.style.display = "none";
 
 		},
 		adjust: function() {
+			var args = arguments,
+				subline = this,
+				showed = subline.showed;
+
 
 		}
 	};
