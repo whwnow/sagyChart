@@ -156,7 +156,7 @@
 				color: "#87B6FE",
 				name: "报警值"
 			}],
-			renderTo: "",
+			renderTo: null,
 			deviation: 0
 		},
 		convertUnit: {
@@ -449,37 +449,6 @@
 		}
 	}
 
-	function initSublineNode(options, parentNode) {
-		var sublineId = generateID(),
-			sublineDiv,
-			i,
-			list,
-			templist = [];
-		sublineDiv = document.createElement("div");
-		sublineDiv.setAttribute("id", sublineId);
-		sublineDiv.style.height = "52px";
-		sublineDiv.style.width = "252px";
-		sublineDiv.style.float = "right";
-		parentNode.appendChild(sublineDiv);
-		list = options.lines;
-		for (i = 0; i < list.length; i++) {
-			templist.push([i, list[i].name]);
-		}
-		$("#" + sublineId).ComboBox({
-			list: templist,
-			//enableMobile: true,
-			comboBox: {
-				width: 252, //定义ComboBox边框宽度
-				height: 52,
-			},
-			defaultOption: "请选择辅助线",
-			callback: function(item) {
-				console.log(item);
-			}
-		});
-		options.comboRef = $("#" + sublineId);
-	}
-
 	/**
 	 * initialise Highcharts' dom node
 	 * @param   options
@@ -574,7 +543,7 @@
 					if (json && json.length !== 0) {
 						sagy.setData(json, options.index, options.pointHandler);
 					} else {
-						sagy.clearData(index);
+						sagy.clearData(options.index);
 						log("ajax:" + options.url + " return null");
 					}
 				},
@@ -729,10 +698,18 @@
 	Subline.prototype = {
 		constructor: Subline,
 		init: function(sagy, options) {
-			var subline = this;
-			var lineNode = subline.node = document.getElementById(options.renderTo);
-			subline.height = lineNode.clientHeight;
-			subline.lines = options.lines;
+			var subline = this,
+				lines = options.lines;
+			if (options.renderTo) {
+				subline.node = document.getElementById(options.renderTo);
+				//subline.height = lineNode.clientHeight;
+			}
+			each(lines, function(i, item) {
+				if (item.renderTo) {
+					item.node = document.getElementById(item.renderTo);
+				}
+			});
+			subline.lines = lines;
 			subline.showed = {};
 		},
 		show: function() {
@@ -754,17 +731,28 @@
 					showed["line" + i] = merge(lines[i], item);
 				});
 			}
-			subline.adjust.apply(subline, args);
+			subline.adjust();
 		},
-		hide: function() {
+		hide: function(index) {
+			var args = arguments,
+				subline = this,
+				yAxis = subline.chart.yAxis,
+				showed = subline.showed;
+			index = ~~index;
 			subline.node.style.display = "none";
-
+			each(showed, function(key) {
+				yAxis[index].removePlotLine(key);
+			});
+			showed = {};
 		},
 		adjust: function() {
 			var args = arguments,
 				subline = this,
+				lines = subline.lines,
 				showed = subline.showed;
+			each(showed, function(key, item) {
 
+			});
 
 		}
 	};
