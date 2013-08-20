@@ -6,7 +6,7 @@
 		im_string = im_obj.toString,
 		im_hasOwn = im_obj.hasOwnProperty,
 		document = window.document,
-		MINUTE = 3600,
+		MINUTE = 60000,
 		HOUR = MINUTE * 60,
 		DAY = HOUR * 24,
 		WEEK = DAY * 7,
@@ -144,7 +144,7 @@
 		template: "a",
 		chartOption: {},
 		renderTo: "",
-		resourcePath: "/Images/sagyChart/",
+		resourcePath: "./images/",
 		subline: {
 			enabled: true,
 			lines: [{
@@ -195,7 +195,7 @@
 			zIndex: 99
 		}).add();
 		var yStr = numFormat(this.y);
-		var yfontsize = yStr.length > 4 ? 24 : 30;
+		var yfontsize = yStr.length > 4 ? 20 : 30;
 		var yfontsizepx = yfontsize + "px";
 		var xString;
 		chart.svg_yText = chart.renderer.text(yStr, chart.plotLeft - 42, this.plotY + chart.plotTop + yfontsize / 2).attr({
@@ -279,7 +279,7 @@
 				result = Highcharts.dateFormat("%H:%M", this.value);
 				break;
 			case 2:
-				result = Highcharts.dateFormat("%H:%M", this.value);
+				result = Highcharts.dateFormat("%m.%d", this.value);
 				break;
 			case 3:
 			case 4:
@@ -409,7 +409,7 @@
 			series: [{
 				turboThreshold: 200000,
 				type: "column",
-				color: "columnColor",
+				color: "#e59c9b",
 				data: [],
 				connectNulls: false,
 				states: {
@@ -496,11 +496,11 @@
 				boxNode,
 				chart,
 				chartOption;
+			sagy.info = {};
 			if (isString(userOption.template)) {
 				chartOption = defaultTemplate[userOption.template];
 				userOption.chartOption = chartOption;
 			}
-
 			options = merge(defaultOptions, userOption);
 			boxNode = document.getElementById(options.renderTo);
 
@@ -513,6 +513,7 @@
 			}
 
 			chart = initChartNode(options.chartOption, boxNode);
+			chart.resourcePath = options.resourcePath;
 			sagy.options = options;
 			//todo what should be in info
 
@@ -565,7 +566,7 @@
 				chart = sagy.chart,
 				options = sagy.options,
 				series = chart.series,
-				xArray = json.xDate,
+				xArray = json.xData,
 				yArray = json.yData,
 				len = xArray.length,
 				i,
@@ -577,8 +578,9 @@
 				temp,
 				sublines,
 				lenSeries,
-				j;
-
+				j,
+				values;
+			//todo 循环检测是否是数字
 			chart.timeType = calculateTimeType(xArray[1] - xArray[0]);
 			chart.recentLength = xArray.length;
 			//如果要换单位,需要传单位过来
@@ -592,28 +594,32 @@
 				sublines = merge(options.lines, json.lines);
 				options.subline.lines = sublines;
 			}
-
-			min = mathMin.apply(math, json.yData);
-			max = mathMax.apply(math, json.yData);
+			values = json.yData.filter(function(val) {
+				return val !== null;
+			});
+			min = mathMin.apply(math, values);
+			max = mathMax.apply(math, values);
 			for (i = len - 1; i >= 0; i--) {
 				point = new Point(xArray[i], yArray[i]);
 				if (isFunction(pointHandler)) {
 					point.isMin = point.y === min;
 					point.isMax = point.y === max;
+					//todo 根据当天日期判断是否是最新点
 					if (point.y && findLastData) {
 						findLastData = false;
 						point.isLast = true;
 					} else {
 						point.isLast = false;
 					}
-					point = pointHandler.call(point, sagy.options.transferData);
+					//point = 
+					pointHandler.call(point, sagy.options.ajaxOption.transferData);
 				}
 				point.y = mathRound(point.y * 100) / 100;
-				list.push(point);
+				list.unshift(point);
 			}
 			index = index > lenSeries || index < lenSeries * -1 ? lenSeries - 1 : index;
 			j = +index + (index < 0 ? lenSeries : 0);
-			series[j].setDate(list);
+			series[j].setData(list);
 		},
 		clearData: function(index, isDeep) {
 			var series = this.chart.series,
@@ -624,7 +630,7 @@
 			if (isDeep) {
 				series[j].destroy();
 			} else {
-				series[j].setDate(null);
+				series[j].setData(null);
 			}
 		},
 		destroy: function() {
@@ -652,7 +658,7 @@
 			temp = max,
 			ratio,
 			i,
-			templist,
+			templist = [],
 			result;
 		if (!baseUnitObj) {
 			return {

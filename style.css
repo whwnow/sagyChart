@@ -33,9 +33,9 @@ body{
 #code>div {
     background: #eee;
     /*margin: 10px 10px 0px 0px;*/
-    /*margin-bottom: 20px;*/
-    padding: 1px;
-    height: 400px;
+    margin-bottom: 20px;
+    /*padding: 1px;*/
+    /*height: 400px;*/
     /*border-radius:  2px 0px 2px 0px;*/
     /*-webkit-box-shadow: 2px 2px 5px #999;*/
 }

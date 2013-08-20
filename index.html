@@ -11,7 +11,7 @@
 	<script type="text/javascript" src="src/sagyChart.js"></script>
 	<script type="text/javascript">
 		$(function(){
-			eval("sagyChart('chartA');");
+			eval("window.chart = sagyChart('chartA');");
 			$("#go").click(function(){
 				eval($("#texteval").val());
 			});
@@ -34,7 +34,28 @@
 			</div>
 		</div>
 		</br>
-		<textarea id="texteval"></textarea>
+		<textarea id="texteval">
+chart.refresh({
+	transferData: {
+		BodySign: "1000040001",
+		EndTime: null,
+		EnergyTypeId: 1,
+		IsArea: false,
+		IsThumbnail: false,
+		IsEqument: false,
+		Sign: "1",
+		StartTime: "1376928000000",
+		Timestep: 1
+	},
+	url: "http://localhost:51284/SingleBuildingCompare/TestChartData?user=Lonston",
+	index: 0,
+	pointHandler:function(option){
+		if(this.isMin){
+			this.color="blue";
+		}
+	}
+});
+		</textarea>
 		<input type="button" id="go" value="run"/>
 	</div>
 </body>

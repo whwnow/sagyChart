@@ -4,18 +4,33 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<title></title>
 	<link rel="stylesheet" type="text/css" href="style.css">
+	<link rel="stylesheet" type="text/css" href="code.css">
 	<script type="text/javascript">
 	</script>
 </head>
 <body>
 	<div id="code">
-		<div id="chartA">
-		sdfdsf
-		</div>
-		<div id="chartA">
-		
-		sdfds
-	</div>
+		<code>
+chart.refresh({
+	transferData: {
+		BodySign: "1000040001",
+		EndTime: null,
+		EnergyTypeId: 1,
+		IsArea: false,
+		IsThumbnail: false,
+		IsEqument: false,
+		Sign: "1",
+		StartTime: "1376928000000",
+		Timestep: 1
+	},
+	url: "http://localhost:51284/SingleBuildingCompare/TestChartData?user=Lonston",
+	index: 0,
+	pointHandler:function(option){
+		if(this.isMin){
+			this.color="blue";
+		}
+	}
+});</code>
 	</div>
 </body>
 </html>
