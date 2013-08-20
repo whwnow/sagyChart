@@ -12,24 +12,6 @@
     top: -6px; 
     background: url(./images/bj_bg.png) no-repeat;
 }
-
-.sagyChart_sublime_left input{
-    position: absolute;
-    top: 40px;
-    left: 7px;
-    width: 65px; 
-    height: 20px; 
-    border-top-left-radius: 6px; 
-    border-top-right-radius: 6px; 
-    border-bottom-right-radius: 6px; 
-    border-bottom-left-radius: 6px; 
-    border: 1px solid rgb(188, 100, 30); 
-    background-color: rgb(254, 243, 234); 
-    padding: 10px 2px 10px 0px; 
-    text-align: center; 
-    font-size: 26px;
-    display: none;
-}
 .sagyChart_sublime_left span{
     text-align: center; 
     line-height: 47px; 
