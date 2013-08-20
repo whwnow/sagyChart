@@ -305,7 +305,7 @@
 			chart: {
 				backgroundColor: "rgba(255,0,0,0)",
 				spacingBottom: 20,
-				marginRight: 80,
+				marginRight: 110,
 				marginLeft: 110,
 				//marginTop: 110,
 				spacingLeft: 0,
@@ -518,7 +518,7 @@
 			//todo what should be in info
 
 			sagy.chart = sagy.info.chart = chart;
-
+			sagy.version = im_version;
 			if (isFunction(callback)) {
 				callback.call(sagy);
 			}

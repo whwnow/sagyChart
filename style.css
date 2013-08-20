@@ -2,6 +2,7 @@
 body{
     padding-bottom: 10px;
     height: 1000px;
+    background: #f6f5ec;
 }
 
 #container {
@@ -21,17 +22,13 @@ body{
 }
 
 
-#code {
-    -webkit-column-count: 2;
-    -webkit-column-gap: 20px;
-
-    /*-webkit-column-rule: 1px dashed #333;*/
-    /*-webkit-column-width: 460px;*/
-    /*margin-right: 10px;*/
-    
+.col {
+    float: left;
+    margin-right: 35px;
+    width: 48%;
 }
-#code>div {
-    background: #eee;
+.col>div {
+    background: #fff;
     /*margin: 10px 10px 0px 0px;*/
     margin-bottom: 20px;
     /*padding: 1px;*/
