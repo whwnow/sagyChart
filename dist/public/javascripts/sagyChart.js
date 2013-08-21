@@ -144,7 +144,7 @@
 		template: "a",
 		chartOption: {},
 		renderTo: "",
-		resourcePath: "./images/",
+		resourcePath: "./images/sagyChart/",
 		subline: {
 			enabled: true,
 			lines: [{

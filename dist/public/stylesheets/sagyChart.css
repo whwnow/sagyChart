@@ -10,7 +10,7 @@
     position: absolute; 
     left: 65px; 
     top: -6px; 
-    background: url(./images/bj_bg.png) no-repeat;
+    background: url(/images/sagychart/bj_bg.png) no-repeat;
 }
 .sagyChart_sublime_left span{
     text-align: center; 
