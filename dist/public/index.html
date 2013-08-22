@@ -37,21 +37,28 @@
 		<textarea id="texteval">
 chart.refresh({
 	transferData: {
-		BodySign: "1000040001",
-		EndTime: null,
-		EnergyTypeId: 1,
-		IsArea: false,
-		IsThumbnail: false,
-		IsEqument: false,
-		Sign: "1",
-		StartTime: "1376928000000",
-		Timestep: 1
+		bodySign: "1000040001",
+		endTime: null,
+		energyTypeId: 1,
+		isArea: false,
+		isThumbnail: false,
+		isEqument: false,
+		sign: "1",
+		startTime: "1376928000000",
+		timestep: 1,
+		number: 10000
 	},
-	url: "http://localhost:51284/SingleBuildingCompare/TestChartData?user=Lonston",
+	url: "./chart",
 	index: 0,
-	pointHandler:function(option){
-		if(this.isMin){
-			this.color="blue";
+	pointHandler: function(option) {
+		if (this.isLast) {
+			this.color = "green";
+		}
+		if (this.isMin) {
+			this.color = "blue";
+		}
+		if (this.isMax) {
+			this.color = "red";
 		}
 	}
 });

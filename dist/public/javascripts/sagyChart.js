@@ -1,5 +1,4 @@
 (function(window, undefined) {
-	//7.7 for fun~
 	//some global variable
 	var im_version = "0.0.5",
 		im_obj = {},
@@ -167,7 +166,7 @@
 			//convertedLen: null
 		},
 		ajaxOption: {
-			url: "",
+			url: "./chart",
 			transferData: {
 				// timeType: 1,
 				// timeOrCount: 24,
@@ -276,10 +275,10 @@
 			result;
 		switch (chart.timeType) {
 			case 1:
-				result = Highcharts.dateFormat("%H:%M", this.value);
-				break;
+				// result = Highcharts.dateFormat("%H:%M", this.value);
+				// break;
 			case 2:
-				result = Highcharts.dateFormat("%m.%d", this.value);
+				result = Highcharts.dateFormat("%H:%M", this.value);
 				break;
 			case 3:
 			case 4:
@@ -585,16 +584,16 @@
 			chart.recentLength = xArray.length;
 			//如果要换单位,需要传单位过来
 			if (options.convertUnit.enabled) {
-				temp = sagy.convertUnitArr(json.yData, json.unit);
+				temp = sagy.convertUnitArr(yArray, json.unit);
 				sagy.info.unit = temp.unit;
-				json.yData = temp.data;
+				yArray = temp.data;
 			}
 
 			if (options.subline.enabled) {
 				sublines = merge(options.lines, json.lines);
 				options.subline.lines = sublines;
 			}
-			values = json.yData.filter(function(val) {
+			values = yArray.filter(function(val) {
 				return val !== null;
 			});
 			min = mathMin.apply(math, values);
@@ -639,8 +638,8 @@
 			sagy.chart = null;
 			sagy.info = {};
 			document.getElementById(sagy.options.renderTo).innerHTML = "";
-
 		},
+
 		redraw: function() {
 			var sagy = this;
 			sagy.chart = new Highcharts.Chart(sagy.options.chartOption);
@@ -654,7 +653,7 @@
 			max = mathMax.apply(math, arr),
 			baseUnitObj = unitDocs[baseUnit],
 			convertUnit = baseUnit,
-			len = max < 0 ? -1 : 0,
+			len = max < 10 ? -1 : 0,
 			temp = max,
 			ratio,
 			i,
@@ -667,14 +666,18 @@
 			};
 		}
 		ratio = baseUnitObj.ratio;
-		while (temp >= ratio * 10) {
-			temp = temp / ratio;
-			if (unitDocs[baseUnitObj.higherLevel]) {
-				convertUnit = unitDocs[baseUnitObj.higherLevel];
-				len++;
-			} else {
-				break;
+		if (len === 0) {
+			while (temp >= ratio * 10) {
+				temp = temp / ratio;
+				if (unitDocs[baseUnitObj.higherLevel]) {
+					convertUnit = baseUnitObj.higherLevel;
+					len++;
+				} else {
+					break;
+				}
 			}
+		} else {
+			convertUnit = baseUnitObj.lowerLevel;
 		}
 
 		if (options.consistent && options.convertedUnit) {
@@ -688,7 +691,7 @@
 			if (arr[i] === null) {
 				templist.push(null);
 			} else {
-				templist.push(arr[i] * mathPow(ratio, len));
+				templist.push(arr[i] * mathPow(ratio, len * -1));
 			}
 		}
 		return {
@@ -744,8 +747,7 @@
 			subline.adjust();
 		},
 		hide: function(index) {
-			var args = arguments,
-				subline = this,
+			var subline = this,
 				yAxis = subline.sagy.chart.yAxis,
 				showed = subline.showed;
 			index = ~~index;
@@ -756,8 +758,7 @@
 			showed = {};
 		},
 		adjust: function() {
-			var args = arguments,
-				subline = this,
+			var subline = this,
 				lines = subline.lines,
 				showed = subline.showed,
 				deviation = subline.options.deviation,
