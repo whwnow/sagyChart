@@ -150,12 +150,14 @@
 				value: 0,
 				color: "#87B6FE",
 				name: "参考值"
-			}, {
-				value: 0,
-				color: "#87B6FE",
-				name: "报警值"
-			}],
-			renderTo: null,
+			}, 
+			// {
+			// 	value: 100,
+			// 	color: "#87B6FE",
+			// 	name: "报警值"
+			// }
+			],
+			renderTo: "sagyChart_sublime",
 			deviation: 0
 		},
 		convertUnit: {
@@ -486,6 +488,12 @@
 				return 2;
 		}
 	}
+
+	function iterator(name, scope) {
+		return function() {
+			scope[name].apply(scope, arguments);
+		};
+	}
 	sagyChart.fn = sagyChart.prototype = {
 		sagyChart: im_version,
 		constructor: sagyChart,
@@ -494,7 +502,8 @@
 				options,
 				boxNode,
 				chart,
-				chartOption;
+				chartOption,
+				subline;
 			sagy.info = {};
 			if (isString(userOption.template)) {
 				chartOption = defaultTemplate[userOption.template];
@@ -508,9 +517,11 @@
 			}
 
 			if (options.subline.enabled) {
-				sagy.subline = sagy.info.subline = new Subline(sagy, options.subline);
+				sagy.subline = subline = sagy.info.subline = new Subline(sagy, options.subline);
+				sagy.showLine = iterator("show", subline);
+				sagy.hideLine = iterator("hide", subline);
+				sagy.adjustLine = iterator("adjust", subline);
 			}
-
 			chart = initChartNode(options.chartOption, boxNode);
 			chart.resourcePath = options.resourcePath;
 			sagy.options = options;
@@ -560,6 +571,7 @@
 				}
 			});
 		},
+		//todo 单位平米驻图需要换颜色
 		setData: function(json, index, pointHandler) {
 			var sagy = this,
 				chart = sagy.chart,
@@ -575,7 +587,7 @@
 				max,
 				findLastData = true,
 				temp,
-				sublines,
+				subline,
 				lenSeries,
 				j,
 				values;
@@ -590,8 +602,8 @@
 			}
 
 			if (options.subline.enabled) {
-				sublines = merge(options.lines, json.lines);
-				options.subline.lines = sublines;
+				subline = merge(options.lines, json.lines);
+				options.subline.lines = subline;
 			}
 			values = yArray.filter(function(val) {
 				return val !== null;
@@ -610,7 +622,6 @@
 					} else {
 						point.isLast = false;
 					}
-					//point = 
 					pointHandler.call(point, sagy.options.ajaxOption.transferData);
 				}
 				point.y = mathRound(point.y * 100) / 100;
@@ -694,6 +705,9 @@
 				templist.push(arr[i] * mathPow(ratio, len * -1));
 			}
 		}
+		each(this.subline.lines, function(i, item) {
+			item.value = item.value * mathPow(ratio, len * -1);
+		});
 		return {
 			data: templist,
 			unit: convertUnit
@@ -741,7 +755,7 @@
 				});
 			} else {
 				each(args, function(i, item) {
-					showed["line" + i] = merge(lines[i], item);
+					showed["line" + i] = merge(lines[i], item[i]);
 				});
 			}
 			subline.adjust();
@@ -789,11 +803,11 @@
 					node = item.node;
 					if (item.value > yAxis.max) {
 						top = chart.plotTop;
-						node.style.top = (top - node.clientHeight / 2 + deviation) + "px";
+						node.style.top = (top - node.scrollHeight / 2 + deviation) + "px";
 					} else {
 						path = plotSvg.d;
 						top = path.split(" ", 3)[2];
-						node.style.top = (top - node.clientHeight / 2 + deviation) + "px";
+						node.style.top = (top - node.scrollHeight / 2 + deviation) + "px";
 					}
 				}
 			});
