@@ -49,6 +49,14 @@
 		return typeof n === 'number';
 	}
 
+	function isEmptyObject(obj) {
+		var name;
+		for (name in obj) {
+			return false;
+		}
+		return true;
+	}
+
 	function generateID() {
 		return "sagy" + mathRandom().toString(36).substring(2, 6); // + Math.random().toString(36).substring(2, 15)
 	}
@@ -64,25 +72,28 @@
 	function each(obj, callback) {
 		var value,
 			i = 0,
-			length = obj.length;
-		if (isArray(obj)) {
-			for (; i < length; i++) {
-				value = callback.call(obj[i], i, obj[i]);
+			length;
+		if (obj) {
+			if (isArray(obj)) {
+				length = obj.length;
+				for (; i < length; i++) {
+					value = callback.call(obj[i], i, obj[i]);
 
-				if (value === false) {
-					break;
+					if (value === false) {
+						break;
+					}
+				}
+			} else {
+				for (i in obj) {
+					value = callback.call(obj[i], i, obj[i]);
+
+					if (value === false) {
+						break;
+					}
 				}
 			}
-		} else {
-			for (i in obj) {
-				value = callback.call(obj[i], i, obj[i]);
-
-				if (value === false) {
-					break;
-				}
-			}
+			return obj;
 		}
-		return obj;
 	}
 
 	function extend(a, b) {
@@ -147,18 +158,18 @@
 		subline: {
 			enabled: true,
 			lines: [{
-				value: 0,
-				color: "#87B6FE",
-				name: "参考值"
-			}, 
-			// {
-			// 	value: 100,
-			// 	color: "#87B6FE",
-			// 	name: "报警值"
-			// }
+					value: 0,
+					color: "#87B6FE",
+					name: "参考值"
+				},
+				// {
+				// 	value: 100,
+				// 	color: "#87B6FE",
+				// 	name: "报警值"
+				// }
 			],
 			renderTo: "sagyChart_sublime",
-			deviation: 0
+			deviation: 22
 		},
 		convertUnit: {
 			enabled: true,
@@ -574,6 +585,8 @@
 		//todo 单位平米驻图需要换颜色
 		setData: function(json, index, pointHandler) {
 			var sagy = this,
+				subline = sagy.subline,
+				lines = subline.lines,
 				chart = sagy.chart,
 				options = sagy.options,
 				series = chart.series,
@@ -587,24 +600,24 @@
 				max,
 				findLastData = true,
 				temp,
-				subline,
 				lenSeries,
 				j,
 				values;
 			//todo 循环检测是否是数字
 			chart.timeType = calculateTimeType(xArray[1] - xArray[0]);
 			chart.recentLength = xArray.length;
-			//如果要换单位,需要传单位过来
+
+			if (options.subline.enabled) {
+				each(json.lines, function(i, item) {
+					lines[i].value = item.value;
+				});
+			}
 			if (options.convertUnit.enabled) {
 				temp = sagy.convertUnitArr(yArray, json.unit);
 				sagy.info.unit = temp.unit;
 				yArray = temp.data;
 			}
 
-			if (options.subline.enabled) {
-				subline = merge(options.lines, json.lines);
-				options.subline.lines = subline;
-			}
 			values = yArray.filter(function(val) {
 				return val !== null;
 			});
@@ -630,6 +643,9 @@
 			index = index > lenSeries || index < lenSeries * -1 ? lenSeries - 1 : index;
 			j = +index + (index < 0 ? lenSeries : 0);
 			series[j].setData(list);
+			if (!isEmptyObject(subline.showed)) {
+				sagy.adjustLine();
+			}
 		},
 		clearData: function(index, isDeep) {
 			var series = this.chart.series,
@@ -661,6 +677,7 @@
 
 	sagyChart.fn.convertUnitArr = function(arr, baseUnit) {
 		var options = this.options.convertUnit,
+			subline = this.subline,
 			max = mathMax.apply(math, arr),
 			baseUnitObj = unitDocs[baseUnit],
 			convertUnit = baseUnit,
@@ -705,9 +722,12 @@
 				templist.push(arr[i] * mathPow(ratio, len * -1));
 			}
 		}
-		each(this.subline.lines, function(i, item) {
-			item.value = item.value * mathPow(ratio, len * -1);
-		});
+		if (!isEmptyObject(subline.showed)) {
+			each(subline.lines, function(i, item) {
+				item.convertedValue = item.value * mathPow(ratio, len * -1);
+			});
+		}
+
 		return {
 			data: templist,
 			unit: convertUnit
@@ -744,18 +764,20 @@
 				subline = this,
 				lines = subline.lines,
 				showed = subline.showed;
-			subline.node.style.display = "block";
 			if (args.length === 0) {
 				each(lines, function(i, item) {
 					showed["line" + i] = item;
+					item.node.style.display = "block";
 				});
 			} else if (isNumber(args[0])) {
 				each(args, function(i) {
 					showed["line" + i] = lines[i];
+					lines[i].node.style.display = "block";
 				});
 			} else {
 				each(args, function(i, item) {
-					showed["line" + i] = merge(lines[i], item[i]);
+					showed["line" + i] = lines[i] = merge(lines[i], item[i]);
+					lines[i].node.style.display = "block";
 				});
 			}
 			subline.adjust();
@@ -777,6 +799,8 @@
 				showed = subline.showed,
 				deviation = subline.options.deviation,
 				chart = subline.sagy.chart,
+				top = chart.plotTop,
+				bottom = chart.plotSizeY,
 				yAxises = chart.yAxis,
 				yAxis;
 			each(showed, function(key, item) {
@@ -785,26 +809,27 @@
 			});
 			each(showed, function(key, item) {
 				var path,
-					top,
 					node,
-					plotSvg;
+					plotSvg,
+					value = item.convertedValue || item.value;
 				yAxis = yAxises[~~item.index];
 				yAxis.addPlotLine({
 					color: item.color,
 					dashStyle: "Solid",
 					width: 2,
-					value: item.value,
+					value: value,
 					id: key,
 					zIndex: 99
 				});
-				plotSvg = yAxis.plotLinesAndBands[yAxis.plotLinesAndBands.length - 1].svgElem;
-				plotSvg.shadow(true);
 				if (item.node) {
 					node = item.node;
-					if (item.value > yAxis.max) {
-						top = chart.plotTop;
+					if (value > yAxis.max) {
 						node.style.top = (top - node.scrollHeight / 2 + deviation) + "px";
+					} else if (value < yAxis.min) {
+						node.style.top = (top + bottom - node.scrollHeight / 2 + deviation) + "px";
 					} else {
+						plotSvg = yAxis.plotLinesAndBands[yAxis.plotLinesAndBands.length - 1].svgElem;
+						plotSvg.shadow(true);
 						path = plotSvg.d;
 						top = path.split(" ", 3)[2];
 						node.style.top = (top - node.scrollHeight / 2 + deviation) + "px";
