@@ -298,7 +298,7 @@
 				result = Highcharts.dateFormat("%m.%d", this.value);
 				break;
 			case 5:
-				result = Highcharts.dateFormat("%m", this.value);
+				result = Highcharts.dateFormat("%m月", this.value);
 				break;
 		}
 		chart.prev = result;

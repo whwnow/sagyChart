@@ -65,5 +65,13 @@ chart.refresh({
 		</textarea>
 		<input type="button" id="go" value="run"/>
 	</div>
+	<div id="sound"></div>
+	<script type="text/javascript">
+		function play(url) {
+			url = url || "./fp.mp3";
+			var div = document.getElementById('sound');
+			div.innerHTML = '<embed src="' + url + '" loop="0" autostart="true" hidden="true"></embed>';
+		}
+	</script>
 </body>
 </html>
