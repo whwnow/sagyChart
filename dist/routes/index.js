@@ -8,16 +8,17 @@ exports.index = function(req, res) {
 	});
 };
 
-function getData(val) {
-	var first = 1377100800000,
+function getData(val, time) {
+	var first = parseInt(time, 10) || 1377100800000, //1377100800000,
 		i,
 		xArray = [],
 		yArray = [];
+	val = parseInt(val, 10);
 	for (i = 0; i < 24; i++) {
 		if (i === 23) {
 			yArray.push(null);
 		} else {
-			
+
 			yArray.push(Math.random() * val);
 		}
 		xArray.push(first + i * 1000 * 60 * 60);
@@ -30,5 +31,5 @@ function getData(val) {
 }
 
 exports.chart = function(req, res) {
-	res.send(getData(req.body.number));
+	res.send(getData(req.body.number, req.body.startTime));
 };

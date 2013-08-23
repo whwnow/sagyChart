@@ -683,6 +683,7 @@
 			convertUnit = baseUnit,
 			len = max < 10 ? -1 : 0,
 			temp = max,
+			tempObj = baseUnitObj,
 			ratio,
 			i,
 			templist = [],
@@ -697,9 +698,10 @@
 		if (len === 0) {
 			while (temp >= ratio * 10) {
 				temp = temp / ratio;
-				if (unitDocs[baseUnitObj.higherLevel]) {
-					convertUnit = baseUnitObj.higherLevel;
+				if (unitDocs[tempObj.higherLevel]) {
+					convertUnit = tempObj.higherLevel;
 					len++;
+					tempObj = unitDocs[tempObj.higherLevel];
 				} else {
 					break;
 				}
