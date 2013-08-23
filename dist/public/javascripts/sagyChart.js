@@ -158,16 +158,14 @@
 		subline: {
 			enabled: true,
 			lines: [{
-					value: 0,
-					color: "#87B6FE",
-					name: "参考值"
-				},
-				// {
-				// 	value: 100,
-				// 	color: "#87B6FE",
-				// 	name: "报警值"
-				// }
-			],
+				value: 0,
+				color: "#87B6FE",
+				name: "参考值"
+			}, {
+				value: 100,
+				color: "#87B6FE",
+				name: "报警值"
+			}],
 			renderTo: "sagyChart_sublime",
 			deviation: 22
 		},
