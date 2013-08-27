@@ -1,5 +1,4 @@
 (function(window, undefined) {
-	//7.7 for fun~
 	//some global variable
 	var im_version = "0.0.5",
 		im_obj = {},
@@ -18,7 +17,8 @@
 		mathMax = math.max,
 		mathMin = math.min,
 		mathAbs = math.abs,
-		mathPow = math.pow;
+		mathPow = math.pow,
+		units = window.unitDocs;
 	//document.createElement("div")
 	//setAttribute("className", "t")
 	var sagyChart = function() {
@@ -50,6 +50,14 @@
 		return typeof n === 'number';
 	}
 
+	function isEmptyObject(obj) {
+		var name;
+		for (name in obj) {
+			return false;
+		}
+		return true;
+	}
+
 	function generateID() {
 		return "sagy" + mathRandom().toString(36).substring(2, 6); // + Math.random().toString(36).substring(2, 15)
 	}
@@ -65,25 +73,28 @@
 	function each(obj, callback) {
 		var value,
 			i = 0,
-			length = obj.length;
-		if (isArray(obj)) {
-			for (; i < length; i++) {
-				value = callback.call(obj[i], i, obj[i]);
+			length;
+		if (obj) {
+			if (isArray(obj)) {
+				length = obj.length;
+				for (; i < length; i++) {
+					value = callback.call(obj[i], i, obj[i]);
 
-				if (value === false) {
-					break;
+					if (value === false) {
+						break;
+					}
+				}
+			} else {
+				for (i in obj) {
+					value = callback.call(obj[i], i, obj[i]);
+
+					if (value === false) {
+						break;
+					}
 				}
 			}
-		} else {
-			for (i in obj) {
-				value = callback.call(obj[i], i, obj[i]);
-
-				if (value === false) {
-					break;
-				}
-			}
+			return obj;
 		}
-		return obj;
 	}
 
 	function extend(a, b) {
@@ -144,7 +155,7 @@
 		template: "a",
 		chartOption: {},
 		renderTo: "",
-		resourcePath: "./images/",
+		resourcePath: "./images/sagyChart/",
 		subline: {
 			enabled: true,
 			lines: [{
@@ -152,12 +163,12 @@
 				color: "#87B6FE",
 				name: "参考值"
 			}, {
-				value: 0,
+				value: 100,
 				color: "#87B6FE",
 				name: "报警值"
 			}],
-			renderTo: null,
-			deviation: 0
+			renderTo: "sagyChart_sublime",
+			deviation: 22
 		},
 		convertUnit: {
 			enabled: true,
@@ -167,7 +178,7 @@
 			//convertedLen: null
 		},
 		ajaxOption: {
-			url: "",
+			url: "./chart",
 			transferData: {
 				// timeType: 1,
 				// timeOrCount: 24,
@@ -276,17 +287,17 @@
 			result;
 		switch (chart.timeType) {
 			case 1:
-				result = Highcharts.dateFormat("%H:%M", this.value);
-				break;
+				// result = Highcharts.dateFormat("%H:%M", this.value);
+				// break;
 			case 2:
-				result = Highcharts.dateFormat("%m.%d", this.value);
+				result = Highcharts.dateFormat("%H:%M", this.value);
 				break;
 			case 3:
 			case 4:
 				result = Highcharts.dateFormat("%m.%d", this.value);
 				break;
 			case 5:
-				result = Highcharts.dateFormat("%m", this.value);
+				result = Highcharts.dateFormat("%m月", this.value);
 				break;
 		}
 		chart.prev = result;
@@ -487,6 +498,12 @@
 				return 2;
 		}
 	}
+
+	function iterator(name, scope) {
+		return function() {
+			scope[name].apply(scope, arguments);
+		};
+	}
 	sagyChart.fn = sagyChart.prototype = {
 		sagyChart: im_version,
 		constructor: sagyChart,
@@ -495,7 +512,8 @@
 				options,
 				boxNode,
 				chart,
-				chartOption;
+				chartOption,
+				subline;
 			sagy.info = {};
 			if (isString(userOption.template)) {
 				chartOption = defaultTemplate[userOption.template];
@@ -509,9 +527,11 @@
 			}
 
 			if (options.subline.enabled) {
-				sagy.subline = sagy.info.subline = new Subline(sagy, options.subline);
+				sagy.subline = subline = sagy.info.subline = new Subline(sagy, options.subline);
+				sagy.showLine = iterator("show", subline);
+				sagy.hideLine = iterator("hide", subline);
+				sagy.adjustLine = iterator("adjust", subline);
 			}
-
 			chart = initChartNode(options.chartOption, boxNode);
 			chart.resourcePath = options.resourcePath;
 			sagy.options = options;
@@ -561,8 +581,11 @@
 				}
 			});
 		},
+		//todo 单位平米驻图需要换颜色
 		setData: function(json, index, pointHandler) {
 			var sagy = this,
+				subline = sagy.subline,
+				lines = subline.lines,
 				chart = sagy.chart,
 				options = sagy.options,
 				series = chart.series,
@@ -576,25 +599,25 @@
 				max,
 				findLastData = true,
 				temp,
-				sublines,
 				lenSeries,
 				j,
 				values;
 			//todo 循环检测是否是数字
 			chart.timeType = calculateTimeType(xArray[1] - xArray[0]);
 			chart.recentLength = xArray.length;
-			//如果要换单位,需要传单位过来
-			if (options.convertUnit.enabled) {
-				temp = sagy.convertUnitArr(json.yData, json.unit);
-				sagy.info.unit = temp.unit;
-				json.yData = temp.data;
-			}
 
 			if (options.subline.enabled) {
-				sublines = merge(options.lines, json.lines);
-				options.subline.lines = sublines;
+				each(json.lines, function(i, item) {
+					lines[i].value = item.value;
+				});
 			}
-			values = json.yData.filter(function(val) {
+			if (options.convertUnit.enabled) {
+				temp = sagy.convertUnitArr(yArray, json.unit);
+				sagy.info.unit = temp.unit;
+				yArray = temp.data;
+			}
+
+			values = yArray.filter(function(val) {
 				return val !== null;
 			});
 			min = mathMin.apply(math, values);
@@ -611,7 +634,6 @@
 					} else {
 						point.isLast = false;
 					}
-					//point = 
 					pointHandler.call(point, sagy.options.ajaxOption.transferData);
 				}
 				point.y = mathRound(point.y * 100) / 100;
@@ -620,6 +642,9 @@
 			index = index > lenSeries || index < lenSeries * -1 ? lenSeries - 1 : index;
 			j = +index + (index < 0 ? lenSeries : 0);
 			series[j].setData(list);
+			if (!isEmptyObject(subline.showed)) {
+				sagy.adjustLine();
+			}
 		},
 		clearData: function(index, isDeep) {
 			var series = this.chart.series,
@@ -639,8 +664,8 @@
 			sagy.chart = null;
 			sagy.info = {};
 			document.getElementById(sagy.options.renderTo).innerHTML = "";
-
 		},
+
 		redraw: function() {
 			var sagy = this;
 			sagy.chart = new Highcharts.Chart(sagy.options.chartOption);
@@ -651,11 +676,13 @@
 
 	sagyChart.fn.convertUnitArr = function(arr, baseUnit) {
 		var options = this.options.convertUnit,
+			subline = this.subline,
 			max = mathMax.apply(math, arr),
-			baseUnitObj = unitDocs[baseUnit],
+			baseUnitObj = units[baseUnit],
 			convertUnit = baseUnit,
-			len = max < 0 ? -1 : 0,
+			len = max < 10 ? -1 : 0,
 			temp = max,
+			tempObj = baseUnitObj,
 			ratio,
 			i,
 			templist = [],
@@ -667,14 +694,19 @@
 			};
 		}
 		ratio = baseUnitObj.ratio;
-		while (temp >= ratio * 10) {
-			temp = temp / ratio;
-			if (unitDocs[baseUnitObj.higherLevel]) {
-				convertUnit = unitDocs[baseUnitObj.higherLevel];
-				len++;
-			} else {
-				break;
+		if (len === 0) {
+			while (temp >= ratio * 10) {
+				temp = temp / ratio;
+				if (units[tempObj.higherLevel]) {
+					convertUnit = tempObj.higherLevel;
+					len++;
+					tempObj = units[tempObj.higherLevel];
+				} else {
+					break;
+				}
 			}
+		} else {
+			convertUnit = baseUnitObj.lowerLevel;
 		}
 
 		if (options.consistent && options.convertedUnit) {
@@ -688,9 +720,15 @@
 			if (arr[i] === null) {
 				templist.push(null);
 			} else {
-				templist.push(arr[i] * mathPow(ratio, len));
+				templist.push(arr[i] * mathPow(ratio, len * -1));
 			}
 		}
+		if (!isEmptyObject(subline.showed)) {
+			each(subline.lines, function(i, item) {
+				item.convertedValue = item.value * mathPow(ratio, len * -1);
+			});
+		}
+
 		return {
 			data: templist,
 			unit: convertUnit
@@ -727,25 +765,26 @@
 				subline = this,
 				lines = subline.lines,
 				showed = subline.showed;
-			subline.node.style.display = "block";
 			if (args.length === 0) {
 				each(lines, function(i, item) {
 					showed["line" + i] = item;
+					item.node.style.display = "block";
 				});
 			} else if (isNumber(args[0])) {
 				each(args, function(i) {
 					showed["line" + i] = lines[i];
+					lines[i].node.style.display = "block";
 				});
 			} else {
 				each(args, function(i, item) {
-					showed["line" + i] = merge(lines[i], item);
+					showed["line" + i] = lines[i] = merge(lines[i], item[i]);
+					lines[i].node.style.display = "block";
 				});
 			}
 			subline.adjust();
 		},
 		hide: function(index) {
-			var args = arguments,
-				subline = this,
+			var subline = this,
 				yAxis = subline.sagy.chart.yAxis,
 				showed = subline.showed;
 			index = ~~index;
@@ -756,12 +795,13 @@
 			showed = {};
 		},
 		adjust: function() {
-			var args = arguments,
-				subline = this,
+			var subline = this,
 				lines = subline.lines,
 				showed = subline.showed,
 				deviation = subline.options.deviation,
 				chart = subline.sagy.chart,
+				top = chart.plotTop,
+				bottom = chart.plotSizeY,
 				yAxises = chart.yAxis,
 				yAxis;
 			each(showed, function(key, item) {
@@ -770,29 +810,30 @@
 			});
 			each(showed, function(key, item) {
 				var path,
-					top,
 					node,
-					plotSvg;
+					plotSvg,
+					value = item.convertedValue || item.value;
 				yAxis = yAxises[~~item.index];
 				yAxis.addPlotLine({
 					color: item.color,
 					dashStyle: "Solid",
 					width: 2,
-					value: item.value,
+					value: value,
 					id: key,
 					zIndex: 99
 				});
-				plotSvg = yAxis.plotLinesAndBands[yAxis.plotLinesAndBands.length - 1].svgElem;
-				plotSvg.shadow(true);
 				if (item.node) {
 					node = item.node;
-					if (item.value > yAxis.max) {
-						top = chart.plotTop;
-						node.style.top = (top - node.clientHeight / 2 + deviation) + "px";
+					if (value > yAxis.max) {
+						node.style.top = (top - node.scrollHeight / 2 + deviation) + "px";
+					} else if (value < yAxis.min) {
+						node.style.top = (top + bottom - node.scrollHeight / 2 + deviation) + "px";
 					} else {
+						plotSvg = yAxis.plotLinesAndBands[yAxis.plotLinesAndBands.length - 1].svgElem;
+						plotSvg.shadow(true);
 						path = plotSvg.d;
 						top = path.split(" ", 3)[2];
-						node.style.top = (top - node.clientHeight / 2 + deviation) + "px";
+						node.style.top = (top - node.scrollHeight / 2 + deviation) + "px";
 					}
 				}
 			});
@@ -802,7 +843,161 @@
 	sagyChart.numFormat = numFormat;
 	sagyChart.version = im_version;
 
+	/**
+	 * 异步工具部分
+	 * @return {AsynTool} 异步工具实例
+	 */
+	var AsynTool = function() {
+		if (!(this instanceof AsynTool)) {
+			return AsynTool();
+		}
+		this._fired = {};
+		this._callbacks = {};
+	};
+
+	var _assign = function(eventName1, eventName2, cb, once) {
+		var proxy = this,
+			length,
+			i = 0,
+			argsLength = arguments.length,
+			bind,
+			_all,
+			callback,
+			events,
+			isOnce,
+			times = 0,
+			flag = {};
+		if (argsLength < 3) {
+			return proxy;
+		}
+		events = Array.prototype.slice.apply(arguments, [0, argsLength - 2]);
+		callback = arguments[argsLength - 2];
+		isOnce = arguments[argsLength - 1];
+
+		if (!isFunction(callback)) {
+			return proxy;
+		}
+
+		length = events.length;
+		bind = function(key) {
+			var method = isOnce ? "once" : "bind";
+			proxy[method](key, function(data) {
+				proxy._fired[key] = proxy._fired[key] || {};
+				proxy._fired[key].data = data;
+				if (!flag[key]) {
+					flag[key] = true;
+					times++;
+				}
+			});
+		};
+
+		for (i = 0; i < length; i++) {
+			bind(events[i]);
+		}
+
+		_all = function(event) {
+			if (times < length) {
+				return;
+			}
+			if (!flag[event]) {
+				return;
+			}
+			var data = [];
+			for (i = 0; i < length; i++) {
+				data.push(proxy._fired[events[i]].data);
+			}
+			if (isOnce) {
+				proxy.removeListener("all", _all);
+			}
+			callback.call(null, data);
+		};
+		proxy.addListener("all", _all);
+	};
+	extend(AsynTool.prototype, {
+		addListener: function(ev, callback) {
+			this._callbacks = this._callbacks || {};
+			this._callbacks[ev] = this._callbacks[ev] || [];
+			this._callbacks[ev].push(callback);
+			return this;
+		},
+		removeListener: function(ev, callback) {
+			var calls = this._callbacks,
+				list,
+				i,
+				l;
+			if (!ev) {
+				this._callbacks = {};
+			} else if (calls) {
+				if (!callback) {
+					calls[ev] = [];
+				} else {
+					list = calls[ev];
+					if (!list) {
+						return this;
+					}
+					l = list.length;
+					for (i = 0; i < l; i++) {
+						if (callback === list[i]) {
+							list[i] = null;
+							break;
+						}
+					}
+				}
+			}
+			return this;
+		},
+		trigger: function(eventName, data) {
+			var list,
+				ev,
+				callback,
+				args,
+				i,
+				l;
+			var both = 2;
+			var calls = this._callbacks;
+			while (both--) {
+				ev = both ? eventName : "all";
+				list = calls[ev];
+				if (list) {
+					for (i = 0, l = list.length; i < l; i++) {
+						if (!(callback = list[i])) {
+							list.slice(i, 1);
+							i--;
+							l--;
+						} else {
+							args = both ? Array.prototype.slice.call(arguments, 1) : arguments;
+							callback.apply(this, args);
+						}
+					}
+				}
+			}
+			return this;
+		},
+		once: function(ev, callback) {
+			var proxy = this;
+			var wrapper = function() {
+				callback.apply(proxy, arguments);
+				proxy.removeListener(ev, wrapper);
+			};
+			proxy.addListener(ev, wrapper);
+			return proxy;
+		},
+		all: function(eventName1, eventName2, callback) {
+			var args = Array.prototype.concat.apply([], arguments);
+			args.push(true);
+			_assign.apply(this, args);
+			return this;
+		},
+		removeAll: function(event) {
+			return this.removeListener(event);
+		}
+	});
+	AsynTool.prototype.on = AsynTool.prototype.addListener;
+	AsynTool.prototype.fire = AsynTool.prototype.trigger;
+	AsynTool.prototype.unbind = AsynTool.prototype.removeListener;
+
 	if (typeof window === "object" && typeof window.document === "object") {
 		window.sagyChart = sagyChart;
+		window.AsynTool = AsynTool;
 	}
 })(window);

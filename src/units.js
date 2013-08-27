@@ -1,4 +1,4 @@
-var unitDocs = {
+window.unitDocs = {
 	"Wh": {
 		//name: "瓦时",
 		lowerLevel: null,
