@@ -776,8 +776,8 @@
 					lines[i].node.style.display = "block";
 				});
 			} else {
-				each(args, function(i, item) {
-					showed["line" + i] = lines[i] = merge(lines[i], item[i]);
+				each(args[0], function(i, item) {
+					showed["line" + i] = lines[i] = merge(lines[i], item);
 					lines[i].node.style.display = "block";
 				});
 			}
