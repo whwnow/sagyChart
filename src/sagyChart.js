@@ -771,9 +771,9 @@
 					item.node.style.display = "block";
 				});
 			} else if (isNumber(args[0])) {
-				each(args, function(i) {
-					showed["line" + i] = lines[i];
-					lines[i].node.style.display = "block";
+				each(args, function(i,item) {
+					showed["line" + item] = lines[item];
+					lines[item].node.style.display = "block";
 				});
 			} else {
 				each(args[0], function(i, item) {
