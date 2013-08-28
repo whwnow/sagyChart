@@ -608,7 +608,128 @@ window.unitDocs = {
 				zIndex: 8
 			}]
 		},
-		b: {}
+		b: {
+			chart: {
+				backgroundColor: "rgba(255,0,0,0)",
+				spacingBottom: 20,
+				marginRight: 110,
+				marginLeft: 110,
+				//marginTop: 110,
+				//marginBottom: 240,
+				spacingLeft: 0,
+				renderTo: "chart_container",
+				height: 650,
+				plotBorderWidth: 1,
+				plotBackgroundColor: "#fffff9"
+			},
+			legend: {
+				enabled: false
+			},
+			credits: {
+				enabled: false,
+			},
+			plotOptions: {
+				connectNulls: false,
+				series: {
+					stickyTracking: true,
+					shadow: false,
+					point: {
+						events: {
+							mouseOver: func_pointMouseover,
+							mouseOut: func_pointMouseout
+						}
+					},
+					marker: {
+						enabled: false,
+						radius: 7,
+						lineColor: 'white',
+						lineWidth: 2,
+						symbol: 'pointCircle'
+					}
+				}
+			},
+			tooltip: {
+				enabled: true,
+				animation: false,
+				formatter: function() {
+					return false;
+				},
+				crosshairs: [{
+					x: true,
+					dashStyle: "ShortDash",
+					width: 1
+				}, {
+					y: true,
+					dashStyle: "ShortDash",
+					width: 1
+					//zIndex: 10
+				}]
+			},
+			title: {
+				text: null
+			},
+			xAxis: {
+				alternateGridColor: "rgba(242,253,242,0.5)",
+				tickLength: 0,
+				tickWidth: 0,
+				gridLineColor: "#B2EAC7",
+				gridLineDashStyle: "longDash",
+				gridLineWidth: 1,
+				type: "datetime",
+				title: {
+					text: null
+				},
+				labels: {
+					enabled: true,
+					style: {
+						fontSize: 20,
+						fontFamily: "Arial",
+						color: "#aaaaaa"
+					},
+					formatter: func_axisFormatter
+				},
+				offset: 25,
+				lineWidth: 0,
+				tickPositioner: func_tickPositioner
+			},
+			yAxis: {
+				startOnTick: false,
+				tickPixelInterval: 80,
+				tickWidth: 0,
+				offset: 150,
+				alternateGridColor: "rgba(244,248,248,0.5)",
+				gridLineColor: "#B2EAC7",
+				gridLineDashStyle: "longDash",
+				title: {
+					text: null
+				},
+				lineWidth: 0,
+				labels: {
+					align: "right",
+					enabled: true,
+					y: 10,
+					style: {
+						fontSize: 20,
+						fontFamily: "Arial",
+						color: "#aaaaaa"
+					}
+				}
+			},
+			series: [{
+				turboThreshold: 200000,
+				type: "line",
+				color: "#25B4B1",
+				data: [],
+				connectNulls: false,
+				states: {
+					hover: {
+						enabled: false
+					}
+				},
+				shadow: false,
+				zIndex: 8
+			}]
+		}
 	};
 
 	function numFormat(val) {
@@ -947,7 +1068,7 @@ window.unitDocs = {
 					item.node.style.display = "block";
 				});
 			} else if (isNumber(args[0])) {
-				each(args, function(i,item) {
+				each(args, function(i, item) {
 					showed["line" + item] = lines[item];
 					lines[item].node.style.display = "block";
 				});
