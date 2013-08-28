@@ -157,7 +157,7 @@
 		renderTo: "",
 		resourcePath: "./images/sagyChart/",
 		subline: {
-			enabled: true,
+			enabled: false,
 			lines: [{
 				value: 0,
 				color: "#87B6FE",
@@ -889,17 +889,23 @@
 			if (args.length === 0) {
 				each(lines, function(i, item) {
 					showed["line" + i] = item;
-					item.node.style.display = "block";
+					if (item.node) {
+						item.node.style.display = "block";
+					}
 				});
 			} else if (isNumber(args[0])) {
 				each(args, function(i, item) {
 					showed["line" + item] = lines[item];
-					lines[item].node.style.display = "block";
+					if (lines[item].node) {
+						lines[item].node.style.display = "block";
+					}
 				});
 			} else {
 				each(args[0], function(i, item) {
 					showed["line" + i] = lines[i] = merge(lines[i], item);
-					lines[i].node.style.display = "block";
+					if (lines[item].node) {
+						lines[i].node.style.display = "block";
+					}
 				});
 			}
 			subline.adjust();
@@ -909,9 +915,11 @@
 				yAxis = subline.sagy.chart.yAxis,
 				showed = subline.showed;
 			index = ~~index;
-			subline.node.style.display = "none";
 			each(showed, function(key) {
 				yAxis[index].removePlotLine(key);
+				if (showed[key].node) {
+					showed[key].node.style.display = "none";
+				}
 			});
 			showed = {};
 		},

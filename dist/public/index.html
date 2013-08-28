@@ -11,10 +11,30 @@
 	<script type="text/javascript">
 		$(function(){
 			// window.chart = sagyChart('chartA');.
-			window.chart = sagyChart({
+			// chart = sagyChart({
+			// 	template: "b",
+			// 	renderTo: "chartA"
+			// });
+
+			chart = sagyChart({
 				template: "b",
-				renderTo: "chartA"
-				});
+				renderTo: "chartA",
+				subline: {
+					enabled: true,
+					lines: [{
+						value: 0,
+						color: "#87B6FE",
+						renderTo: "sagyChart_sublime_a",
+					}, {
+						value: 100,
+						color: "#87B6FE",
+						renderTo: "sagyChart_sublime_b"
+					}],
+					//renderTo: "sagyChart_sublime_a",
+					deviation: 22
+				}
+			});
+
 			$("#go").click(function(){
 				eval($("#texteval").val());
 			});
@@ -29,11 +49,17 @@
 <body>
 	<div id="container">
 		<div id="chartA">
-			<div class="sagyChart_sublime_container" id="sagyChart_sublime">
-				<div class="sagyChart_sublime_left">
-					<span class="sagyChart_sublime_left_span">111</span>
+			<div class="sagyChart_sublime_container" id="sagyChart_sublime_a">
+				<div class="sagyChart_sublime_left_a">
+					<span class="sagyChart_sublime_left_span">xxx</span>
 				</div>
 				<img class="sagyChart_sublime_right" src="./images/sagychart/bj_del.png" />
+			</div>
+			<div class="sagyChart_sublime_container" id="sagyChart_sublime_b">
+				<div class="sagyChart_sublime_left_b">
+					<span class="sagyChart_sublime_left_span">xxx</span>
+				</div>
+				<img class="sagyChart_sublime_right" src="./images/sagychart/ck_del.png" />
 			</div>
 		</div>
 		</br>
