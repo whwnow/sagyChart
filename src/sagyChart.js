@@ -569,7 +569,7 @@
 			}
 			return resultStr;
 		} else {
-			return "";
+			return "--";
 		}
 	}
 
