@@ -19,8 +19,6 @@
 		mathAbs = math.abs,
 		mathPow = math.pow,
 		units = window.unitDocs;
-	//document.createElement("div")
-	//setAttribute("className", "t")
 	var sagyChart = function() {
 		var args = arguments,
 			options = args[0],
@@ -639,15 +637,14 @@
 				error("given a wrong dom id!");
 			}
 
-			if (options.subline.enabled) {
-				sagy.subline = subline = sagy.info.subline = new Subline(sagy, options.subline);
-				sagy.showLine = iterator("show", subline);
-				sagy.hideLine = iterator("hide", subline);
-				sagy.adjustLine = iterator("adjust", subline);
-			}
+			sagy.subline = subline = sagy.info.subline = new Subline(sagy, options.subline);
+			sagy.showLine = iterator("show", subline);
+			sagy.hideLine = iterator("hide", subline);
+			sagy.adjustLine = iterator("adjust", subline);
 			chart = initChartNode(options.chartOption, boxNode);
 			chart.resourcePath = options.resourcePath;
 			sagy.options = options;
+			
 			//todo what should be in info
 
 			sagy.chart = sagy.info.chart = chart;
