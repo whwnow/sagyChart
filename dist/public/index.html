@@ -67,34 +67,16 @@
 		</div>
 		</br>
 		<textarea id="texteval">
-chart.refresh({
-	transferData: {
-		bodySign: "1000040001",
-		endTime: null,
-		energyTypeId: 1,
-		isArea: false,
-		isThumbnail: false,
-		isEqument: false,
-		sign: "1",
-		timestep: 1,
-		number: 10000,
-		startTime:1377100800000,
-		isRandom:true
-	},
-	url: "./chart",
-	index: 0,
-	pointHandler: function(option) {
-		if (this.isLast) {
-			this.color = "green";
-		}
-		if (this.isMin) {
-			this.color = "blue";
-		}
-		if (this.isMax) {
-			this.color = "red";
-		}
-	}
-});
+var docElm = document.documentElement;
+            if (docElm.requestFullscreen) {
+                docElm.requestFullscreen();
+            }
+            else if (docElm.mozRequestFullScreen) {
+                docElm.mozRequestFullScreen();
+            }
+            else if (docElm.webkitRequestFullScreen) {
+                docElm.webkitRequestFullScreen();
+            }
 		</textarea>
 		<input type="button" id="go" value="run"/>
 	</div>
