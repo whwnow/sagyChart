@@ -224,6 +224,8 @@
 			case 5:
 				xString = Highcharts.dateFormat("%m", this.x);
 				break;
+			default:
+				xString = Highcharts.dateFormat("%H:%M", this.x);
 		}
 		chart.svg_xText = chart.renderer.text(xString, chart.plotLeft + this.plotX, chart.plotTop + chart.plotHeight + 45).attr({
 			zIndex: 100,
@@ -289,6 +291,8 @@
 			case 5:
 				result = Highcharts.dateFormat("%m月", this.value);
 				break;
+			default:
+				result = Highcharts.dateFormat("%H:%M", this.value);
 		}
 		chart.prev = result;
 		if (result === prev) {
@@ -593,17 +597,18 @@
 		return new Highcharts.Chart(options);
 	}
 
-	function calculateTimeType(milliseconds) {
+	function calculateTimeType(milliseconds, _ratio) {
+		var ratio = _ratio || 1;
 		switch (true) {
-			case milliseconds <= 10 * MINUTE:
+			case milliseconds <= 10 * MINUTE * ratio:
 				return 1;
-			case milliseconds > 10 * MINUTE && milliseconds <= HOUR:
+			case milliseconds > 10 * MINUTE * ratio && milliseconds <= HOUR * ratio:
 				return 2;
-			case milliseconds > HOUR && milliseconds <= DAY:
+			case milliseconds > HOUR * ratio && milliseconds <= DAY * ratio:
 				return 3;
-			case milliseconds > DAY && milliseconds <= WEEK:
+			case milliseconds > DAY * ratio && milliseconds <= WEEK * ratio:
 				return 4;
-			case milliseconds > WEEK:
+			case milliseconds > WEEK * ratio:
 				return 5;
 			default:
 				return 2;
@@ -644,7 +649,7 @@
 			chart = initChartNode(options.chartOption, boxNode);
 			chart.resourcePath = options.resourcePath;
 			sagy.options = options;
-			
+
 			//todo what should be in info
 
 			sagy.chart = sagy.info.chart = chart;
@@ -656,23 +661,27 @@
 		refresh: function(userOption, callback) {
 			var sagy = this,
 				options = sagy.options.ajaxOption,
+				transferData,
 				_userOption,
 				_callback;
 			_userOption = userOption.transferData ? userOption : {
 				transferData: userOption
 			};
 			if (userOption) {
-				extend(options, _userOption);
+				transferData = merge(options.transferData, _userOption.transferData);
+				options = merge(options, _userOption);
+				options.transferData = transferData;
+				sagy.options.ajaxOption = options;
 			}
 			_callback = callback ? callback : options.callback;
 			$.ajax({
 				type: "POST",
 				datatype: "json",
-				data: options.transferData,
+				data: JSON.stringify(options.transferData),
 				url: options.url,
 				success: function(json, textStatus) {
 					if (json && json.length !== 0) {
-						sagy.setData(json, options.index, options.pointHandler);
+						sagy.setData(json, options.index);
 					} else {
 						sagy.clearData(options.index);
 						log("ajax:" + options.url + " return null");
@@ -692,17 +701,19 @@
 			});
 		},
 		//todo 单位平米驻图需要换颜色
-		setData: function(json, index, pointHandler) {
+		setData: function(json, _index) {
 			var sagy = this,
 				subline = sagy.subline,
 				lines = subline.lines,
 				chart = sagy.chart,
 				options = sagy.options,
+				pointHandler = options.ajaxOption.pointHandler,
+				index = _index === undefined ? options.ajaxOption.index : _index,
 				series = chart.series,
 				xArray = json.xData,
 				yArray = json.yData,
 				len = xArray.length,
-				i,
+				i = 0,
 				list = [],
 				point,
 				min,
@@ -712,8 +723,15 @@
 				lenSeries,
 				j,
 				values;
-			//todo 循环检测是否是数字
-			chart.timeType = calculateTimeType(xArray[1] - xArray[0]);
+			while (i < (yArray.length - 1) && yArray[i] === null || yArray[i + 1] === null) {
+				i++;
+			}
+			if (i >= yArray.length) {
+				chart.timeType = 6;
+			} else {
+				chart.timeType = calculateTimeType(xArray[i + 1] - xArray[i], options.axisRatio);
+			}
+
 			chart.recentLength = xArray.length;
 
 			if (options.subline.enabled) {
@@ -746,7 +764,7 @@
 					}
 					pointHandler.call(point, sagy.options.ajaxOption.transferData);
 				}
-				point.y = mathRound(point.y * 100) / 100;
+				point.y = point.y === null ? null : mathRound(point.y * 100) / 100;
 				list.unshift(point);
 			}
 			index = index > lenSeries || index < lenSeries * -1 ? lenSeries - 1 : index;
