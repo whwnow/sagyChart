@@ -144,6 +144,10 @@
 		return ret;
 	}
 
+	function zeroTime(a) {
+		return a - a % DAY + new Date().getTimezoneOffset() * HOUR;
+	}
+
 	function Point(x, y) {
 		this.x = x;
 		this.y = y;
@@ -196,10 +200,10 @@
 			zIndex: 99
 		}).add();
 		var yStr = numFormat(this.y);
-		var yfontsize = yStr.length > 4 ? 20 : 30;
+		var yfontsize = yStr.length > 4 ? 20 : 28;
 		var yfontsizepx = yfontsize + "px";
 		var xString;
-		chart.svg_yText = chart.renderer.text(yStr, chart.plotLeft - 42, this.plotY + chart.plotTop + yfontsize / 2).attr({
+		chart.svg_yText = chart.renderer.text(yStr, chart.plotLeft - 43, this.plotY + chart.plotTop + yfontsize / 2).attr({
 			zIndex: 100,
 			"text-anchor": "middle"
 		}).css({
@@ -328,7 +332,6 @@
 				enabled: false,
 			},
 			plotOptions: {
-				connectNulls: false,
 				series: {
 					stickyTracking: false,
 					pointPadding: 0,
@@ -416,7 +419,6 @@
 				type: "column",
 				color: "#e59c9b",
 				data: [],
-				connectNulls: false,
 				states: {
 					hover: {
 						enabled: false
@@ -447,7 +449,6 @@
 				enabled: false,
 			},
 			plotOptions: {
-				connectNulls: false,
 				series: {
 					stickyTracking: true,
 					shadow: false,
@@ -538,7 +539,6 @@
 				type: "line",
 				color: "#25B4B1",
 				data: [],
-				connectNulls: false,
 				states: {
 					hover: {
 						enabled: false
@@ -550,7 +550,7 @@
 		}
 	};
 
-	function numFormat(val) {
+	function numFormat(val, returnNum) {
 		var num = parseFloat(val);
 		var decimal, isMinus = false,
 			resultStr;
@@ -561,6 +561,9 @@
 			}
 			decimal = num >= 10000 ? 1 : num >= 1000 ? 10 : num >= 100 ? 100 : num >= 10 ? 1000 : 10000;
 			num = mathRound(num * decimal) / decimal;
+			if (returnNum) {
+				return num;
+			}
 			if (num >= 100000) {
 				resultStr = num.toExponential(1);
 			} else {
@@ -571,7 +574,11 @@
 			}
 			return resultStr;
 		} else {
-			return "--";
+			if (returnNum) {
+				return null;
+			} else {
+				return "--";
+			}
 		}
 	}
 
@@ -630,7 +637,6 @@
 				chart,
 				chartOption,
 				subline;
-			sagy.info = {};
 			if (isString(userOption.template)) {
 				chartOption = defaultTemplate[userOption.template];
 				userOption.chartOption = chartOption;
@@ -642,17 +648,15 @@
 				error("given a wrong dom id!");
 			}
 
-			sagy.subline = subline = sagy.info.subline = new Subline(sagy, options.subline);
+			sagy.subline = subline = new Subline(sagy, options.subline);
 			sagy.showLine = iterator("show", subline);
 			sagy.hideLine = iterator("hide", subline);
 			sagy.adjustLine = iterator("adjust", subline);
 			chart = initChartNode(options.chartOption, boxNode);
 			chart.resourcePath = options.resourcePath;
 			sagy.options = options;
-
-			//todo what should be in info
-
-			sagy.chart = sagy.info.chart = chart;
+			sagy.chart = chart;
+			sagy.transferData = options.ajaxOption.transferData;
 			sagy.version = im_version;
 			if (isFunction(callback)) {
 				callback.call(sagy);
@@ -680,11 +684,17 @@
 				data: JSON.stringify(options.transferData),
 				url: options.url,
 				success: function(json, textStatus) {
-					if (json && json.length !== 0) {
+					var status;
+					if (json && json.yData && json.yData.length !== 0) {
 						sagy.setData(json, options.index);
+						status = true;
 					} else {
 						sagy.clearData(options.index);
 						log("ajax:" + options.url + " return null");
+						status = false;
+					}
+					if (isFunction(_callback)) {
+						_callback.call(sagy, status);
 					}
 				},
 				error: function() {
@@ -692,12 +702,7 @@
 				},
 				// status: 200
 				// statusText: "OK"
-				complete: function(e) {
-					if (isFunction(_callback)) {
-						var status = e.statusText === "OK" ? true : false;
-						_callback.call(sagy.info, status);
-					}
-				}
+				complete: function(e) {}
 			});
 		},
 		//todo 单位平米驻图需要换颜色
@@ -722,7 +727,8 @@
 				temp,
 				lenSeries,
 				j,
-				values;
+				values,
+				lastX;
 			while (i < (yArray.length - 1) && yArray[i] === null || yArray[i + 1] === null) {
 				i++;
 			}
@@ -741,7 +747,7 @@
 			}
 			if (options.convertUnit.enabled) {
 				temp = sagy.convertUnitArr(yArray, json.unit);
-				sagy.info.unit = temp.unit;
+				sagy.unit = temp.unit;
 				yArray = temp.data;
 			}
 
@@ -751,12 +757,18 @@
 			min = mathMin.apply(math, values);
 			max = mathMax.apply(math, values);
 			for (i = len - 1; i >= 0; i--) {
+				if (lastX) {
+					if ((lastX - xArray[i]) > HOUR * 2) {
+						point = new Point(xArray[i] + HOUR * 2, null);
+						list.unshift(point);
+					}
+				}
 				point = new Point(xArray[i], yArray[i]);
 				if (isFunction(pointHandler)) {
 					point.isMin = point.y === min;
 					point.isMax = point.y === max;
 					//todo 根据当天日期判断是否是最新点
-					if (point.y && findLastData) {
+					if (findLastData && point.y !== null && point.x > zeroTime(new Date - 0)) {
 						findLastData = false;
 						point.isLast = true;
 					} else {
@@ -764,8 +776,10 @@
 					}
 					pointHandler.call(point, sagy.options.ajaxOption.transferData);
 				}
+				// point.y = point.y === null ? null : numFormat(point.y,true);
 				point.y = point.y === null ? null : mathRound(point.y * 100) / 100;
 				list.unshift(point);
+				lastX = yArray[i] === null ? null : xArray[i];
 			}
 			index = index > lenSeries || index < lenSeries * -1 ? lenSeries - 1 : index;
 			j = +index + (index < 0 ? lenSeries : 0);
@@ -790,7 +804,6 @@
 			var sagy = this;
 			sagy.chart.destroy();
 			sagy.chart = null;
-			sagy.info = {};
 			document.getElementById(sagy.options.renderTo).innerHTML = "";
 		},
 
