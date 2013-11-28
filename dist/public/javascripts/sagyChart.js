@@ -324,47 +324,43 @@ window.unitDocs = {
     return a - a % DAY + new Date().getTimezoneOffset() * HOUR;
   }
 
+  function numFormat(val, returnNum) {
+    var num = parseFloat(val);
+    var decimal, isMinus = false,
+      resultStr;
+    if (!isNaN(num)) {
+      if (num < 0) {
+        isMinus = true;
+        num *= -1;
+      }
+      decimal = num >= 10000 ? 1 : num >= 1000 ? 10 : num >= 100 ? 100 : num >= 10 ? 1000 : 10000;
+      num = mathRound(num * decimal) / decimal;
+      if (returnNum) {
+        return num;
+      }
+      if (num >= 100000) {
+        resultStr = num.toExponential(1);
+      } else {
+        resultStr = num.toString();
+      }
+      if (isMinus) {
+        resultStr = "-" + resultStr;
+      }
+      return resultStr;
+    } else {
+      if (returnNum) {
+        return null;
+      } else {
+        return "--";
+      }
+    }
+  }
+
+
   function Point(x, y) {
     this.x = x;
     this.y = y;
   }
-
-  var defaultOptions = {
-    template: "a",
-    chartOption: {},
-    renderTo: "",
-    resourcePath: "./images/sagyChart/",
-    subline: {
-      enabled: false,
-      lines: [],
-      renderTo: "",
-      deviation: 0
-    },
-    convertUnit: {
-      enabled: true,
-      consistent: false,
-      //baseUnit: "kWh",
-      //convertedUnit: null,
-      //convertedLen: null
-    },
-    ajaxOption: {
-      url: "./chart",
-      transferData: {
-        // timeType: 1,
-        // timeOrCount: 24,
-        // endTime: new Date - 0,
-        // building: "",
-        // equipment: "",
-        // energyType: 1,
-        // functionType: 0,
-        // formula: "",
-        // isPerMeter: false,
-      },
-      index: 0,
-      callback: null,
-      pointHandler: null
-    }
-  };
 
   var func_pointMouseover = function() {
     var chart = this.series.chart;
@@ -482,282 +478,162 @@ window.unitDocs = {
   };
 
   var defaultTemplate = {
-    /**
-     * 建筑对比柱图
-     * @type {Object}
-     */
-    a: {
-      chart: {
-        backgroundColor: "rgba(255,0,0,0)",
-        spacingBottom: 20,
-        marginRight: 110,
-        marginLeft: 110,
-        //marginTop: 110,
-        spacingLeft: 0,
-        renderTo: "chart_container",
-        height: 650,
-        //marginBottom: 240,
-        //marginRight:100,
-        plotBorderWidth: 1,
-        plotBackgroundColor: "#fffff9"
-      },
-      legend: {
-        enabled: false
-      },
-      credits: {
-        enabled: false,
-      },
-      plotOptions: {
-        series: {
-          turboThreshold: 200000,
-          stickyTracking: false,
-          pointPadding: 0,
-          borderWidth: 0,
-          groupPadding: 0.1,
-          pointPlacement: "on",
-          shadow: false,
-          point: {
-            events: {
-              mouseOver: func_pointMouseover,
-              mouseOut: func_pointMouseout
-            }
-          }
-        }
-      },
-      tooltip: {
-        enabled: true,
-        animation: false,
-        formatter: function() {
-          return false;
-        },
-        crosshairs: [{
-          x: true,
-          dashStyle: "ShortDash",
-          width: 1
-        }, {
-          y: true,
-          dashStyle: "ShortDash",
-          width: 1,
-          zIndex: 10
-        }]
-      },
-      title: {
-        text: null
-      },
-      xAxis: {
-        alternateGridColor: "rgba(242,253,242,0.5)",
-        tickLength: 0,
-        tickWidth: 0,
-        gridLineColor: "#B2EAC7",
-        gridLineDashStyle: "longDash",
-        gridLineWidth: 1,
-        type: "datetime",
-        title: {
-          text: null
-        },
-        labels: {
-          enabled: true,
-          style: {
-            fontSize: 20,
-            fontFamily: "Arial",
-            color: "#aaaaaa"
-          },
-          formatter: func_axisFormatter
-        },
-        offset: 25,
-        lineWidth: 0,
-        tickPositioner: func_tickPositioner
-      },
-      yAxis: {
-        startOnTick: false,
-        tickPixelInterval: 80,
-        tickWidth: 0,
-        offset: 150,
-        alternateGridColor: "rgba(244,248,248,0.5)",
-        gridLineColor: "#B2EAC7",
-        gridLineDashStyle: "longDash",
-        title: {
-          text: null
-        },
-        lineWidth: 0,
-        labels: {
-          align: "right",
-          enabled: true,
-          y: 10,
-          style: {
-            fontSize: 20,
-            fontFamily: "Arial",
-            color: "#aaaaaa"
-          }
-        }
-      },
-      series: [{
+    chart: {
+      backgroundColor: "rgba(255,0,0,0)",
+      spacingBottom: 20,
+      marginRight: 110,
+      marginLeft: 110,
+      //marginTop: 110,
+      spacingLeft: 0,
+      renderTo: "chart_container",
+      height: 650,
+      //marginBottom: 240,
+      //marginRight:100,
+      plotBorderWidth: 1,
+      plotBackgroundColor: "#fffff9"
+    },
+    legend: {
+      enabled: false
+    },
+    credits: {
+      enabled: false,
+    },
+    plotOptions: {
+      series: {
         turboThreshold: 200000,
-        type: "column",
-        color: "#e59c9b",
-        data: [],
-        states: {
-          hover: {
-            enabled: false
-          }
-        },
+        stickyTracking: false,
+        pointPadding: 0,
+        borderWidth: 0,
+        groupPadding: 0.1,
+        pointPlacement: "on",
         shadow: false,
-        zIndex: 8
+        point: {
+          events: {
+            mouseOver: func_pointMouseover,
+            mouseOut: func_pointMouseout
+          }
+        }
+      }
+    },
+    tooltip: {
+      enabled: true,
+      animation: false,
+      formatter: function() {
+        return false;
+      },
+      crosshairs: [{
+        x: true,
+        dashStyle: "ShortDash",
+        width: 1
+      }, {
+        y: true,
+        dashStyle: "ShortDash",
+        width: 1,
+        zIndex: 10
       }]
     },
-    b: {
-      chart: {
-        backgroundColor: "rgba(255,0,0,0)",
-        spacingBottom: 20,
-        marginRight: 110,
-        marginLeft: 110,
-        //marginTop: 110,
-        //marginBottom: 240,
-        spacingLeft: 0,
-        renderTo: "chart_container",
-        height: 650,
-        plotBorderWidth: 1,
-        plotBackgroundColor: "#fffff9"
-      },
-      legend: {
-        enabled: false
-      },
-      credits: {
-        enabled: false,
-      },
-      plotOptions: {
-        series: {
-          stickyTracking: true,
-          shadow: false,
-          point: {
-            events: {
-              mouseOver: func_pointMouseover,
-              mouseOut: func_pointMouseout
-            }
-          },
-          marker: {
-            enabled: false,
-            radius: 7,
-            lineColor: 'white',
-            lineWidth: 2,
-            symbol: 'pointCircle'
-          }
-        }
-      },
-      tooltip: {
-        enabled: true,
-        animation: false,
-        formatter: function() {
-          return false;
-        },
-        crosshairs: [{
-          x: true,
-          dashStyle: "ShortDash",
-          width: 1
-        }, {
-          y: true,
-          dashStyle: "ShortDash",
-          width: 1
-          //zIndex: 10
-        }]
-      },
+    title: {
+      text: null
+    },
+    xAxis: {
+      alternateGridColor: "rgba(242,253,242,0.5)",
+      tickLength: 0,
+      tickWidth: 0,
+      gridLineColor: "#B2EAC7",
+      gridLineDashStyle: "longDash",
+      gridLineWidth: 1,
+      type: "datetime",
       title: {
         text: null
       },
-      xAxis: {
-        alternateGridColor: "rgba(242,253,242,0.5)",
-        tickLength: 0,
-        tickWidth: 0,
-        gridLineColor: "#B2EAC7",
-        gridLineDashStyle: "longDash",
-        gridLineWidth: 1,
-        type: "datetime",
-        title: {
-          text: null
+      labels: {
+        enabled: true,
+        style: {
+          fontSize: 20,
+          fontFamily: "Arial",
+          color: "#aaaaaa"
         },
-        labels: {
-          enabled: true,
-          style: {
-            fontSize: 20,
-            fontFamily: "Arial",
-            color: "#aaaaaa"
-          },
-          formatter: func_axisFormatter
-        },
-        offset: 25,
-        lineWidth: 0,
-        tickPositioner: func_tickPositioner
+        formatter: func_axisFormatter
       },
-      yAxis: {
-        startOnTick: false,
-        tickPixelInterval: 80,
-        tickWidth: 0,
-        offset: 150,
-        alternateGridColor: "rgba(244,248,248,0.5)",
-        gridLineColor: "#B2EAC7",
-        gridLineDashStyle: "longDash",
-        title: {
-          text: null
-        },
-        lineWidth: 0,
-        labels: {
-          align: "right",
-          enabled: true,
-          y: 10,
-          style: {
-            fontSize: 20,
-            fontFamily: "Arial",
-            color: "#aaaaaa"
-          }
+      offset: 25,
+      lineWidth: 0,
+      tickPositioner: func_tickPositioner
+    },
+    yAxis: {
+      startOnTick: false,
+      tickPixelInterval: 80,
+      tickWidth: 0,
+      offset: 150,
+      alternateGridColor: "rgba(244,248,248,0.5)",
+      gridLineColor: "#B2EAC7",
+      gridLineDashStyle: "longDash",
+      title: {
+        text: null
+      },
+      lineWidth: 0,
+      labels: {
+        align: "right",
+        enabled: true,
+        y: 10,
+        style: {
+          fontSize: 20,
+          fontFamily: "Arial",
+          color: "#aaaaaa"
+        }
+      }
+    },
+    series: [{
+      turboThreshold: 200000,
+      type: "column",
+      color: "#e59c9b",
+      data: [],
+      states: {
+        hover: {
+          enabled: false
         }
       },
-      series: [{
-        turboThreshold: 200000,
-        type: "line",
-        color: "#25B4B1",
-        data: [],
-        states: {
-          hover: {
-            enabled: false
-          }
-        },
-        shadow: false,
-        zIndex: 8
-      }]
+      shadow: false,
+      zIndex: 8
+    }]
+  };
+
+  var defaultOptions = {
+    chartOption: defaultTemplate,
+    renderTo: "",
+    resourcePath: "./images/sagyChart/",
+    subline: {
+      enabled: false,
+      lines: [],
+      renderTo: "",
+      deviation: 0
+    },
+    convertUnit: {
+      enabled: true,
+      consistent: false,
+      //baseUnit: "kWh",
+      //convertedUnit: null,
+      //convertedLen: null
+    },
+    ajaxOption: {
+      url: "./chart",
+      transferData: {
+        // timeType: 1,
+        // timeOrCount: 24,
+        // endTime: new Date - 0,
+        // building: "",
+        // equipment: "",
+        // energyType: 1,
+        // functionType: 0,
+        // formula: "",
+        // isPerMeter: false,
+      },
+      index: 0,
+      callback: null,
+      pointHandler: null
     }
   };
 
-  function numFormat(val, returnNum) {
-    var num = parseFloat(val);
-    var decimal, isMinus = false,
-      resultStr;
-    if (!isNaN(num)) {
-      if (num < 0) {
-        isMinus = true;
-        num *= -1;
-      }
-      decimal = num >= 10000 ? 1 : num >= 1000 ? 10 : num >= 100 ? 100 : num >= 10 ? 1000 : 10000;
-      num = mathRound(num * decimal) / decimal;
-      if (returnNum) {
-        return num;
-      }
-      if (num >= 100000) {
-        resultStr = num.toExponential(1);
-      } else {
-        resultStr = num.toString();
-      }
-      if (isMinus) {
-        resultStr = "-" + resultStr;
-      }
-      return resultStr;
-    } else {
-      if (returnNum) {
-        return null;
-      } else {
-        return "--";
-      }
-    }
-  }
+
 
   /**
    * initialise Highcharts' dom node
@@ -814,10 +690,10 @@ window.unitDocs = {
         chart,
         chartOption,
         subline;
-      if (isString(userOption.template)) {
-        chartOption = defaultTemplate[userOption.template];
-        userOption.chartOption = chartOption;
+      if (userOption.chartOption) {
+        userOption.chartOption = merge(defaultTemplate, userOption.chartOption);
       }
+      console.log(userOption.chartOption);
       options = merge(defaultOptions, userOption);
       boxNode = document.getElementById(options.renderTo);
 

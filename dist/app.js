@@ -26,6 +26,7 @@ if ('development' === app.get('env')) {
 	app.use(express.errorHandler());
 }
 
+
 app.get('/', routes.index);
 app.post('/chart', routes.chart);
 //app.get('/users', user.list);
