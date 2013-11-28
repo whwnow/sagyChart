@@ -10,11 +10,11 @@
 	<script type="text/javascript" src="./javascripts/sagyChart.js"></script>
 	<script type="text/javascript">
 		$(function(){
-			// window.chart = sagyChart('chartA');
+			window.chart = sagyChart('chartA');
 
 
 			// chart = sagyChart({
-			// 	template: "b",
+			// 	template: "a",
 			// 	renderTo: "chartA"
 			// });
 
@@ -38,14 +38,14 @@
 			// 	}
 			// });
 
-			$("#go").click(function(){
-				eval($("#texteval").val());
-			});
-			$("#texteval").on("keyup",function(e){
-				if(e.keyCode===13&&e.ctrlKey){
-					eval($("#texteval").val());
-				}
-			})
+			// $("#go").click(function(){
+			// 	eval($("#texteval").val());
+			// });
+			// $("#texteval").on("keyup",function(e){
+			// 	if(e.keyCode===13&&e.ctrlKey){
+			// 		eval($("#texteval").val());
+			// 	}
+			// })
 		});
 	</script>
 </head>
@@ -67,16 +67,20 @@
 		</div>
 		</br>
 		<textarea id="texteval">
-var docElm = document.documentElement;
-            if (docElm.requestFullscreen) {
-                docElm.requestFullscreen();
-            }
-            else if (docElm.mozRequestFullScreen) {
-                docElm.mozRequestFullScreen();
-            }
-            else if (docElm.webkitRequestFullScreen) {
-                docElm.webkitRequestFullScreen();
-            }
+chart.refresh({
+    transferData: {
+        bodySign: "1000040001",
+        endTime: null,
+        energyTypeId: 1,
+        isArea: false,
+        isThumbnail: false,
+        isEqument: false,
+        sign: "1",
+        startTime: "1376928000000",
+        timestep: 1,
+        number: 10000
+    }
+});
 		</textarea>
 		<input type="button" id="go" value="run"/>
 	</div>

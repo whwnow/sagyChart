@@ -16,7 +16,7 @@ function getData(val, time, isRandom) {
 		len = isRandom ? 100 : 24,
 		sum = first,
 		add;
-	val = parseInt(val, 10);
+	val = parseInt(val, 10)||1;
 	for (i = 0; i < len; i++) {
 		if (i === len - 1) {
 			yArray.push(null);
