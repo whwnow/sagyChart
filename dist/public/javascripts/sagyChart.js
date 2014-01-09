@@ -176,10 +176,10 @@ window.unitDocs = {
 };
 (function(window, undefined) {
   //some global variable
-  var im_version = "0.1.0",
+  var im_version = "0.6.0",
     im_obj = {},
     im_string = im_obj.toString,
-    im_hasOwn = im_obj.hasOwnProperty,
+    // im_hasOwn = im_obj.hasOwnProperty,
     document = window.document,
     MINUTE = 60000,
     HOUR = MINUTE * 60,
@@ -188,11 +188,11 @@ window.unitDocs = {
     math = Math,
     mathRound = math.round,
     mathRandom = math.random,
-    mathFloor = math.floor,
-    mathCeil = math.ceil,
+    // mathFloor = math.floor,
+    // mathCeil = math.ceil,
     mathMax = math.max,
     mathMin = math.min,
-    mathAbs = math.abs,
+    // mathAbs = math.abs,
     mathPow = math.pow,
     units = window.unitDocs;
   var sagyChart = function() {
@@ -201,8 +201,7 @@ window.unitDocs = {
       callback = args[1];
     if (isString(options)) {
       options = {
-        renderTo: args[0],
-        template: "a"
+        renderTo: args[0]
       };
     }
     return new sagyChart.fn.init(options, callback);
@@ -261,7 +260,6 @@ window.unitDocs = {
       } else {
         for (i in obj) {
           value = callback.call(obj[i], i, obj[i]);
-
           if (value === false) {
             break;
           }
@@ -288,40 +286,48 @@ window.unitDocs = {
    */
 
   function merge() {
-    var i,
-      len = arguments.length,
-      ret = {},
-      doCopy = function(copy, original) {
-        var value, key;
+    var src, copyIsArray, copy, name, options, clone,
+      target = {},
+      i = 0,
+      length = arguments.length;
 
-        if (typeof copy !== 'object') {
-          copy = {};
-        }
+    for (; i < length; i++) {
+      if ((options = arguments[i]) != null) {
 
-        for (key in original) {
-          if (original.hasOwnProperty(key)) {
-            value = original[key];
+        for (name in options) {
+          src = target[name];
+          copy = options[name];
 
-            if (value && typeof value === 'object' && im_string.call(value) !== '[object Array]' && typeof value.nodeType !== 'number') {
-              copy[key] = doCopy(copy[key] || {}, value);
+          if (target === copy) {
+            continue;
+          }
+
+          if (copy && (typeof copy === 'object' || (copyIsArray = isArray(copy)))) {
+            if (copyIsArray) {
+              copyIsArray = false;
+              clone = src && isArray(src) ? src : [];
 
             } else {
-              copy[key] = original[key];
+              clone = src && typeof src === 'object' ? src : {};
             }
+
+            target[name] = merge(clone, copy);
+
+          } else if (copy !== undefined) {
+            target[name] = copy;
           }
         }
-        return copy;
-      };
-
-    for (i = 0; i < len; i++) {
-      ret = doCopy(ret, arguments[i]);
+      }
     }
-
-    return ret;
+    return target;
   }
 
   function zeroTime(a) {
-    return a - a % DAY + new Date().getTimezoneOffset() * HOUR;
+    a.setHours(0);
+    a.setMinutes(0);
+    a.setSeconds(0);
+    a.setMilliseconds(0);
+    return a.getTime();
   }
 
   function numFormat(val, returnNum) {
@@ -480,17 +486,17 @@ window.unitDocs = {
   var defaultTemplate = {
     chart: {
       backgroundColor: "rgba(255,0,0,0)",
-      spacingBottom: 20,
-      marginRight: 110,
-      marginLeft: 110,
+      // spacingBottom: 20,
+      // marginRight: 110,
+      // marginLeft: 110,
       //marginTop: 110,
-      spacingLeft: 0,
+      // spacingLeft: 0,
       renderTo: "chart_container",
-      height: 650,
+      // height: 650,
       //marginBottom: 240,
       //marginRight:100,
-      plotBorderWidth: 1,
-      plotBackgroundColor: "#fffff9"
+      // plotBorderWidth: 1,
+      // plotBackgroundColor: "#fffff9"
     },
     legend: {
       enabled: false
@@ -499,101 +505,105 @@ window.unitDocs = {
       enabled: false,
     },
     plotOptions: {
-      series: {
-        turboThreshold: 200000,
-        stickyTracking: false,
+      column: {
         pointPadding: 0,
         borderWidth: 0,
         groupPadding: 0.1,
         pointPlacement: "on",
-        shadow: false,
-        point: {
-          events: {
-            mouseOver: func_pointMouseover,
-            mouseOut: func_pointMouseout
-          }
-        }
+      },
+      series: {
+        turboThreshold: 200000,
+        stickyTracking: true,
+        shadow: false
+        // point: {
+        //   events: {
+        //     mouseOver: func_pointMouseover,
+        //     mouseOut: func_pointMouseout
+        //   }
+        // }
       }
     },
-    tooltip: {
-      enabled: true,
-      animation: false,
-      formatter: function() {
-        return false;
-      },
-      crosshairs: [{
-        x: true,
-        dashStyle: "ShortDash",
-        width: 1
-      }, {
-        y: true,
-        dashStyle: "ShortDash",
-        width: 1,
-        zIndex: 10
-      }]
-    },
+    // tooltip: {
+    //   enabled: true,
+    //   animation: false,
+    //   formatter: function() {
+    //     return false;
+    //   },
+    //   crosshairs: [{
+    //     x: true,
+    //     dashStyle: "ShortDash",
+    //     width: 1
+    //   }, {
+    //     y: true,
+    //     dashStyle: "ShortDash",
+    //     width: 1,
+    //     zIndex: 10
+    //   }]
+    // },
     title: {
       text: null
     },
     xAxis: {
-      alternateGridColor: "rgba(242,253,242,0.5)",
+      // alternateGridColor: "rgba(242,253,242,0.5)",
       tickLength: 0,
       tickWidth: 0,
-      gridLineColor: "#B2EAC7",
-      gridLineDashStyle: "longDash",
-      gridLineWidth: 1,
+      lineWidth: 0,
+      // gridLineColor: "#B2EAC7",
+      // gridLineDashStyle: "longDash",
+      // gridLineWidth: 1,
       type: "datetime",
       title: {
         text: null
       },
-      labels: {
-        enabled: true,
-        style: {
-          fontSize: 20,
-          fontFamily: "Arial",
-          color: "#aaaaaa"
-        },
-        formatter: func_axisFormatter
-      },
-      offset: 25,
-      lineWidth: 0,
-      tickPositioner: func_tickPositioner
+      // labels: {
+      //   enabled: true,
+      //   style: {
+      //     fontSize: 20,
+      //     fontFamily: "Arial",
+      //     color: "#aaaaaa"
+      //   },
+      //   formatter: func_axisFormatter
+      // },
+      // offset: 25,
+
+      // tickPositioner: func_tickPositioner
     },
     yAxis: {
-      startOnTick: false,
-      tickPixelInterval: 80,
+      // startOnTick: false,
+      // tickPixelInterval: 80,
       tickWidth: 0,
-      offset: 150,
-      alternateGridColor: "rgba(244,248,248,0.5)",
-      gridLineColor: "#B2EAC7",
-      gridLineDashStyle: "longDash",
+      lineWidth: 0,
+      // offset: 150,
+      // alternateGridColor: "rgba(244,248,248,0.5)",
+      // gridLineColor: "#B2EAC7",
+      // gridLineDashStyle: "longDash",
       title: {
         text: null
       },
-      lineWidth: 0,
-      labels: {
-        align: "right",
-        enabled: true,
-        y: 10,
-        style: {
-          fontSize: 20,
-          fontFamily: "Arial",
-          color: "#aaaaaa"
-        }
-      }
+
+      // labels: {
+      //   align: "right",
+      //   enabled: true,
+      //   y: 10,
+      //   style: {
+      //     fontSize: 20,
+      //     fontFamily: "Arial",
+      //     color: "#aaaaaa"
+      //   }
+      // }
     },
     series: [{
       turboThreshold: 200000,
-      type: "column",
-      color: "#e59c9b",
+      // type: "column",
+      // color: "#e59c9b",
       data: [],
-      states: {
-        hover: {
-          enabled: false
-        }
-      },
+      // states: {
+      //   hover: {
+      //     enabled: false
+      //   }
+      // },
       shadow: false,
-      zIndex: 8
+      // zIndex: 8
     }]
   };
 
@@ -601,6 +611,8 @@ window.unitDocs = {
     chartOption: defaultTemplate,
     renderTo: "",
     resourcePath: "./images/sagyChart/",
+    autoAxis: true,
+    autoTooltip: true,
     subline: {
       enabled: false,
       lines: [],
@@ -644,10 +656,7 @@ window.unitDocs = {
 
   function initChartNode(options, parentNode) {
     var chartId = generateID(),
-      chartDiv,
-      i,
-      list,
-      templist = [];
+      chartDiv;
     chartDiv = document.createElement("div");
     chartDiv.setAttribute("id", chartId);
     chartDiv.style.height = "100%";
@@ -688,23 +697,28 @@ window.unitDocs = {
         options,
         boxNode,
         chart,
-        chartOption,
         subline;
-      if (userOption.chartOption) {
-        userOption.chartOption = merge(defaultTemplate, userOption.chartOption);
+      if (!userOption.chartOption) {
+        error('chartOption为必选项!');
       }
-      console.log(userOption.chartOption);
+      userOption.chartOption = merge(defaultTemplate, userOption.chartOption);
       options = merge(defaultOptions, userOption);
+      if (options.autoAxis) {
+        options.chartOption.xAxis.labels.formatter = func_axisFormatter;
+        options.chartOption.xAxis.tickPositioner = func_tickPositioner;
+      }
+
       boxNode = document.getElementById(options.renderTo);
 
       if (!boxNode) {
-        error("given a wrong dom id!");
+        error('页面不存在id为' + options.renderTo + '的元素');
       }
 
       sagy.subline = subline = new Subline(sagy, options.subline);
       sagy.showLine = iterator("show", subline);
       sagy.hideLine = iterator("hide", subline);
       sagy.adjustLine = iterator("adjust", subline);
+
       chart = initChartNode(options.chartOption, boxNode);
       chart.resourcePath = options.resourcePath;
       sagy.options = options;
@@ -736,7 +750,7 @@ window.unitDocs = {
         datatype: "json",
         data: JSON.stringify(options.transferData),
         url: options.url,
-        success: function(json, textStatus) {
+        success: function(json) {
           var status;
           if (json && json.yData && json.yData.length !== 0) {
             sagy.setData(json, options.index);
@@ -752,10 +766,7 @@ window.unitDocs = {
         },
         error: function() {
           log("ajax:" + options.url + " error!");
-        },
-        // status: 200
-        // statusText: "OK"
-        complete: function(e) {}
+        }
       });
     },
     //todo 单位平米驻图需要换颜色
@@ -820,7 +831,7 @@ window.unitDocs = {
         if (isFunction(pointHandler)) {
           point.isMin = point.y === min;
           point.isMax = point.y === max;
-          if (findLastData && point.y !== null && point.x > zeroTime(new Date - 0)) {
+          if (findLastData && point.y !== null && point.x > zeroTime(new Date())) {
             findLastData = false;
             point.isLast = true;
           } else {
@@ -878,8 +889,7 @@ window.unitDocs = {
       tempObj = baseUnitObj,
       ratio,
       i,
-      templist = [],
-      result;
+      templist = [];
     if (!baseUnitObj) {
       return {
         data: arr,
@@ -997,7 +1007,6 @@ window.unitDocs = {
     },
     adjust: function() {
       var subline = this,
-        lines = subline.lines,
         showed = subline.showed,
         deviation = subline.options.deviation,
         chart = subline.sagy.chart,
