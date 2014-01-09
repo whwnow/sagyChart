@@ -1,6 +1,6 @@
 (function(window, undefined) {
   //some global variable
-  var im_version = "0.1.0",
+  var im_version = "0.6.0",
     im_obj = {},
     im_string = im_obj.toString,
     // im_hasOwn = im_obj.hasOwnProperty,
@@ -25,8 +25,7 @@
       callback = args[1];
     if (isString(options)) {
       options = {
-        renderTo: args[0],
-        template: "a"
+        renderTo: args[0]
       };
     }
     return new sagyChart.fn.init(options, callback);
@@ -85,7 +84,6 @@
       } else {
         for (i in obj) {
           value = callback.call(obj[i], i, obj[i]);
-
           if (value === false) {
             break;
           }
@@ -308,17 +306,17 @@
   var defaultTemplate = {
     chart: {
       backgroundColor: "rgba(255,0,0,0)",
-      spacingBottom: 20,
-      marginRight: 110,
-      marginLeft: 110,
+      // spacingBottom: 20,
+      // marginRight: 110,
+      // marginLeft: 110,
       //marginTop: 110,
-      spacingLeft: 0,
+      // spacingLeft: 0,
       renderTo: "chart_container",
-      height: 650,
+      // height: 650,
       //marginBottom: 240,
       //marginRight:100,
-      plotBorderWidth: 1,
-      plotBackgroundColor: "#fffff9"
+      // plotBorderWidth: 1,
+      // plotBackgroundColor: "#fffff9"
     },
     legend: {
       enabled: false
@@ -327,101 +325,105 @@
       enabled: false,
     },
     plotOptions: {
-      series: {
-        turboThreshold: 200000,
-        stickyTracking: false,
+      column: {
         pointPadding: 0,
         borderWidth: 0,
         groupPadding: 0.1,
         pointPlacement: "on",
-        shadow: false,
-        point: {
-          events: {
-            mouseOver: func_pointMouseover,
-            mouseOut: func_pointMouseout
-          }
-        }
+      },
+      series: {
+        turboThreshold: 200000,
+        stickyTracking: true,
+        shadow: false
+        // point: {
+        //   events: {
+        //     mouseOver: func_pointMouseover,
+        //     mouseOut: func_pointMouseout
+        //   }
+        // }
       }
     },
-    tooltip: {
-      enabled: true,
-      animation: false,
-      formatter: function() {
-        return false;
-      },
-      crosshairs: [{
-        x: true,
-        dashStyle: "ShortDash",
-        width: 1
-      }, {
-        y: true,
-        dashStyle: "ShortDash",
-        width: 1,
-        zIndex: 10
-      }]
-    },
+    // tooltip: {
+    //   enabled: true,
+    //   animation: false,
+    //   formatter: function() {
+    //     return false;
+    //   },
+    //   crosshairs: [{
+    //     x: true,
+    //     dashStyle: "ShortDash",
+    //     width: 1
+    //   }, {
+    //     y: true,
+    //     dashStyle: "ShortDash",
+    //     width: 1,
+    //     zIndex: 10
+    //   }]
+    // },
     title: {
       text: null
     },
     xAxis: {
-      alternateGridColor: "rgba(242,253,242,0.5)",
+      // alternateGridColor: "rgba(242,253,242,0.5)",
       tickLength: 0,
       tickWidth: 0,
-      gridLineColor: "#B2EAC7",
-      gridLineDashStyle: "longDash",
-      gridLineWidth: 1,
+      lineWidth: 0,
+      // gridLineColor: "#B2EAC7",
+      // gridLineDashStyle: "longDash",
+      // gridLineWidth: 1,
       type: "datetime",
       title: {
         text: null
       },
-      labels: {
-        enabled: true,
-        style: {
-          fontSize: 20,
-          fontFamily: "Arial",
-          color: "#aaaaaa"
-        },
-        formatter: func_axisFormatter
-      },
-      offset: 25,
-      lineWidth: 0,
-      tickPositioner: func_tickPositioner
+      // labels: {
+      //   enabled: true,
+      //   style: {
+      //     fontSize: 20,
+      //     fontFamily: "Arial",
+      //     color: "#aaaaaa"
+      //   },
+      //   formatter: func_axisFormatter
+      // },
+      // offset: 25,
+
+      // tickPositioner: func_tickPositioner
     },
     yAxis: {
-      startOnTick: false,
-      tickPixelInterval: 80,
+      // startOnTick: false,
+      // tickPixelInterval: 80,
       tickWidth: 0,
-      offset: 150,
-      alternateGridColor: "rgba(244,248,248,0.5)",
-      gridLineColor: "#B2EAC7",
-      gridLineDashStyle: "longDash",
+      lineWidth: 0,
+      // offset: 150,
+      // alternateGridColor: "rgba(244,248,248,0.5)",
+      // gridLineColor: "#B2EAC7",
+      // gridLineDashStyle: "longDash",
       title: {
         text: null
       },
-      lineWidth: 0,
-      labels: {
-        align: "right",
-        enabled: true,
-        y: 10,
-        style: {
-          fontSize: 20,
-          fontFamily: "Arial",
-          color: "#aaaaaa"
-        }
-      }
+
+      // labels: {
+      //   align: "right",
+      //   enabled: true,
+      //   y: 10,
+      //   style: {
+      //     fontSize: 20,
+      //     fontFamily: "Arial",
+      //     color: "#aaaaaa"
+      //   }
+      // }
     },
     series: [{
       turboThreshold: 200000,
-      type: "column",
-      color: "#e59c9b",
+      // type: "column",
+      // color: "#e59c9b",
       data: [],
-      states: {
-        hover: {
-          enabled: false
-        }
-      },
+      // states: {
+      //   hover: {
+      //     enabled: false
+      //   }
+      // },
       shadow: false,
-      zIndex: 8
+      // zIndex: 8
     }]
   };
 
@@ -429,6 +431,8 @@
     chartOption: defaultTemplate,
     renderTo: "",
     resourcePath: "./images/sagyChart/",
+    autoAxis: true,
+    autoTooltip: true,
     subline: {
       enabled: false,
       lines: [],
@@ -514,20 +518,27 @@
         boxNode,
         chart,
         subline;
-      if (userOption.chartOption) {
-        userOption.chartOption = merge(defaultTemplate, userOption.chartOption);
+      if (!userOption.chartOption) {
+        error('chartOption为必选项!');
       }
+      userOption.chartOption = merge(defaultTemplate, userOption.chartOption);
       options = merge(defaultOptions, userOption);
+      if (options.autoAxis) {
+        options.chartOption.xAxis.labels.formatter = func_axisFormatter;
+        options.chartOption.xAxis.tickPositioner = func_tickPositioner;
+      }
+
       boxNode = document.getElementById(options.renderTo);
 
       if (!boxNode) {
-        error("given a wrong dom id!");
+        error('页面不存在id为' + options.renderTo + '的元素');
       }
 
       sagy.subline = subline = new Subline(sagy, options.subline);
       sagy.showLine = iterator("show", subline);
       sagy.hideLine = iterator("hide", subline);
       sagy.adjustLine = iterator("adjust", subline);
+
       chart = initChartNode(options.chartOption, boxNode);
       chart.resourcePath = options.resourcePath;
       sagy.options = options;
