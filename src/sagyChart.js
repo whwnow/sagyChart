@@ -3,7 +3,7 @@
   var im_version = "0.1.0",
     im_obj = {},
     im_string = im_obj.toString,
-    im_hasOwn = im_obj.hasOwnProperty,
+    // im_hasOwn = im_obj.hasOwnProperty,
     document = window.document,
     MINUTE = 60000,
     HOUR = MINUTE * 60,
@@ -12,11 +12,11 @@
     math = Math,
     mathRound = math.round,
     mathRandom = math.random,
-    mathFloor = math.floor,
-    mathCeil = math.ceil,
+    // mathFloor = math.floor,
+    // mathCeil = math.ceil,
     mathMax = math.max,
     mathMin = math.min,
-    mathAbs = math.abs,
+    // mathAbs = math.abs,
     mathPow = math.pow,
     units = window.unitDocs;
   var sagyChart = function() {
@@ -112,36 +112,40 @@
    */
 
   function merge() {
-    var i,
-      len = arguments.length,
-      ret = {},
-      doCopy = function(copy, original) {
-        var value, key;
+    var src, copyIsArray, copy, name, options, clone,
+      target = {},
+      i = 0,
+      length = arguments.length;
 
-        if (typeof copy !== 'object') {
-          copy = {};
-        }
+    for (; i < length; i++) {
+      if ((options = arguments[i]) != null) {
 
-        for (key in original) {
-          if (original.hasOwnProperty(key)) {
-            value = original[key];
+        for (name in options) {
+          src = target[name];
+          copy = options[name];
 
-            if (value && typeof value === 'object' && im_string.call(value) !== '[object Array]' && typeof value.nodeType !== 'number') {
-              copy[key] = doCopy(copy[key] || {}, value);
+          if (target === copy) {
+            continue;
+          }
+
+          if (copy && (typeof copy === 'object' || (copyIsArray = isArray(copy)))) {
+            if (copyIsArray) {
+              copyIsArray = false;
+              clone = src && isArray(src) ? src : [];
 
             } else {
-              copy[key] = original[key];
+              clone = src && typeof src === 'object' ? src : {};
             }
+
+            target[name] = merge(clone, copy);
+
+          } else if (copy !== undefined) {
+            target[name] = copy;
           }
         }
-        return copy;
-      };
-
-    for (i = 0; i < len; i++) {
-      ret = doCopy(ret, arguments[i]);
+      }
     }
-
-    return ret;
+    return target;
   }
 
   function zeroTime(a) {
@@ -468,10 +472,7 @@
 
   function initChartNode(options, parentNode) {
     var chartId = generateID(),
-      chartDiv,
-      i,
-      list,
-      templist = [];
+      chartDiv;
     chartDiv = document.createElement("div");
     chartDiv.setAttribute("id", chartId);
     chartDiv.style.height = "100%";
@@ -512,15 +513,11 @@
         options,
         boxNode,
         chart,
-        chartOption = defaultTemplate,
         subline;
       if (userOption.chartOption) {
-        chartOption = merge(defaultTemplate, userOption.chartOption);
-        userOption.chartOption = null;
+        userOption.chartOption = merge(defaultTemplate, userOption.chartOption);
       }
-      console.log(userOption.chartOption);
       options = merge(defaultOptions, userOption);
-      options.chartOption = chartOption;
       boxNode = document.getElementById(options.renderTo);
 
       if (!boxNode) {
@@ -531,7 +528,7 @@
       sagy.showLine = iterator("show", subline);
       sagy.hideLine = iterator("hide", subline);
       sagy.adjustLine = iterator("adjust", subline);
-      chart = initChartNode(chartOption, boxNode);
+      chart = initChartNode(options.chartOption, boxNode);
       chart.resourcePath = options.resourcePath;
       sagy.options = options;
       sagy.chart = chart;
@@ -562,7 +559,7 @@
         datatype: "json",
         data: JSON.stringify(options.transferData),
         url: options.url,
-        success: function(json, textStatus) {
+        success: function(json) {
           var status;
           if (json && json.yData && json.yData.length !== 0) {
             sagy.setData(json, options.index);
@@ -578,10 +575,7 @@
         },
         error: function() {
           log("ajax:" + options.url + " error!");
-        },
-        // status: 200
-        // statusText: "OK"
-        complete: function(e) {}
+        }
       });
     },
     //todo 单位平米驻图需要换颜色
@@ -646,7 +640,7 @@
         if (isFunction(pointHandler)) {
           point.isMin = point.y === min;
           point.isMax = point.y === max;
-          if (findLastData && point.y !== null && point.x > zeroTime(new Date - 0)) {
+          if (findLastData && point.y !== null && point.x > zeroTime(new Date() - 0)) {
             findLastData = false;
             point.isLast = true;
           } else {
@@ -704,8 +698,7 @@
       tempObj = baseUnitObj,
       ratio,
       i,
-      templist = [],
-      result;
+      templist = [];
     if (!baseUnitObj) {
       return {
         data: arr,
@@ -823,7 +816,6 @@
     },
     adjust: function() {
       var subline = this,
-        lines = subline.lines,
         showed = subline.showed,
         deviation = subline.options.deviation,
         chart = subline.sagy.chart,
