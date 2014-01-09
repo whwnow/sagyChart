@@ -147,7 +147,11 @@
   }
 
   function zeroTime(a) {
-    return a - a % DAY + new Date().getTimezoneOffset() * HOUR;
+    a.setHours(0);
+    a.setMinutes(0);
+    a.setSeconds(0);
+    a.setMilliseconds(0);
+    return a.getTime();
   }
 
   function numFormat(val, returnNum) {
@@ -651,7 +655,7 @@
         if (isFunction(pointHandler)) {
           point.isMin = point.y === min;
           point.isMax = point.y === max;
-          if (findLastData && point.y !== null && point.x > zeroTime(new Date() - 0)) {
+          if (findLastData && point.y !== null && point.x > zeroTime(new Date())) {
             findLastData = false;
             point.isLast = true;
           } else {
