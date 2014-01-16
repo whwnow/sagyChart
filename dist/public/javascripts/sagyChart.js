@@ -176,7 +176,7 @@ window.unitDocs = {
 };
 (function(window, undefined) {
   //some global variable
-  var im_version = "0.6.0",
+  var im_version = "0.7.0",
     im_obj = {},
     im_string = im_obj.toString,
     // im_hasOwn = im_obj.hasOwnProperty,
@@ -364,7 +364,9 @@ window.unitDocs = {
 
 
   function Point(x, y) {
-    this.x = x;
+    if (x) {
+      this.x = x;
+    }
     this.y = y;
   }
 
@@ -707,6 +709,10 @@ window.unitDocs = {
         options.chartOption.xAxis.labels.formatter = func_axisFormatter;
         options.chartOption.xAxis.tickPositioner = func_tickPositioner;
       }
+      if (options.autoTooltip) {
+        options.chartOption.plotOptions.series.point.events.mouseOver.mouseOut = func_pointMouseover;
+        options.chartOption.plotOptions.series.point.events.mouseOut = func_pointMouseout;
+      }
 
       boxNode = document.getElementById(options.renderTo);
 
@@ -765,7 +771,7 @@ window.unitDocs = {
           }
         },
         error: function() {
-          log("ajax:" + options.url + " error!");
+          error("ajax:" + options.url + " error!");
         }
       });
     },
@@ -782,7 +788,8 @@ window.unitDocs = {
         lenSeries = series.length,
         xArray = json.xData,
         yArray = json.yData,
-        len = xArray.length,
+        len = yArray.length,
+        isDatetime = !! xArray,
         i = 0,
         list = [],
         point,
@@ -793,16 +800,18 @@ window.unitDocs = {
         j,
         values,
         lastX;
-      while (i < (yArray.length - 1) && yArray[i] === null || yArray[i + 1] === null) {
-        i++;
-      }
-      if (i >= yArray.length) {
-        chart.timeType = 6;
-      } else {
-        chart.timeType = calculateTimeType(xArray[i + 1] - xArray[i], options.axisRatio);
-      }
+      if (isDatetime) {
+        while (i < (yArray.length - 1) && yArray[i] === null || yArray[i + 1] === null) {
+          i++;
+        }
+        if (i >= yArray.length) {
+          chart.timeType = 6;
+        } else {
+          chart.timeType = calculateTimeType(xArray[i + 1] - xArray[i], options.axisRatio);
+        }
 
-      chart.recentLength = xArray.length;
+        chart.recentLength = xArray.length;
+      }
 
       if (options.subline.enabled) {
         each(json.lines, function(i, item) {
@@ -821,17 +830,20 @@ window.unitDocs = {
       min = mathMin.apply(math, values);
       max = mathMax.apply(math, values);
       for (i = len - 1; i >= 0; i--) {
-        if (lastX) {
-          if ((lastX - xArray[i]) > HOUR * 2) {
-            point = new Point(xArray[i] + HOUR * 2, null);
-            list.unshift(point);
+        if (isDatetime) {
+          if (lastX) {
+            if ((lastX - xArray[i]) > HOUR * 2) {
+              point = new Point(xArray[i] + HOUR * 2, null);
+              list.unshift(point);
+            }
           }
+          lastX = yArray[i] === null ? null : xArray[i];
         }
         point = new Point(xArray[i], yArray[i]);
         if (isFunction(pointHandler)) {
           point.isMin = point.y === min;
           point.isMax = point.y === max;
-          if (findLastData && point.y !== null && point.x > zeroTime(new Date())) {
+          if (isDatetime && findLastData && point.y !== null && point.x > zeroTime(new Date())) {
             findLastData = false;
             point.isLast = true;
           } else {
@@ -842,7 +854,7 @@ window.unitDocs = {
         // point.y = point.y === null ? null : numFormat(point.y,true);
         point.y = point.y === null ? null : mathRound(point.y * 100) / 100;
         list.unshift(point);
-        lastX = yArray[i] === null ? null : xArray[i];
+
       }
       index = index > lenSeries || index < lenSeries * -1 ? lenSeries - 1 : index;
       j = +index + (index < 0 ? lenSeries : 0);

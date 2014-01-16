@@ -1,6 +1,6 @@
 (function(window, undefined) {
   //some global variable
-  var im_version = "0.6.0",
+  var im_version = "0.7.0",
     im_obj = {},
     im_string = im_obj.toString,
     // im_hasOwn = im_obj.hasOwnProperty,
