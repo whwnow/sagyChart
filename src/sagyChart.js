@@ -531,6 +531,10 @@
         options.chartOption.xAxis.labels.formatter = func_axisFormatter;
         options.chartOption.xAxis.tickPositioner = func_tickPositioner;
       }
+      if (options.autoTooltip) {
+        options.chartOption.plotOptions.series.point.events.mouseOver.mouseOut = func_pointMouseover;
+        options.chartOption.plotOptions.series.point.events.mouseOut = func_pointMouseout;
+      }
 
       boxNode = document.getElementById(options.renderTo);
 
@@ -589,7 +593,7 @@
           }
         },
         error: function() {
-          log("ajax:" + options.url + " error!");
+          error("ajax:" + options.url + " error!");
         }
       });
     },
@@ -606,7 +610,7 @@
         lenSeries = series.length,
         xArray = json.xData,
         yArray = json.yData,
-        len = xArray.length,
+        len = yArray.length,
         i = 0,
         list = [],
         point,
