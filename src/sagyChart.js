@@ -188,7 +188,9 @@
 
 
   function Point(x, y) {
-    this.x = x;
+    if (x) {
+      this.x = x;
+    }
     this.y = y;
   }
 
@@ -611,6 +613,7 @@
         xArray = json.xData,
         yArray = json.yData,
         len = yArray.length,
+        isDatetime = !! xArray,
         i = 0,
         list = [],
         point,
@@ -621,16 +624,18 @@
         j,
         values,
         lastX;
-      while (i < (yArray.length - 1) && yArray[i] === null || yArray[i + 1] === null) {
-        i++;
-      }
-      if (i >= yArray.length) {
-        chart.timeType = 6;
-      } else {
-        chart.timeType = calculateTimeType(xArray[i + 1] - xArray[i], options.axisRatio);
-      }
+      if (isDatetime) {
+        while (i < (yArray.length - 1) && yArray[i] === null || yArray[i + 1] === null) {
+          i++;
+        }
+        if (i >= yArray.length) {
+          chart.timeType = 6;
+        } else {
+          chart.timeType = calculateTimeType(xArray[i + 1] - xArray[i], options.axisRatio);
+        }
 
-      chart.recentLength = xArray.length;
+        chart.recentLength = xArray.length;
+      }
 
       if (options.subline.enabled) {
         each(json.lines, function(i, item) {
@@ -649,17 +654,20 @@
       min = mathMin.apply(math, values);
       max = mathMax.apply(math, values);
       for (i = len - 1; i >= 0; i--) {
-        if (lastX) {
-          if ((lastX - xArray[i]) > HOUR * 2) {
-            point = new Point(xArray[i] + HOUR * 2, null);
-            list.unshift(point);
+        if (isDatetime) {
+          if (lastX) {
+            if ((lastX - xArray[i]) > HOUR * 2) {
+              point = new Point(xArray[i] + HOUR * 2, null);
+              list.unshift(point);
+            }
           }
+          lastX = yArray[i] === null ? null : xArray[i];
         }
         point = new Point(xArray[i], yArray[i]);
         if (isFunction(pointHandler)) {
           point.isMin = point.y === min;
           point.isMax = point.y === max;
-          if (findLastData && point.y !== null && point.x > zeroTime(new Date())) {
+          if (isDatetime && findLastData && point.y !== null && point.x > zeroTime(new Date())) {
             findLastData = false;
             point.isLast = true;
           } else {
@@ -670,7 +678,7 @@
         // point.y = point.y === null ? null : numFormat(point.y,true);
         point.y = point.y === null ? null : mathRound(point.y * 100) / 100;
         list.unshift(point);
-        lastX = yArray[i] === null ? null : xArray[i];
+
       }
       index = index > lenSeries || index < lenSeries * -1 ? lenSeries - 1 : index;
       j = +index + (index < 0 ? lenSeries : 0);
