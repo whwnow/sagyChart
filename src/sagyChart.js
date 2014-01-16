@@ -603,6 +603,7 @@
         pointHandler = options.ajaxOption.pointHandler,
         index = _index === undefined ? options.ajaxOption.index : _index,
         series = chart.series,
+        lenSeries = series.length,
         xArray = json.xData,
         yArray = json.yData,
         len = xArray.length,
@@ -613,7 +614,6 @@
         max,
         findLastData = true,
         temp,
-        lenSeries,
         j,
         values,
         lastX;
@@ -670,7 +670,13 @@
       }
       index = index > lenSeries || index < lenSeries * -1 ? lenSeries - 1 : index;
       j = +index + (index < 0 ? lenSeries : 0);
-      series[j].setData(list);
+      if (series[j]) {
+        series[j].setData(list);
+      } else {
+        chart.addSeries({
+          data: list
+        });
+      }
       if (!isEmptyObject(subline.showed)) {
         sagy.adjustLine();
       }
