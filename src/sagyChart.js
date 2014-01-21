@@ -1,6 +1,6 @@
 (function(window, undefined) {
   //some global variable
-  var im_version = "0.7.0",
+  var im_version = "0.7.1",
     im_obj = {},
     im_string = im_obj.toString,
     // im_hasOwn = im_obj.hasOwnProperty,
@@ -467,7 +467,8 @@
       },
       index: 0,
       callback: null,
-      pointHandler: null
+      pointHandler: null,
+      isJson: true
     }
   };
 
@@ -578,7 +579,7 @@
       $.ajax({
         type: "POST",
         datatype: "json",
-        data: JSON.stringify(options.transferData),
+        data: options.isJson ? options.transferData : JSON.stringify(options.transferData),
         url: options.url,
         success: function(json) {
           var status;
