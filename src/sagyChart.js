@@ -664,7 +664,7 @@
           }
           lastX = yArray[i] === null ? null : xArray[i];
         }
-        point = new Point(xArray[i], yArray[i]);
+        point = new Point(isDatetime ? xArray[i] : null, yArray[i]);
         if (isFunction(pointHandler)) {
           point.isMin = point.y === min;
           point.isMax = point.y === max;
