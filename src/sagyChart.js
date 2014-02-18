@@ -346,7 +346,7 @@
       // marginLeft: 110,
       //marginTop: 110,
       // spacingLeft: 0,
-      renderTo: "chart_container",
+      renderTo: "chart_container"
       // height: 650,
       //marginBottom: 240,
       //marginRight:100,
@@ -357,15 +357,15 @@
       enabled: false
     },
     credits: {
-      enabled: false,
+      enabled: false
     },
     plotOptions: {
-      column: {
-        pointPadding: 0,
-        borderWidth: 0,
-        groupPadding: 0.1,
-        pointPlacement: "on",
-      },
+      // column: {
+      //   pointPadding: 0,
+      //   borderWidth: 0,
+      //   groupPadding: 0.1,
+      //   pointPlacement: "on",
+      // },
       series: {
         turboThreshold: 200000,
         stickyTracking: true,
@@ -406,10 +406,10 @@
       // gridLineColor: "#B2EAC7",
       // gridLineDashStyle: "longDash",
       // gridLineWidth: 1,
-      type: "datetime",
+      // type: "datetime",
       title: {
         text: null
-      },
+      }
       // labels: {
       //   enabled: true,
       //   style: {
@@ -434,7 +434,7 @@
       // gridLineDashStyle: "longDash",
       title: {
         text: null
-      },
+      }
 
       // labels: {
       //   align: "right",
@@ -446,20 +446,20 @@
       //     color: "#aaaaaa"
       //   }
       // }
-    },
-    series: [{
-      turboThreshold: 200000,
-      // type: "column",
-      // color: "#e59c9b",
-      data: [],
-      // states: {
-      //   hover: {
-      //     enabled: false
-      //   }
-      // },
-      shadow: false,
-      // zIndex: 8
-    }]
+    }
+    // series: [{
+    //   turboThreshold: 200000,
+    //   // type: "column",
+    //   // color: "#e59c9b",
+    //   data: [],
+    //   // states: {
+    //   //   hover: {
+    //   //     enabled: false
+    //   //   }
+    //   // },
+    //   shadow: false,
+    //   // zIndex: 8
+    // }]
   };
 
   var defaultOptions = {
