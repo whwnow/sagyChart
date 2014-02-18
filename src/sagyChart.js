@@ -104,12 +104,8 @@
     return a;
   }
 
-  /**
-   * 更新
-   * @return {object} 更新结果
-   */
 
-  function merge() {
+  function deepCopy() {
     var src, copyIsArray, copy, name, options, clone,
       target = {},
       i = 0,
@@ -144,6 +140,39 @@
       }
     }
     return target;
+  }
+
+  function merge() {
+    var i,
+      len = arguments.length,
+      ret = {},
+      doCopy = function(copy, original) {
+        var value, key;
+
+        if (typeof copy !== 'object') {
+          copy = {};
+        }
+
+        for (key in original) {
+          if (original.hasOwnProperty(key)) {
+            value = original[key];
+
+            if (value && typeof value === 'object' && im_string.call(value) !== '[object Array]' && typeof value.nodeType !== 'number') {
+              copy[key] = doCopy(copy[key] || {}, value);
+
+            } else {
+              copy[key] = original[key];
+            }
+          }
+        }
+        return copy;
+      };
+
+    for (i = 0; i < len; i++) {
+      ret = doCopy(ret, arguments[i]);
+    }
+
+    return ret;
   }
 
   function zeroTime(a) {
