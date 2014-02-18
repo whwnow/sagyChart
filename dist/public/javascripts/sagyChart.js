@@ -176,7 +176,7 @@ window.unitDocs = {
 };
 (function(window, undefined) {
   //some global variable
-  var im_version = "0.7.0",
+  var im_version = "0.8.1",
     im_obj = {},
     im_string = im_obj.toString,
     // im_hasOwn = im_obj.hasOwnProperty,
@@ -280,12 +280,8 @@ window.unitDocs = {
     return a;
   }
 
-  /**
-   * 更新
-   * @return {object} 更新结果
-   */
 
-  function merge() {
+  function deepCopy() {
     var src, copyIsArray, copy, name, options, clone,
       target = {},
       i = 0,
@@ -320,6 +316,39 @@ window.unitDocs = {
       }
     }
     return target;
+  }
+
+  function merge() {
+    var i,
+      len = arguments.length,
+      ret = {},
+      doCopy = function(copy, original) {
+        var value, key;
+
+        if (typeof copy !== 'object') {
+          copy = {};
+        }
+
+        for (key in original) {
+          if (original.hasOwnProperty(key)) {
+            value = original[key];
+
+            if (value && typeof value === 'object' && im_string.call(value) !== '[object Array]' && typeof value.nodeType !== 'number') {
+              copy[key] = doCopy(copy[key] || {}, value);
+
+            } else {
+              copy[key] = original[key];
+            }
+          }
+        }
+        return copy;
+      };
+
+    for (i = 0; i < len; i++) {
+      ret = doCopy(ret, arguments[i]);
+    }
+
+    return ret;
   }
 
   function zeroTime(a) {
@@ -493,7 +522,7 @@ window.unitDocs = {
       // marginLeft: 110,
       //marginTop: 110,
       // spacingLeft: 0,
-      renderTo: "chart_container",
+      renderTo: "chart_container"
       // height: 650,
       //marginBottom: 240,
       //marginRight:100,
@@ -504,15 +533,15 @@ window.unitDocs = {
       enabled: false
     },
     credits: {
-      enabled: false,
+      enabled: false
     },
     plotOptions: {
-      column: {
-        pointPadding: 0,
-        borderWidth: 0,
-        groupPadding: 0.1,
-        pointPlacement: "on",
-      },
+      // column: {
+      //   pointPadding: 0,
+      //   borderWidth: 0,
+      //   groupPadding: 0.1,
+      //   pointPlacement: "on",
+      // },
       series: {
         turboThreshold: 200000,
         stickyTracking: true,
@@ -553,10 +582,10 @@ window.unitDocs = {
       // gridLineColor: "#B2EAC7",
       // gridLineDashStyle: "longDash",
       // gridLineWidth: 1,
-      type: "datetime",
+      // type: "datetime",
       title: {
         text: null
-      },
+      }
       // labels: {
       //   enabled: true,
       //   style: {
@@ -581,7 +610,7 @@ window.unitDocs = {
       // gridLineDashStyle: "longDash",
       title: {
         text: null
-      },
+      }
 
       // labels: {
       //   align: "right",
@@ -593,20 +622,20 @@ window.unitDocs = {
       //     color: "#aaaaaa"
       //   }
       // }
-    },
-    series: [{
-      turboThreshold: 200000,
-      // type: "column",
-      // color: "#e59c9b",
-      data: [],
-      // states: {
-      //   hover: {
-      //     enabled: false
-      //   }
-      // },
-      shadow: false,
-      // zIndex: 8
-    }]
+    }
+    // series: [{
+    //   turboThreshold: 200000,
+    //   // type: "column",
+    //   // color: "#e59c9b",
+    //   data: [],
+    //   // states: {
+    //   //   hover: {
+    //   //     enabled: false
+    //   //   }
+    //   // },
+    //   shadow: false,
+    //   // zIndex: 8
+    // }]
   };
 
   var defaultOptions = {
@@ -643,7 +672,8 @@ window.unitDocs = {
       },
       index: 0,
       callback: null,
-      pointHandler: null
+      pointHandler: null,
+      isJson: true
     }
   };
 
@@ -754,7 +784,7 @@ window.unitDocs = {
       $.ajax({
         type: "POST",
         datatype: "json",
-        data: JSON.stringify(options.transferData),
+        data: options.isJson ? options.transferData : JSON.stringify(options.transferData),
         url: options.url,
         success: function(json) {
           var status;
@@ -839,7 +869,7 @@ window.unitDocs = {
           }
           lastX = yArray[i] === null ? null : xArray[i];
         }
-        point = new Point(xArray[i], yArray[i]);
+        point = new Point(isDatetime ? xArray[i] : null, yArray[i]);
         if (isFunction(pointHandler)) {
           point.isMin = point.y === min;
           point.isMax = point.y === max;
