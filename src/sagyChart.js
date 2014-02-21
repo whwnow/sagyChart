@@ -515,8 +515,8 @@
       chartDiv;
     chartDiv = document.createElement("div");
     chartDiv.setAttribute("id", chartId);
-    chartDiv.style.height = "100%";
-    chartDiv.style.width = "100%";
+    // chartDiv.style.height = "100%";
+    // chartDiv.style.width = "100%";
     parentNode.appendChild(chartDiv);
     options.chart.renderTo = chartId;
     return new Highcharts.Chart(options);
@@ -637,7 +637,7 @@
         chart = sagy.chart,
         options = sagy.options,
         pointHandler = options.ajaxOption.pointHandler,
-        index = _index === undefined ? options.ajaxOption.index : _index,
+        index = _index === undefined ? options.ajaxOption.index : options.ajaxOption.index = _index,
         series = chart.series,
         lenSeries = series.length,
         xArray = json.xData,
@@ -703,7 +703,7 @@
           } else {
             point.isLast = false;
           }
-          pointHandler.call(point, sagy.options.ajaxOption.transferData);
+          pointHandler.call(point, sagy.options.ajaxOption);
         }
         // point.y = point.y === null ? null : numFormat(point.y,true);
         point.y = point.y === null ? null : mathRound(point.y * 100) / 100;
@@ -857,7 +857,7 @@
       } else {
         each(args[0], function(i, item) {
           showed["line" + i] = lines[i] = merge(lines[i], item);
-          if (lines[item].node) {
+          if (lines[i].node) {
             lines[i].node.style.display = "block";
           }
         });
