@@ -466,8 +466,8 @@
     chartOption: defaultTemplate,
     renderTo: "",
     resourcePath: "./images/sagyChart/",
-    autoAxis: true,
-    autoTooltip: true,
+    autoAxis: false,
+    autoTooltip: false,
     subline: {
       enabled: false,
       lines: [],
