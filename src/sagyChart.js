@@ -640,10 +640,10 @@
         index = _index === undefined ? options.ajaxOption.index : options.ajaxOption.index = _index,
         series = chart.series,
         lenSeries = series.length,
-        xArray = json.xData,
-        yArray = json.yData,
-        len = yArray.length,
-        isDatetime = !! xArray,
+        xData = json.xData,
+        yData = json.yData,
+        len = yData.length,
+        isDatetime = !! xData,
         i = 0,
         list = [],
         point,
@@ -655,16 +655,16 @@
         values,
         lastX;
       if (isDatetime) {
-        while (i < (yArray.length - 1) && yArray[i] === null || yArray[i + 1] === null) {
+        while (i < (yData.length - 1) && yData[i] === null || yData[i + 1] === null) {
           i++;
         }
-        if (i >= yArray.length) {
+        if (i >= yData.length) {
           chart.timeType = 6;
         } else {
-          chart.timeType = calculateTimeType(xArray[i + 1] - xArray[i], options.axisRatio);
+          chart.timeType = calculateTimeType(xData[i + 1] - xData[i], options.axisRatio);
         }
 
-        chart.recentLength = xArray.length;
+        chart.recentLength = xData.length;
       }
 
       if (options.subline.enabled) {
@@ -673,12 +673,12 @@
         });
       }
       if (options.convertUnit.enabled) {
-        temp = sagy.convertUnitArr(yArray, json.unit);
+        temp = sagy.convertUnitArr(yData, json.unit);
         sagy.unit = temp.unit;
-        yArray = temp.data;
+        yData = temp.data;
       }
 
-      values = yArray.filter(function(val) {
+      values = yData.filter(function(val) {
         return val !== null;
       });
       min = mathMin.apply(math, values);
@@ -686,14 +686,14 @@
       for (i = len - 1; i >= 0; i--) {
         if (isDatetime) {
           if (lastX) {
-            if ((lastX - xArray[i]) > HOUR * 2) {
-              point = new Point(xArray[i] + HOUR * 2, null);
+            if ((lastX - xData[i]) > HOUR * 2) {
+              point = new Point(xData[i] + HOUR * 2, null);
               list.unshift(point);
             }
           }
-          lastX = yArray[i] === null ? null : xArray[i];
+          lastX = yData[i] === null ? null : xData[i];
         }
-        point = new Point(isDatetime ? xArray[i] : null, yArray[i]);
+        point = new Point(isDatetime ? xData[i] : null, yData[i]);
         if (isFunction(pointHandler)) {
           point.isMin = point.y === min;
           point.isMax = point.y === max;
