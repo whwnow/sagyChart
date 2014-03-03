@@ -176,7 +176,7 @@ window.unitDocs = {
 };
 (function(window, undefined) {
   //some global variable
-  var im_version = "0.8.2",
+  var im_version = "0.9.1",
     im_obj = {},
     im_string = im_obj.toString,
     // im_hasOwn = im_obj.hasOwnProperty,
@@ -642,8 +642,8 @@ window.unitDocs = {
     chartOption: defaultTemplate,
     renderTo: "",
     resourcePath: "./images/sagyChart/",
-    autoAxis: true,
-    autoTooltip: true,
+    autoAxis: false,
+    autoTooltip: false,
     subline: {
       enabled: false,
       lines: [],
@@ -812,92 +812,135 @@ window.unitDocs = {
         lines = subline.lines,
         chart = sagy.chart,
         options = sagy.options,
-        pointHandler = options.ajaxOption.pointHandler,
-        index = _index === undefined ? options.ajaxOption.index : options.ajaxOption.index = _index,
-        series = chart.series,
-        lenSeries = series.length,
-        xArray = json.xData,
-        yArray = json.yData,
-        len = yArray.length,
-        isDatetime = !! xArray,
+        index = ~~_index,
+        xData = json.xData,
+        yData = json.yData,
+        isDatetime = false,
         i = 0,
-        list = [],
-        point,
-        min,
-        max,
-        findLastData = true,
-        temp,
-        j,
-        values,
-        lastX;
-      if (isDatetime) {
-        while (i < (yArray.length - 1) && yArray[i] === null || yArray[i + 1] === null) {
+        tempData;
+      if (!isArray(yData)) {
+        error('返回json格式有误,yData必须是数组.');
+      }
+
+      if (isArray(xData) && isNumber(xData[0])) {
+        isDatetime = true;
+        //todo 计算xAxis的index
+      } else if (isArray(xData) && isString(xData[0])) {
+        isDatetime = false;
+        chart.xAxis[0].update({
+          categories: xData
+        });
+      }
+
+      if (options.autoAxis || options.autoTooltip && isDatetime) {
+        tempData = isArray(yData[0]) ? yData[0] : yData;
+        while (i < (tempData.length - 1) && tempData[i] === null || tempData[i + 1] === null) {
           i++;
         }
-        if (i >= yArray.length) {
+        if (i >= tempData.length) {
           chart.timeType = 6;
         } else {
-          chart.timeType = calculateTimeType(xArray[i + 1] - xArray[i], options.axisRatio);
+          chart.timeType = calculateTimeType(xData[i + 1] - xData[i], options.axisRatio);
         }
-
-        chart.recentLength = xArray.length;
+        chart.recentLength = xData.length;
       }
+
+      if (isArray(yData) && isArray(yData[0])) {
+        for (i = 0; i < yData.length; i++) {
+          sagy.setValueOnly(xData, yData[i], i, isDatetime, json.unit, json.optional);
+        }
+      } else {
+        sagy.setValueOnly(xData, yData, index, isDatetime, json.unit, json.optional);
+      }
+
 
       if (options.subline.enabled) {
         each(json.lines, function(i, item) {
           lines[i].value = item.value;
         });
-      }
-      if (options.convertUnit.enabled) {
-        temp = sagy.convertUnitArr(yArray, json.unit);
-        sagy.unit = temp.unit;
-        yArray = temp.data;
+        if (!isEmptyObject(subline.showed)) {
+          sagy.adjustLine();
+        }
       }
 
-      values = yArray.filter(function(val) {
+    },
+    setValueOnly: function(xData, yData, index, isDatetime, unit, optional) {
+      var sagy = this,
+        chart = sagy.chart,
+        options = sagy.options,
+        pointHandler = options.ajaxOption.pointHandler,
+        series = chart.series,
+        // latestX,
+        isDoFindLatest = true,
+        list = [],
+        unitTemp,
+        values,
+        min,
+        point,
+        max,
+        temp,
+        i = 0;
+
+      var each_function = function(key, value) {
+        if (parseInt(key) === i) {
+          point.optional = value;
+          return false;
+        }
+      };
+
+      if (unit) {
+        unitTemp = sagy.convertUnitArr(yData, unit);
+        sagy.unit = unitTemp.unit;
+        yData = unitTemp.data;
+      }
+
+      options.ajaxOption.index = index;
+
+      values = yData.filter(function(val) {
         return val !== null;
       });
       min = mathMin.apply(math, values);
       max = mathMax.apply(math, values);
-      for (i = len - 1; i >= 0; i--) {
-        if (isDatetime) {
-          if (lastX) {
-            if ((lastX - xArray[i]) > HOUR * 2) {
-              point = new Point(xArray[i] + HOUR * 2, null);
-              list.unshift(point);
-            }
-          }
-          lastX = yArray[i] === null ? null : xArray[i];
-        }
-        point = new Point(isDatetime ? xArray[i] : null, yArray[i]);
+
+      for (i = 0; i < yData.length; i++) {
+        point = new Point(isDatetime ? xData[i] : null, yData[i]);
         if (isFunction(pointHandler)) {
           point.isMin = point.y === min;
           point.isMax = point.y === max;
-          if (isDatetime && findLastData && point.y !== null && point.x > zeroTime(new Date())) {
-            findLastData = false;
-            point.isLast = true;
-          } else {
-            point.isLast = false;
+          if (optional) {
+            each(optional, each_function);
           }
           pointHandler.call(point, sagy.options.ajaxOption);
         }
-        // point.y = point.y === null ? null : numFormat(point.y,true);
         point.y = point.y === null ? null : mathRound(point.y * 100) / 100;
-        list.unshift(point);
+        list.push(point);
+      }
 
+      for (i = list.length - 1; i >= 0; i--) {
+        // todo 大于2小时是否加点
+        /*if (isDatetime && latestX) {
+          if((latestX- xData[i])>HOUR*2){
+
+          }
+        }
+        latestX = yData[i] === null ? null : xData[i];*/
+        temp = list[i];
+        if (isDatetime && isDoFindLatest && temp.y !== null && temp.x > zeroTime(new Date())) {
+          isDoFindLatest = false;
+          temp.isLatest = true;
+        } else {
+          temp.isLatest = false;
+        }
       }
-      index = index > lenSeries || index < lenSeries * -1 ? lenSeries - 1 : index;
-      j = +index + (index < 0 ? lenSeries : 0);
-      if (series[j]) {
-        series[j].setData(list);
+
+      // index = index > lenSeries || index < lenSeries * -1 ? lenSeries - 1 : index;
+      i = +index + (index < 0 ? series.length : 0);
+      if (series[i]) {
+        series[i].setData(list);
       } else {
-        chart.addSeries({
-          data: list
-        });
+        error("不存在的series,可能因为错误index.");
       }
-      if (!isEmptyObject(subline.showed)) {
-        sagy.adjustLine();
-      }
+
     },
     clearData: function(index, isDeep) {
       var series = this.chart.series,
