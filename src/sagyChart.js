@@ -1,4 +1,3 @@
-;
 (function(name, factory) {
   var root = this;
   if (typeof define === "function" && define.amd) {
@@ -8,7 +7,7 @@
   }
 }).call(this, 'sagyChart', function() {
   //some global variable
-  var im_version = "0.9.1",
+  var im_version = "0.10.1",
     im_obj = {},
     im_string = im_obj.toString,
     // im_hasOwn = im_obj.hasOwnProperty,
@@ -976,6 +975,6 @@
 
   sagyChart.numFormat = numFormat;
   sagyChart.version = im_version;
-  
+
   return sagyChart;
 });
