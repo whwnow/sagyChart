@@ -26,7 +26,182 @@
     mathPow = math.pow,
     root = (typeof window === "object" && window) || this,
     document = root.document,
-    units = root.unitDocs;
+    units = root.unitDocs = {
+      "Wh": {
+        //name: "瓦时",
+        lowerLevel: null,
+        higherLevel: "kWh",
+        ratio: 1000
+      },
+      "kWh": {
+        //name: "千瓦时",
+        lowerLevel: "Wh",
+        higherLevel: "MWh",
+        ratio: 1000
+      },
+      "MWh": {
+        //name: "兆瓦时",
+        lowerLevel: "kWh",
+        higherLevel: "GWh",
+        ratio: 1000
+      },
+      "GWh": {
+        //name: "吉瓦时",
+        lowerLevel: "MWh",
+        higherLevel: "TWh",
+        ratio: 1000
+      },
+      "TWh": {
+        //name: "太瓦时",
+        lowerLevel: "GWh",
+        higherLevel: "PWh",
+        ratio: 1000
+      },
+      "PWh": {
+        //name: "拍瓦时",
+        lowerLevel: "TWh",
+        higherLevel: "EWh",
+        ratio: 1000
+      },
+      "EWh": {
+        //name: "艾瓦时",
+        lowerLevel: "PWh",
+        higherLevel: "ZWh",
+        ratio: 1000
+      },
+      "ZWh": {
+        //name: "泽瓦时",
+        lowerLevel: "EWh",
+        higherLevel: "YWh",
+        ratio: 1000
+      },
+      "YWh": {
+        //name: "尧瓦时",
+        lowerLevel: "ZWh",
+        higherLevel: null,
+        ratio: 1000
+      },
+      "W": {
+        //name: "瓦",
+        lowerLevel: null,
+        higherLevel: "kW",
+        ratio: 1000
+      },
+      "kW": {
+        //name: "千瓦",
+        lowerLevel: "W",
+        higherLevel: "MW",
+        ratio: 1000
+      },
+      "MW": {
+        //name: "兆瓦",
+        lowerLevel: "kW",
+        higherLevel: "GW",
+        ratio: 1000
+      },
+      "GW": {
+        //name: "吉瓦",
+        lowerLevel: "MW",
+        higherLevel: "TW",
+        ratio: 1000
+      },
+      "TW": {
+        //name: "太瓦",
+        lowerLevel: "GW",
+        higherLevel: "PW",
+        ratio: 1000
+      },
+      "PW": {
+        //name: "拍瓦",
+        lowerLevel: "TW",
+        higherLevel: "EW",
+        ratio: 1000
+      },
+      "EW": {
+        //name: "艾瓦",
+        lowerLevel: "PW",
+        higherLevel: "ZW",
+        ratio: 1000
+      },
+      "ZW": {
+        //name: "泽瓦",
+        lowerLevel: "EW",
+        higherLevel: "YW",
+        ratio: 1000
+      },
+      "YW": {
+        //name: "尧瓦",
+        lowerLevel: "ZW",
+        higherLevel: null,
+        ratio: 1000
+      },
+      "元": {
+        //name: "元",
+        lowerLevel: null,
+        higherLevel: "万元",
+        ratio: 1000
+      },
+      "万元": {
+        //name: "万元",
+        lowerLevel: "元",
+        higherLevel: "亿元",
+        ratio: 1000
+      },
+      "亿元": {
+        //name: "亿元",
+        lowerLevel: "万元",
+        higherLevel: null,
+        ratio: 1000
+      },
+      "g": {
+        //name: "克",
+        lowerLevel: null,
+        higherLevel: "kg",
+        ratio: 1000
+      },
+      "kg": {
+        //name: "千克",
+        lowerLevel: "g",
+        higherLevel: null,
+        ratio: 1000
+      },
+      "T": {
+        //name: "吨",
+        lowerLevel: "kg",
+        higherLevel: null,
+        ratio: 1000
+      },
+      "J": {
+        //name: "焦",
+        lowerLevel: null,
+        higherLevel: "kJ",
+        ratio: 1000
+      },
+      "kJ": {
+        //name: "千焦",
+        lowerLevel: "J",
+        higherLevel: "MJ",
+        ratio: 1000
+      },
+      "MJ": {
+        //name: "兆焦",
+        lowerLevel: "kJ",
+        higherLevel: null,
+        ratio: 1000
+      },
+      "L": {
+        //name: "升",
+        lowerLevel: null,
+        higherLevel: "T",
+        ratio: 1000
+      },
+      "m³": {
+        //name: "立方米",
+        lowerLevel: "L",
+        higherLevel: null,
+        ratio: 1000
+      }
+    };
   var sagyChart = function() {
     var args = arguments,
       options = args[0],
@@ -84,7 +259,6 @@
         length = obj.length;
         for (; i < length; i++) {
           value = callback.call(obj[i], i, obj[i]);
-
           if (value === false) {
             break;
           }
@@ -112,35 +286,27 @@
     return a;
   }
 
-
   function deepCopy() {
     var src, copyIsArray, copy, name, options, clone,
       target = {},
       i = 0,
       length = arguments.length;
-
     for (; i < length; i++) {
       if ((options = arguments[i]) != null) {
-
         for (name in options) {
           src = target[name];
           copy = options[name];
-
           if (target === copy) {
             continue;
           }
-
           if (copy && (typeof copy === 'object' || (copyIsArray = isArray(copy)))) {
             if (copyIsArray) {
               copyIsArray = false;
               clone = src && isArray(src) ? src : [];
-
             } else {
               clone = src && typeof src === 'object' ? src : {};
             }
-
             target[name] = merge(clone, copy);
-
           } else if (copy !== undefined) {
             target[name] = copy;
           }
@@ -156,18 +322,14 @@
       ret = {},
       doCopy = function(copy, original) {
         var value, key;
-
         if (typeof copy !== 'object') {
           copy = {};
         }
-
         for (key in original) {
           if (original.hasOwnProperty(key)) {
             value = original[key];
-
             if (value && typeof value === 'object' && im_string.call(value) !== '[object Array]' && typeof value.nodeType !== 'number') {
               copy[key] = doCopy(copy[key] || {}, value);
-
             } else {
               copy[key] = original[key];
             }
@@ -175,11 +337,9 @@
         }
         return copy;
       };
-
     for (i = 0; i < len; i++) {
       ret = doCopy(ret, arguments[i]);
     }
-
     return ret;
   }
 
@@ -223,14 +383,12 @@
     }
   }
 
-
   function Point(x, y) {
     if (x) {
       this.x = x;
     }
     this.y = y;
   }
-
   var func_pointMouseover = function() {
     var chart = this.series.chart;
     if (chart.hoverPoint) {
@@ -281,7 +439,6 @@
     }).add();
     chart.hoverPoint = this;
   };
-
   var func_pointMouseout = function() {
     var chart = this.series.chart;
     if (chart.svg_xText) {
@@ -296,7 +453,6 @@
     }
     chart.hoverPoint = null;
   };
-
   var func_tickPositioner = function() {
     var chart = this.chart;
     var result;
@@ -317,7 +473,6 @@
     }
     return result;
   };
-
   var func_axisFormatter = function() {
     var chart = this.chart,
       prev = chart.prev || "",
@@ -345,7 +500,6 @@
     }
     return result;
   };
-
   var defaultTemplate = {
     chart: {
       backgroundColor: "rgba(255,0,0,0)",
@@ -428,7 +582,6 @@
       //   formatter: func_axisFormatter
       // },
       // offset: 25,
-
       // tickPositioner: func_tickPositioner
     },
     yAxis: {
@@ -443,7 +596,6 @@
       title: {
         text: null
       }
-
       // labels: {
       //   align: "right",
       //   enabled: true,
@@ -469,7 +621,6 @@
     //   // zIndex: 8
     // }]
   };
-
   var defaultOptions = {
     chartOption: defaultTemplate,
     renderTo: "",
@@ -508,16 +659,12 @@
       isJson: true
     }
   };
-
-
-
   /**
    * initialise Highcharts' dom node
    * @param   options
    * @param   parentNode
    * @return {Highchart} chart obj
    */
-
   function initChartNode(options, parentNode) {
     var chartId = generateID(),
       chartDiv;
@@ -575,18 +722,14 @@
         options.chartOption.plotOptions.series.point.events.mouseOver.mouseOut = func_pointMouseover;
         options.chartOption.plotOptions.series.point.events.mouseOut = func_pointMouseout;
       }
-
       boxNode = document.getElementById(options.renderTo);
-
       if (!boxNode) {
         error('页面不存在id为' + options.renderTo + '的元素');
       }
-
       sagy.subline = subline = new Subline(sagy, options.subline);
       sagy.showLine = iterator("show", subline);
       sagy.hideLine = iterator("hide", subline);
       sagy.adjustLine = iterator("adjust", subline);
-
       chart = initChartNode(options.chartOption, boxNode);
       chart.resourcePath = options.resourcePath;
       sagy.options = options;
@@ -653,7 +796,6 @@
       if (!isArray(yData)) {
         error('返回json格式有误,yData必须是数组.');
       }
-
       if (isArray(xData) && isNumber(xData[0])) {
         isDatetime = true;
         //todo 计算xAxis的index
@@ -663,7 +805,6 @@
           categories: xData
         });
       }
-
       if (options.autoAxis || options.autoTooltip && isDatetime) {
         tempData = isArray(yData[0]) ? yData[0] : yData;
         while (i < (tempData.length - 1) && tempData[i] === null || tempData[i + 1] === null) {
@@ -676,7 +817,6 @@
         }
         chart.recentLength = xData.length;
       }
-
       if (isArray(yData) && isArray(yData[0])) {
         for (i = 0; i < yData.length; i++) {
           sagy.setValueOnly(xData, yData[i], i, isDatetime, json.unit, json.optional);
@@ -684,8 +824,6 @@
       } else {
         sagy.setValueOnly(xData, yData, index, isDatetime, json.unit, json.optional);
       }
-
-
       if (options.subline.enabled) {
         each(json.lines, function(i, item) {
           lines[i].value = item.value;
@@ -694,7 +832,6 @@
           sagy.adjustLine();
         }
       }
-
     },
     setValueOnly: function(xData, yData, index, isDatetime, unit, optional) {
       var sagy = this,
@@ -712,28 +849,23 @@
         max,
         temp,
         i = 0;
-
       var each_function = function(key, value) {
         if (parseInt(key) === i) {
           point.optional = value;
           return false;
         }
       };
-
       if (unit) {
         unitTemp = sagy.convertUnitArr(yData, unit);
         sagy.unit = unitTemp.unit;
         yData = unitTemp.data;
       }
-
       options.ajaxOption.index = index;
-
       values = yData.filter(function(val) {
         return val !== null;
       });
       min = mathMin.apply(math, values);
       max = mathMax.apply(math, values);
-
       for (i = 0; i < yData.length; i++) {
         point = new Point(isDatetime ? xData[i] : null, yData[i]);
         if (isFunction(pointHandler)) {
@@ -747,7 +879,6 @@
         point.y = point.y === null ? null : mathRound(point.y * 100) / 100;
         list.push(point);
       }
-
       for (i = list.length - 1; i >= 0; i--) {
         // todo 大于2小时是否加点
         /*if (isDatetime && latestX) {
@@ -764,7 +895,6 @@
           temp.isLatest = false;
         }
       }
-
       // index = index > lenSeries || index < lenSeries * -1 ? lenSeries - 1 : index;
       i = +index + (index < 0 ? series.length : 0);
       if (series[i]) {
@@ -772,7 +902,6 @@
       } else {
         error("不存在的series,可能因为错误index.");
       }
-
     },
     clearData: function(index, isDeep) {
       var series = this.chart.series,
@@ -792,7 +921,6 @@
       sagy.chart = null;
       document.getElementById(sagy.options.renderTo).innerHTML = "";
     },
-
     redraw: function() {
       var sagy = this;
       sagy.chart = new Highcharts.Chart(sagy.options.chartOption);
@@ -800,7 +928,6 @@
     }
   };
   sagyChart.fn.init.prototype = sagyChart.fn;
-
   sagyChart.fn.convertUnitArr = function(arr, baseUnit) {
     var options = this.options.convertUnit,
       subline = this.subline,
@@ -834,7 +961,6 @@
     } else {
       convertUnit = baseUnitObj.lowerLevel;
     }
-
     if (options.consistent && options.convertedUnit) {
       convertUnit = options.convertedUnit;
       len = options.convertedLen;
@@ -854,7 +980,6 @@
         item.convertedValue = item.value * mathPow(ratio, len * -1);
       });
     }
-
     return {
       data: templist,
       unit: convertUnit
@@ -864,7 +989,6 @@
   function Subline() {
     this.init.apply(this, arguments);
   }
-
   Subline.prototype = {
     constructor: Subline,
     init: function(sagy, options) {
@@ -972,9 +1096,7 @@
       });
     }
   };
-
   sagyChart.numFormat = numFormat;
   sagyChart.version = im_version;
-
   return sagyChart;
 });
