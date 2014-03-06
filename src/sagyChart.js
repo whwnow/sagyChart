@@ -1,10 +1,17 @@
-(function(window, undefined) {
+;
+(function(name, factory) {
+  var root = this;
+  if (typeof define === "function" && define.amd) {
+    define(factory);
+  } else {
+    root[name] = factory();
+  }
+}).call(this, 'sagyChart', function() {
   //some global variable
   var im_version = "0.9.1",
     im_obj = {},
     im_string = im_obj.toString,
     // im_hasOwn = im_obj.hasOwnProperty,
-    document = window.document,
     MINUTE = 60000,
     HOUR = MINUTE * 60,
     DAY = HOUR * 24,
@@ -18,7 +25,9 @@
     mathMin = math.min,
     // mathAbs = math.abs,
     mathPow = math.pow,
-    units = window.unitDocs;
+    root = (typeof window === "object" && window) || this,
+    document = root.document,
+    units = root.unitDocs;
   var sagyChart = function() {
     var args = arguments,
       options = args[0],
@@ -1121,8 +1130,5 @@
   AsynTool.prototype.fire = AsynTool.prototype.trigger;
   AsynTool.prototype.unbind = AsynTool.prototype.removeListener;
 
-  if (typeof window === "object" && typeof window.document === "object") {
-    window.sagyChart = sagyChart;
-    window.AsynTool = AsynTool;
-  }
-})(window);
+  return sagyChart;
+});
