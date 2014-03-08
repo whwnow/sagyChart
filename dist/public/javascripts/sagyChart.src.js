@@ -2,12 +2,11 @@
   var root = this;
   if (typeof define === "function" && define.amd) {
     define(factory);
-  } else {
-    root[name] = factory();
   }
+  root[name] = factory();
 }).call(this, 'sagyChart', function() {
   //some global variable
-  var im_version = "0.10.2",
+  var im_version = "0.10.3",
     im_obj = {},
     im_string = im_obj.toString,
     // im_hasOwn = im_obj.hasOwnProperty,
