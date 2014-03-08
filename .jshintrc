@@ -1,0 +1,12 @@
+{
+  "undef": true,
+  "unused": true,
+  "node": true,
+  "browser": true,
+  "laxcomma": true,
+  "jquery": true,
+  "globals": {
+    "define": true,
+    "require": true
+  }
+}
