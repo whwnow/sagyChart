@@ -6,7 +6,7 @@
   root[name] = factory();
 }).call(this, 'sagyChart', function() {
   //some global variable
-  var im_version = "0.10.3",
+  var im_version = "0.10.4",
     im_obj = {},
     im_string = im_obj.toString,
     // im_hasOwn = im_obj.hasOwnProperty,
@@ -664,13 +664,15 @@
    * @param   parentNode
    * @return {Highchart} chart obj
    */
-  function initChartNode(options, parentNode) {
+  function initChartNode(options, renderTo) {
     var chartId = generateID(),
-      chartDiv;
+      chartDiv,
+      parentNode = renderTo;
     chartDiv = document.createElement("div");
     chartDiv.setAttribute("id", chartId);
-    // chartDiv.style.height = "100%";
-    // chartDiv.style.width = "100%";
+    if (isString(renderTo)) {
+      parentNode = document.getElementById(renderTo);
+    }
     parentNode.appendChild(chartDiv);
     options.chart.renderTo = chartId;
     return new Highcharts.Chart(options);
@@ -705,7 +707,6 @@
     init: function(userOption, callback) {
       var sagy = this,
         options,
-        boxNode,
         chart,
         subline;
       if (!userOption.chartOption) {
@@ -721,15 +722,14 @@
         options.chartOption.plotOptions.series.point.events.mouseOver.mouseOut = func_pointMouseover;
         options.chartOption.plotOptions.series.point.events.mouseOut = func_pointMouseout;
       }
-      boxNode = document.getElementById(options.renderTo);
-      if (!boxNode) {
+      if (isString(options.renderTo) && document.getElementById(options.renderTo)) {
         error('页面不存在id为' + options.renderTo + '的元素');
       }
       sagy.subline = subline = new Subline(sagy, options.subline);
       sagy.showLine = iterator("show", subline);
       sagy.hideLine = iterator("hide", subline);
       sagy.adjustLine = iterator("adjust", subline);
-      chart = initChartNode(options.chartOption, boxNode);
+      chart = initChartNode(options.chartOption, options.renderTo);
       chart.resourcePath = options.resourcePath;
       sagy.options = options;
       sagy.chart = chart;
