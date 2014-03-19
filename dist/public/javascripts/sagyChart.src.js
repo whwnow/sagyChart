@@ -722,7 +722,7 @@
         options.chartOption.plotOptions.series.point.events.mouseOver.mouseOut = func_pointMouseover;
         options.chartOption.plotOptions.series.point.events.mouseOut = func_pointMouseout;
       }
-      if (isString(options.renderTo) && document.getElementById(options.renderTo)) {
+      if (isString(options.renderTo) && !document.getElementById(options.renderTo)) {
         error('页面不存在id为' + options.renderTo + '的元素');
       }
       sagy.subline = subline = new Subline(sagy, options.subline);
