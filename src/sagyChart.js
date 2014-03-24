@@ -164,9 +164,15 @@
         higherLevel: null,
         ratio: 1000
       },
-      "T": {
+      "t": {
         //name: "吨",
         lowerLevel: "kg",
+        higherLevel: "kt",
+        ratio: 1000
+      },
+      "kt": {
+        //name: "千吨",
+        lowerLevel: "t",
         higherLevel: null,
         ratio: 1000
       },
