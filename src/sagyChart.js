@@ -349,7 +349,7 @@
     a.setMilliseconds(0);
     return a.getTime();
   }
-  //todo 考虑返回数据时,大于100000的情况,科学计数法变成字符串了.
+
   function numFormat(val, returnNum) {
     var num = parseFloat(val);
     var decimal, isMinus = false,
@@ -1014,7 +1014,7 @@
     }
     temp = value * mathPow(ratio, len * -1);
     return {
-      data: temp,
+      data: numFormat(temp, true),
       unit: convertUnit
     };
   };
