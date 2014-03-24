@@ -6,7 +6,7 @@
   root[name] = factory();
 }).call(this, 'sagyChart', function() {
   //some global variable
-  var im_version = "0.10.4",
+  var im_version = "0.11.4",
     im_obj = {},
     im_string = im_obj.toString,
     // im_hasOwn = im_obj.hasOwnProperty,
@@ -349,7 +349,7 @@
     a.setMilliseconds(0);
     return a.getTime();
   }
-
+  //todo 考虑返回数据时,大于100000的情况,科学计数法变成字符串了.
   function numFormat(val, returnNum) {
     var num = parseFloat(val);
     var decimal, isMinus = false,
@@ -981,6 +981,40 @@
     }
     return {
       data: templist,
+      unit: convertUnit
+    };
+  };
+  sagyChart.fn.convertUnit = sagyChart.convertUnit = function(value, baseUnit) {
+    var convertUnit = baseUnit,
+      baseUnitObj = units[baseUnit],
+      len = value < 10 ? -1 : 0,
+      temp = value,
+      tempObj = baseUnitObj,
+      ratio;
+    if (!baseUnitObj || isNaN(value)) {
+      return {
+        data: value,
+        unit: baseUnit
+      };
+    }
+    ratio = baseUnitObj.ratio;
+    if (len === 0) {
+      while (temp >= ratio * 10) {
+        temp = temp / ratio;
+        if (units[tempObj.higherLevel]) {
+          convertUnit = tempObj.higherLevel;
+          len++;
+          tempObj = units[tempObj.higherLevel];
+        } else {
+          break;
+        }
+      }
+    } else {
+      convertUnit = baseUnitObj.lowerLevel;
+    }
+    temp = value * mathPow(ratio, len * -1);
+    return {
+      data: temp,
       unit: convertUnit
     };
   };
