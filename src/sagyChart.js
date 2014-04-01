@@ -141,19 +141,19 @@
         //name: '元',
         lowerLevel: null,
         higherLevel: '万元',
-        ratio: 1000
+        ratio: 10000
       },
       '万元': {
         //name: '万元',
         lowerLevel: '元',
         higherLevel: '亿元',
-        ratio: 1000
+        ratio: 10000
       },
       '亿元': {
         //name: '亿元',
         lowerLevel: '万元',
         higherLevel: null,
-        ratio: 1000
+        ratio: 10000
       },
       'g': {
         //name: '克',
@@ -182,6 +182,36 @@
       'MT': {
         //name: '千吨',
         lowerLevel: 'kT',
+        higherLevel: null,
+        ratio: 1000
+      },
+      '克': {
+        //name: '克',
+        lowerLevel: null,
+        higherLevel: '千克',
+        ratio: 1000
+      },
+      '千克': {
+        //name: '千克',
+        lowerLevel: '克',
+        higherLevel: '吨',
+        ratio: 1000
+      },
+      '吨': {
+        //name: '吨',
+        lowerLevel: '千克',
+        higherLevel: '千吨',
+        ratio: 1000
+      },
+      '千吨': {
+        //name: '千吨',
+        lowerLevel: '吨',
+        higherLevel: '兆吨',
+        ratio: 1000
+      },
+      '兆吨': {
+        //name: '千吨',
+        lowerLevel: '千吨',
         higherLevel: null,
         ratio: 1000
       },
