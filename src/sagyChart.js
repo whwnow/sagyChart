@@ -1,6 +1,6 @@
 (function(name, factory) {
   var root = this;
-  if (typeof define === "function" && define.amd) {
+  if (typeof define === 'function' && define.amd) {
     define(factory);
   } else if (typeof module !== 'undefined' && module.exports) {
     module.exports = factory();
@@ -9,7 +9,7 @@
   }
 }).call(this, 'sagyChart', function() {
   //some global variable
-  var im_version = "0.11.4",
+  var im_version = '0.11.4',
     im_obj = {},
     im_string = im_obj.toString,
     // im_hasOwn = im_obj.hasOwnProperty,
@@ -26,186 +26,192 @@
     mathMin = math.min,
     // mathAbs = math.abs,
     mathPow = math.pow,
-    root = (typeof window === "object" && window) || this,
+    root = (typeof window === 'object' && window) || this,
     document = root.document,
     units = root.unitDocs = {
-      "Wh": {
-        //name: "瓦时",
+      'Wh': {
+        //name: '瓦时',
         lowerLevel: null,
-        higherLevel: "kWh",
+        higherLevel: 'kWh',
         ratio: 1000
       },
-      "kWh": {
-        //name: "千瓦时",
-        lowerLevel: "Wh",
-        higherLevel: "MWh",
+      'kWh': {
+        //name: '千瓦时',
+        lowerLevel: 'Wh',
+        higherLevel: 'MWh',
         ratio: 1000
       },
-      "MWh": {
-        //name: "兆瓦时",
-        lowerLevel: "kWh",
-        higherLevel: "GWh",
+      'MWh': {
+        //name: '兆瓦时',
+        lowerLevel: 'kWh',
+        higherLevel: 'GWh',
         ratio: 1000
       },
-      "GWh": {
-        //name: "吉瓦时",
-        lowerLevel: "MWh",
-        higherLevel: "TWh",
+      'GWh': {
+        //name: '吉瓦时',
+        lowerLevel: 'MWh',
+        higherLevel: 'TWh',
         ratio: 1000
       },
-      "TWh": {
-        //name: "太瓦时",
-        lowerLevel: "GWh",
-        higherLevel: "PWh",
+      'TWh': {
+        //name: '太瓦时',
+        lowerLevel: 'GWh',
+        higherLevel: 'PWh',
         ratio: 1000
       },
-      "PWh": {
-        //name: "拍瓦时",
-        lowerLevel: "TWh",
-        higherLevel: "EWh",
+      'PWh': {
+        //name: '拍瓦时',
+        lowerLevel: 'TWh',
+        higherLevel: 'EWh',
         ratio: 1000
       },
-      "EWh": {
-        //name: "艾瓦时",
-        lowerLevel: "PWh",
-        higherLevel: "ZWh",
+      'EWh': {
+        //name: '艾瓦时',
+        lowerLevel: 'PWh',
+        higherLevel: 'ZWh',
         ratio: 1000
       },
-      "ZWh": {
-        //name: "泽瓦时",
-        lowerLevel: "EWh",
-        higherLevel: "YWh",
+      'ZWh': {
+        //name: '泽瓦时',
+        lowerLevel: 'EWh',
+        higherLevel: 'YWh',
         ratio: 1000
       },
-      "YWh": {
-        //name: "尧瓦时",
-        lowerLevel: "ZWh",
+      'YWh': {
+        //name: '尧瓦时',
+        lowerLevel: 'ZWh',
         higherLevel: null,
         ratio: 1000
       },
-      "W": {
-        //name: "瓦",
+      'W': {
+        //name: '瓦',
         lowerLevel: null,
-        higherLevel: "kW",
+        higherLevel: 'kW',
         ratio: 1000
       },
-      "kW": {
-        //name: "千瓦",
-        lowerLevel: "W",
-        higherLevel: "MW",
+      'kW': {
+        //name: '千瓦',
+        lowerLevel: 'W',
+        higherLevel: 'MW',
         ratio: 1000
       },
-      "MW": {
-        //name: "兆瓦",
-        lowerLevel: "kW",
-        higherLevel: "GW",
+      'MW': {
+        //name: '兆瓦',
+        lowerLevel: 'kW',
+        higherLevel: 'GW',
         ratio: 1000
       },
-      "GW": {
-        //name: "吉瓦",
-        lowerLevel: "MW",
-        higherLevel: "TW",
+      'GW': {
+        //name: '吉瓦',
+        lowerLevel: 'MW',
+        higherLevel: 'TW',
         ratio: 1000
       },
-      "TW": {
-        //name: "太瓦",
-        lowerLevel: "GW",
-        higherLevel: "PW",
+      'TW': {
+        //name: '太瓦',
+        lowerLevel: 'GW',
+        higherLevel: 'PW',
         ratio: 1000
       },
-      "PW": {
-        //name: "拍瓦",
-        lowerLevel: "TW",
-        higherLevel: "EW",
+      'PW': {
+        //name: '拍瓦',
+        lowerLevel: 'TW',
+        higherLevel: 'EW',
         ratio: 1000
       },
-      "EW": {
-        //name: "艾瓦",
-        lowerLevel: "PW",
-        higherLevel: "ZW",
+      'EW': {
+        //name: '艾瓦',
+        lowerLevel: 'PW',
+        higherLevel: 'ZW',
         ratio: 1000
       },
-      "ZW": {
-        //name: "泽瓦",
-        lowerLevel: "EW",
-        higherLevel: "YW",
+      'ZW': {
+        //name: '泽瓦',
+        lowerLevel: 'EW',
+        higherLevel: 'YW',
         ratio: 1000
       },
-      "YW": {
-        //name: "尧瓦",
-        lowerLevel: "ZW",
+      'YW': {
+        //name: '尧瓦',
+        lowerLevel: 'ZW',
         higherLevel: null,
         ratio: 1000
       },
-      "元": {
-        //name: "元",
+      '元': {
+        //name: '元',
         lowerLevel: null,
-        higherLevel: "万元",
+        higherLevel: '万元',
         ratio: 1000
       },
-      "万元": {
-        //name: "万元",
-        lowerLevel: "元",
-        higherLevel: "亿元",
+      '万元': {
+        //name: '万元',
+        lowerLevel: '元',
+        higherLevel: '亿元',
         ratio: 1000
       },
-      "亿元": {
-        //name: "亿元",
-        lowerLevel: "万元",
+      '亿元': {
+        //name: '亿元',
+        lowerLevel: '万元',
         higherLevel: null,
         ratio: 1000
       },
-      "g": {
-        //name: "克",
+      'g': {
+        //name: '克',
         lowerLevel: null,
-        higherLevel: "kg",
+        higherLevel: 'kg',
         ratio: 1000
       },
-      "kg": {
-        //name: "千克",
-        lowerLevel: "g",
+      'kg': {
+        //name: '千克',
+        lowerLevel: 'g',
+        higherLevel: 'T',
+        ratio: 1000
+      },
+      'T': {
+        //name: '吨',
+        lowerLevel: 'kg',
+        higherLevel: 'kT',
+        ratio: 1000
+      },
+      'kT': {
+        //name: '千吨',
+        lowerLevel: 'T',
+        higherLevel: 'MT',
+        ratio: 1000
+      },
+      'MT': {
+        //name: '千吨',
+        lowerLevel: 'kT',
         higherLevel: null,
         ratio: 1000
       },
-      "t": {
-        //name: "吨",
-        lowerLevel: "kg",
-        higherLevel: "kt",
+      'J': {
+        //name: '焦',
+        lowerLevel: null,
+        higherLevel: 'kJ',
         ratio: 1000
       },
-      "kt": {
-        //name: "千吨",
-        lowerLevel: "t",
+      'kJ': {
+        //name: '千焦',
+        lowerLevel: 'J',
+        higherLevel: 'MJ',
+        ratio: 1000
+      },
+      'MJ': {
+        //name: '兆焦',
+        lowerLevel: 'kJ',
         higherLevel: null,
         ratio: 1000
       },
-      "J": {
-        //name: "焦",
+      'L': {
+        //name: '升',
         lowerLevel: null,
-        higherLevel: "kJ",
+        higherLevel: 'T',
         ratio: 1000
       },
-      "kJ": {
-        //name: "千焦",
-        lowerLevel: "J",
-        higherLevel: "MJ",
-        ratio: 1000
-      },
-      "MJ": {
-        //name: "兆焦",
-        lowerLevel: "kJ",
-        higherLevel: null,
-        ratio: 1000
-      },
-      "L": {
-        //name: "升",
-        lowerLevel: null,
-        higherLevel: "T",
-        ratio: 1000
-      },
-      "m³": {
-        //name: "立方米",
-        lowerLevel: "L",
+      'm³': {
+        //name: '立方米',
+        lowerLevel: 'L',
         higherLevel: null,
         ratio: 1000
       }
@@ -223,15 +229,15 @@
   };
 
   function isString(s) {
-    return typeof s === "string";
+    return typeof s === 'string';
   }
 
   function isArray(arr) {
-    return im_string.call(arr) === "[object Array]";
+    return im_string.call(arr) === '[object Array]';
   }
 
   function isFunction(func) {
-    return im_string.call(func) === "[object Function]";
+    return im_string.call(func) === '[object Function]';
   }
 
   function isNumber(n) {
@@ -247,7 +253,7 @@
   }
 
   function generateID() {
-    return "sagy" + mathRandom().toString(36).substring(2, 6); // + Math.random().toString(36).substring(2, 15)
+    return 'sagy' + mathRandom().toString(36).substring(2, 6); // + Math.random().toString(36).substring(2, 15)
   }
 
   function error(msg) {
@@ -379,14 +385,14 @@
         resultStr = num.toString();
       }
       if (isMinus) {
-        resultStr = "-" + resultStr;
+        resultStr = '-' + resultStr;
       }
       return resultStr;
     } else {
       if (returnNum) {
         return null;
       } else {
-        return "--";
+        return '--';
       }
     }
   }
@@ -404,48 +410,48 @@
     if (chart.hoverPoint) {
       func_pointMouseout.call(this);
     }
-    chart.svg_yRect = chart.renderer.image(chart.resourcePath + "panel_Y.png", chart.plotLeft - 80, this.plotY + chart.plotTop - 21, 80, 50).attr({
-      fill: "white",
+    chart.svg_yRect = chart.renderer.image(chart.resourcePath + 'panel_Y.png', chart.plotLeft - 80, this.plotY + chart.plotTop - 21, 80, 50).attr({
+      fill: 'white',
       zIndex: 99
     }).add();
     var yStr = numFormat(this.y);
     var yfontsize = yStr.length > 4 ? 20 : 28;
-    var yfontsizepx = yfontsize + "px";
+    var yfontsizepx = yfontsize + 'px';
     var xString;
     chart.svg_yText = chart.renderer.text(yStr, chart.plotLeft - 43, this.plotY + chart.plotTop + yfontsize / 2).attr({
       zIndex: 100,
-      "text-anchor": "middle"
+      'text-anchor': 'middle'
     }).css({
-      color: "white",
+      color: 'white',
       fontSize: yfontsizepx
     }).add();
-    chart.svg_xRect = chart.renderer.image(chart.resourcePath + "panel_X.png", chart.plotLeft + this.plotX - 52, chart.plotTop + chart.plotHeight, 102, 60).attr({
-      fill: "white",
+    chart.svg_xRect = chart.renderer.image(chart.resourcePath + 'panel_X.png', chart.plotLeft + this.plotX - 52, chart.plotTop + chart.plotHeight, 102, 60).attr({
+      fill: 'white',
       zIndex: 99
     }).add();
     switch (chart.timeType) {
       case 1:
-        xString = Highcharts.dateFormat("%H:%M", this.x);
+        xString = Highcharts.dateFormat('%H:%M', this.x);
         break;
       case 2:
-        xString = Highcharts.dateFormat("%H:%M", this.x);
+        xString = Highcharts.dateFormat('%H:%M', this.x);
         break;
       case 3:
       case 4:
-        xString = Highcharts.dateFormat("%m.%d", this.x);
+        xString = Highcharts.dateFormat('%m.%d', this.x);
         break;
       case 5:
-        xString = Highcharts.dateFormat("%m", this.x);
+        xString = Highcharts.dateFormat('%m', this.x);
         break;
       default:
-        xString = Highcharts.dateFormat("%H:%M", this.x);
+        xString = Highcharts.dateFormat('%H:%M', this.x);
     }
     chart.svg_xText = chart.renderer.text(xString, chart.plotLeft + this.plotX, chart.plotTop + chart.plotHeight + 45).attr({
       zIndex: 100,
-      "text-anchor": "middle"
+      'text-anchor': 'middle'
     }).css({
-      color: "white",
-      fontSize: "32px"
+      color: 'white',
+      fontSize: '32px'
     }).add();
     chart.hoverPoint = this;
   };
@@ -485,45 +491,45 @@
   };
   var func_axisFormatter = function() {
     var chart = this.chart,
-      prev = chart.prev || "",
+      prev = chart.prev || '',
       result;
     switch (chart.timeType) {
       case 1:
-        // result = Highcharts.dateFormat("%H:%M", this.value);
+        // result = Highcharts.dateFormat('%H:%M', this.value);
         // break;
       case 2:
-        result = Highcharts.dateFormat("%H:%M", this.value);
+        result = Highcharts.dateFormat('%H:%M', this.value);
         break;
       case 3:
       case 4:
-        result = Highcharts.dateFormat("%m.%d", this.value);
+        result = Highcharts.dateFormat('%m.%d', this.value);
         break;
       case 5:
-        result = Highcharts.dateFormat("%m月", this.value);
+        result = Highcharts.dateFormat('%m月', this.value);
         break;
       default:
-        result = Highcharts.dateFormat("%H:%M", this.value);
+        result = Highcharts.dateFormat('%H:%M', this.value);
     }
     chart.prev = result;
     if (result === prev) {
-      result = "";
+      result = '';
     }
     return result;
   };
   var defaultTemplate = {
     chart: {
-      backgroundColor: "rgba(255,0,0,0)",
+      backgroundColor: 'rgba(255,0,0,0)',
       // spacingBottom: 20,
       // marginRight: 110,
       // marginLeft: 110,
       //marginTop: 110,
       // spacingLeft: 0,
-      renderTo: "chart_container"
+      renderTo: 'chart_container'
       // height: 650,
       //marginBottom: 240,
       //marginRight:100,
       // plotBorderWidth: 1,
-      // plotBackgroundColor: "#fffff9"
+      // plotBackgroundColor: '#fffff9'
     },
     legend: {
       enabled: false
@@ -536,7 +542,7 @@
       //   pointPadding: 0,
       //   borderWidth: 0,
       //   groupPadding: 0.1,
-      //   pointPlacement: "on",
+      //   pointPlacement: 'on',
       // },
       series: {
         turboThreshold: 200000,
@@ -558,11 +564,11 @@
     //   },
     //   crosshairs: [{
     //     x: true,
-    //     dashStyle: "ShortDash",
+    //     dashStyle: 'ShortDash',
     //     width: 1
     //   }, {
     //     y: true,
-    //     dashStyle: "ShortDash",
+    //     dashStyle: 'ShortDash',
     //     width: 1,
     //     zIndex: 10
     //   }]
@@ -571,14 +577,14 @@
       text: null
     },
     xAxis: {
-      // alternateGridColor: "rgba(242,253,242,0.5)",
+      // alternateGridColor: 'rgba(242,253,242,0.5)',
       tickLength: 0,
       tickWidth: 0,
       lineWidth: 0,
-      // gridLineColor: "#B2EAC7",
-      // gridLineDashStyle: "longDash",
+      // gridLineColor: '#B2EAC7',
+      // gridLineDashStyle: 'longDash',
       // gridLineWidth: 1,
-      // type: "datetime",
+      // type: 'datetime',
       title: {
         text: null
       }
@@ -586,8 +592,8 @@
       //   enabled: true,
       //   style: {
       //     fontSize: 20,
-      //     fontFamily: "Arial",
-      //     color: "#aaaaaa"
+      //     fontFamily: 'Arial',
+      //     color: '#aaaaaa'
       //   },
       //   formatter: func_axisFormatter
       // },
@@ -600,27 +606,27 @@
       tickWidth: 0,
       lineWidth: 0,
       // offset: 150,
-      // alternateGridColor: "rgba(244,248,248,0.5)",
-      // gridLineColor: "#B2EAC7",
-      // gridLineDashStyle: "longDash",
+      // alternateGridColor: 'rgba(244,248,248,0.5)',
+      // gridLineColor: '#B2EAC7',
+      // gridLineDashStyle: 'longDash',
       title: {
         text: null
       }
       // labels: {
-      //   align: "right",
+      //   align: 'right',
       //   enabled: true,
       //   y: 10,
       //   style: {
       //     fontSize: 20,
-      //     fontFamily: "Arial",
-      //     color: "#aaaaaa"
+      //     fontFamily: 'Arial',
+      //     color: '#aaaaaa'
       //   }
       // }
     }
     // series: [{
     //   turboThreshold: 200000,
-    //   // type: "column",
-    //   // color: "#e59c9b",
+    //   // type: 'column',
+    //   // color: '#e59c9b',
     //   data: [],
     //   // states: {
     //   //   hover: {
@@ -633,34 +639,34 @@
   };
   var defaultOptions = {
     chartOption: defaultTemplate,
-    renderTo: "",
-    resourcePath: "./images/sagyChart/",
+    renderTo: '',
+    resourcePath: './images/sagyChart/',
     autoAxis: false,
     autoTooltip: false,
     subline: {
       enabled: false,
       lines: [],
-      renderTo: "",
+      renderTo: '',
       deviation: 0
     },
     convertUnit: {
       enabled: true,
       consistent: false,
-      //baseUnit: "kWh",
+      //baseUnit: 'kWh',
       //convertedUnit: null,
       //convertedLen: null
     },
     ajaxOption: {
-      url: "./chart",
+      url: './chart',
       transferData: {
         // timeType: 1,
         // timeOrCount: 24,
         // endTime: new Date - 0,
-        // building: "",
-        // equipment: "",
+        // building: '',
+        // equipment: '',
         // energyType: 1,
         // functionType: 0,
-        // formula: "",
+        // formula: '',
         // isPerMeter: false,
       },
       index: 0,
@@ -679,8 +685,8 @@
     var chartId = generateID(),
       chartDiv,
       parentNode = renderTo;
-    chartDiv = document.createElement("div");
-    chartDiv.setAttribute("id", chartId);
+    chartDiv = document.createElement('div');
+    chartDiv.setAttribute('id', chartId);
     if (isString(renderTo)) {
       parentNode = document.getElementById(renderTo);
     }
@@ -737,9 +743,9 @@
         error('页面不存在id为' + options.renderTo + '的元素');
       }
       sagy.subline = subline = new Subline(sagy, options.subline);
-      sagy.showLine = iterator("show", subline);
-      sagy.hideLine = iterator("hide", subline);
-      sagy.adjustLine = iterator("adjust", subline);
+      sagy.showLine = iterator('show', subline);
+      sagy.hideLine = iterator('hide', subline);
+      sagy.adjustLine = iterator('adjust', subline);
       chart = initChartNode(options.chartOption, options.renderTo);
       chart.resourcePath = options.resourcePath;
       sagy.options = options;
@@ -767,8 +773,8 @@
       }
       _callback = callback ? callback : options.callback;
       $.ajax({
-        type: "POST",
-        datatype: "json",
+        type: 'POST',
+        datatype: 'json',
         data: options.isJson ? options.transferData : JSON.stringify(options.transferData),
         url: options.url,
         success: function(json) {
@@ -778,7 +784,7 @@
             status = true;
           } else {
             sagy.clearData(options.index);
-            log("ajax:" + options.url + " return null");
+            log('ajax:' + options.url + ' return null');
             status = false;
           }
           if (isFunction(_callback)) {
@@ -786,7 +792,7 @@
           }
         },
         error: function() {
-          error("ajax:" + options.url + " error!");
+          error('ajax:' + options.url + ' error!');
         }
       });
     },
@@ -910,7 +916,7 @@
       if (series[i]) {
         series[i].setData(list);
       } else {
-        error("不存在的series,可能因为错误index.");
+        error('不存在的series,可能因为错误index.');
       }
     },
     clearData: function(index, isDeep) {
@@ -929,7 +935,7 @@
       var sagy = this;
       sagy.chart.destroy();
       sagy.chart = null;
-      document.getElementById(sagy.options.renderTo).innerHTML = "";
+      document.getElementById(sagy.options.renderTo).innerHTML = '';
     },
     redraw: function() {
       var sagy = this;
@@ -1061,23 +1067,23 @@
         showed = subline.showed;
       if (args.length === 0) {
         each(lines, function(i, item) {
-          showed["line" + i] = item;
+          showed['line' + i] = item;
           if (item.node) {
-            item.node.style.display = "block";
+            item.node.style.display = 'block';
           }
         });
       } else if (isNumber(args[0])) {
         each(args, function(i, item) {
-          showed["line" + item] = lines[item];
+          showed['line' + item] = lines[item];
           if (lines[item].node) {
-            lines[item].node.style.display = "block";
+            lines[item].node.style.display = 'block';
           }
         });
       } else {
         each(args[0], function(i, item) {
-          showed["line" + i] = lines[i] = merge(lines[i], item);
+          showed['line' + i] = lines[i] = merge(lines[i], item);
           if (lines[i].node) {
-            lines[i].node.style.display = "block";
+            lines[i].node.style.display = 'block';
           }
         });
       }
@@ -1091,7 +1097,7 @@
       each(showed, function(key) {
         yAxis[index].removePlotLine(key);
         if (showed[key].node) {
-          showed[key].node.style.display = "none";
+          showed[key].node.style.display = 'none';
         }
       });
       showed = {};
@@ -1117,7 +1123,7 @@
         yAxis = yAxises[~~item.index];
         yAxis.addPlotLine({
           color: item.color,
-          dashStyle: "Solid",
+          dashStyle: 'Solid',
           width: 2,
           value: value,
           id: key,
@@ -1126,15 +1132,15 @@
         if (item.node) {
           node = item.node;
           if (value > yAxis.max) {
-            node.style.top = (top - node.scrollHeight / 2 + deviation) + "px";
+            node.style.top = (top - node.scrollHeight / 2 + deviation) + 'px';
           } else if (value < yAxis.min) {
-            node.style.top = (top + bottom - node.scrollHeight / 2 + deviation) + "px";
+            node.style.top = (top + bottom - node.scrollHeight / 2 + deviation) + 'px';
           } else {
             plotSvg = yAxis.plotLinesAndBands[yAxis.plotLinesAndBands.length - 1].svgElem;
             plotSvg.shadow(true);
             path = plotSvg.d;
-            top = path.split(" ", 3)[2];
-            node.style.top = (top - node.scrollHeight / 2 + deviation) + "px";
+            top = path.split(' ', 3)[2];
+            node.style.top = (top - node.scrollHeight / 2 + deviation) + 'px';
           }
         }
       });
