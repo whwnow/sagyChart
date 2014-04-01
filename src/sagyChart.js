@@ -2,8 +2,11 @@
   var root = this;
   if (typeof define === "function" && define.amd) {
     define(factory);
+  } else if (typeof module !== 'undefined' && module.exports) {
+    module.exports = factory();
+  } else {
+    root[name] = factory();
   }
-  root[name] = factory();
 }).call(this, 'sagyChart', function() {
   //some global variable
   var im_version = "0.11.4",
@@ -368,7 +371,7 @@
       decimal = num >= 10000 ? 1 : num >= 1000 ? 10 : num >= 100 ? 100 : num >= 10 ? 1000 : 10000;
       num = mathRound(num * decimal) / decimal;
       if (returnNum) {
-        return num;
+        return isMinus ? num * -1 : num;
       }
       if (num >= 100000) {
         resultStr = num.toExponential(1);
@@ -387,6 +390,8 @@
       }
     }
   }
+
+  //todo 扩展Array的filter,防止低版本IE报错
 
   function Point(x, y) {
     if (x) {
