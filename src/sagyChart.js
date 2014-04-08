@@ -1023,7 +1023,11 @@
     } else {
       convertUnit = baseUnitObj.lowerLevel;
     }
-    temp = value * mathPow(ratio, len * -1);
+    if (value == null) {
+      temp = null;
+    } else {
+      temp = value * mathPow(ratio, len * -1);
+    }
     return {
       data: numFormat(temp, returnNum),
       unit: convertUnit
