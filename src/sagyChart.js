@@ -17,6 +17,7 @@
     HOUR = MINUTE * 60,
     DAY = HOUR * 24,
     WEEK = DAY * 7,
+    MONTH = WEEK * 4,
     math = Math,
     mathRound = math.round,
     mathRandom = math.random,
@@ -28,6 +29,7 @@
     mathPow = math.pow,
     root = (typeof window === 'object' && window) || this,
     document = root.document,
+    highchart = Highcharts,
     units = root.unitDocs = {
       'Wh': {
         lowerLevel: null,
@@ -425,20 +427,20 @@
     }).add();
     switch (chart.timeType) {
       case 1:
-        xString = Highcharts.dateFormat('%H:%M', this.x);
+        xString = highchart.dateFormat('%H:%M', this.x);
         break;
       case 2:
-        xString = Highcharts.dateFormat('%H:%M', this.x);
+        xString = highchart.dateFormat('%H:%M', this.x);
         break;
       case 3:
       case 4:
-        xString = Highcharts.dateFormat('%m.%d', this.x);
+        xString = highchart.dateFormat('%m.%d', this.x);
         break;
       case 5:
-        xString = Highcharts.dateFormat('%m', this.x);
+        xString = highchart.dateFormat('%m', this.x);
         break;
       default:
-        xString = Highcharts.dateFormat('%H:%M', this.x);
+        xString = highchart.dateFormat('%H:%M', this.x);
     }
     chart.svg_xText = chart.renderer.text(xString, chart.plotLeft + this.plotX, chart.plotTop + chart.plotHeight + 45).attr({
       zIndex: 100,
@@ -489,20 +491,20 @@
       result;
     switch (chart.timeType) {
       case 1:
-        // result = Highcharts.dateFormat('%H:%M', this.value);
+        // result = highchart.dateFormat('%H:%M', this.value);
         // break;
       case 2:
-        result = Highcharts.dateFormat('%H:%M', this.value);
+        result = highchart.dateFormat('%H:%M', this.value);
         break;
       case 3:
       case 4:
-        result = Highcharts.dateFormat('%m.%d', this.value);
+        result = highchart.dateFormat('%m.%d', this.value);
         break;
       case 5:
-        result = Highcharts.dateFormat('%m月', this.value);
+        result = highchart.dateFormat('%m月', this.value);
         break;
       default:
-        result = Highcharts.dateFormat('%H:%M', this.value);
+        result = highchart.dateFormat('%H:%M', this.value);
     }
     chart.prev = result;
     if (result === prev) {
@@ -686,7 +688,7 @@
     }
     parentNode.appendChild(chartDiv);
     options.chart.renderTo = chartId;
-    return new Highcharts.Chart(options);
+    return new highchart.Chart(options);
   }
 
   function calculateTimeType(milliseconds, _ratio) {
@@ -933,7 +935,7 @@
     },
     redraw: function() {
       var sagy = this;
-      sagy.chart = new Highcharts.Chart(sagy.options.chartOption);
+      sagy.chart = new highchart.Chart(sagy.options.chartOption);
       sagy.refresh();
     }
   };
