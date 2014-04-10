@@ -9,14 +9,14 @@
   }
 }).call(this, 'sagyChart', function() {
   //some global variable
-  var im_version = '0.11.5',
+  var im_version = '0.12.1',
     im_obj = {},
     im_string = im_obj.toString,
     // im_hasOwn = im_obj.hasOwnProperty,
     MINUTE = 60000,
     HOUR = MINUTE * 60,
     DAY = HOUR * 24,
-    WEEK = DAY * 7,
+    MONTH = DAY * 31,
     math = Math,
     mathRound = math.round,
     mathRandom = math.random,
@@ -28,219 +28,184 @@
     mathPow = math.pow,
     root = (typeof window === 'object' && window) || this,
     document = root.document,
+    highchart = Highcharts,
     units = root.unitDocs = {
       'Wh': {
-        //name: '瓦时',
         lowerLevel: null,
         higherLevel: 'kWh',
         ratio: 1000
       },
       'kWh': {
-        //name: '千瓦时',
         lowerLevel: 'Wh',
         higherLevel: 'MWh',
         ratio: 1000
       },
       'MWh': {
-        //name: '兆瓦时',
         lowerLevel: 'kWh',
         higherLevel: 'GWh',
         ratio: 1000
       },
       'GWh': {
-        //name: '吉瓦时',
         lowerLevel: 'MWh',
         higherLevel: 'TWh',
         ratio: 1000
       },
       'TWh': {
-        //name: '太瓦时',
         lowerLevel: 'GWh',
         higherLevel: 'PWh',
         ratio: 1000
       },
       'PWh': {
-        //name: '拍瓦时',
         lowerLevel: 'TWh',
         higherLevel: 'EWh',
         ratio: 1000
       },
       'EWh': {
-        //name: '艾瓦时',
         lowerLevel: 'PWh',
         higherLevel: 'ZWh',
         ratio: 1000
       },
       'ZWh': {
-        //name: '泽瓦时',
         lowerLevel: 'EWh',
         higherLevel: 'YWh',
         ratio: 1000
       },
       'YWh': {
-        //name: '尧瓦时',
         lowerLevel: 'ZWh',
         higherLevel: null,
         ratio: 1000
       },
       'W': {
-        //name: '瓦',
         lowerLevel: null,
         higherLevel: 'kW',
         ratio: 1000
       },
       'kW': {
-        //name: '千瓦',
         lowerLevel: 'W',
         higherLevel: 'MW',
         ratio: 1000
       },
       'MW': {
-        //name: '兆瓦',
         lowerLevel: 'kW',
         higherLevel: 'GW',
         ratio: 1000
       },
       'GW': {
-        //name: '吉瓦',
         lowerLevel: 'MW',
         higherLevel: 'TW',
         ratio: 1000
       },
       'TW': {
-        //name: '太瓦',
         lowerLevel: 'GW',
         higherLevel: 'PW',
         ratio: 1000
       },
       'PW': {
-        //name: '拍瓦',
         lowerLevel: 'TW',
         higherLevel: 'EW',
         ratio: 1000
       },
       'EW': {
-        //name: '艾瓦',
         lowerLevel: 'PW',
         higherLevel: 'ZW',
         ratio: 1000
       },
       'ZW': {
-        //name: '泽瓦',
         lowerLevel: 'EW',
         higherLevel: 'YW',
         ratio: 1000
       },
       'YW': {
-        //name: '尧瓦',
         lowerLevel: 'ZW',
         higherLevel: null,
         ratio: 1000
       },
       '元': {
-        //name: '元',
         lowerLevel: null,
         higherLevel: '万元',
         ratio: 10000
       },
       '万元': {
-        //name: '万元',
         lowerLevel: '元',
         higherLevel: '亿元',
         ratio: 10000
       },
       '亿元': {
-        //name: '亿元',
         lowerLevel: '万元',
         higherLevel: null,
         ratio: 10000
       },
       'g': {
-        //name: '克',
         lowerLevel: null,
         higherLevel: 'kg',
         ratio: 1000
       },
       'kg': {
-        //name: '千克',
         lowerLevel: 'g',
         higherLevel: 'T',
         ratio: 1000
       },
       'T': {
-        //name: '吨',
         lowerLevel: 'kg',
         higherLevel: 'kT',
         ratio: 1000
       },
       'kT': {
-        //name: '千吨',
         lowerLevel: 'T',
         higherLevel: 'MT',
         ratio: 1000
       },
       'MT': {
-        //name: '千吨',
         lowerLevel: 'kT',
         higherLevel: null,
         ratio: 1000
       },
       '克': {
-        //name: '克',
         lowerLevel: null,
         higherLevel: '千克',
         ratio: 1000
       },
       '千克': {
-        //name: '千克',
         lowerLevel: '克',
         higherLevel: '吨',
         ratio: 1000
       },
       '吨': {
-        //name: '吨',
         lowerLevel: '千克',
         higherLevel: '千吨',
         ratio: 1000
       },
       '千吨': {
-        //name: '千吨',
         lowerLevel: '吨',
         higherLevel: '兆吨',
         ratio: 1000
       },
       '兆吨': {
-        //name: '千吨',
         lowerLevel: '千吨',
         higherLevel: null,
         ratio: 1000
       },
       'J': {
-        //name: '焦',
         lowerLevel: null,
         higherLevel: 'kJ',
         ratio: 1000
       },
       'kJ': {
-        //name: '千焦',
         lowerLevel: 'J',
         higherLevel: 'MJ',
         ratio: 1000
       },
       'MJ': {
-        //name: '兆焦',
         lowerLevel: 'kJ',
         higherLevel: null,
         ratio: 1000
       },
       'L': {
-        //name: '升',
         lowerLevel: null,
         higherLevel: 'T',
         ratio: 1000
       },
       'm³': {
-        //name: '立方米',
         lowerLevel: 'L',
         higherLevel: null,
         ratio: 1000
@@ -461,20 +426,20 @@
     }).add();
     switch (chart.timeType) {
       case 1:
-        xString = Highcharts.dateFormat('%H:%M', this.x);
+        xString = highchart.dateFormat('%H:%M', this.x);
         break;
       case 2:
-        xString = Highcharts.dateFormat('%H:%M', this.x);
+        xString = highchart.dateFormat('%H:%M', this.x);
         break;
       case 3:
       case 4:
-        xString = Highcharts.dateFormat('%m.%d', this.x);
+        xString = highchart.dateFormat('%m.%d', this.x);
         break;
       case 5:
-        xString = Highcharts.dateFormat('%m', this.x);
+        xString = highchart.dateFormat('%m', this.x);
         break;
       default:
-        xString = Highcharts.dateFormat('%H:%M', this.x);
+        xString = highchart.dateFormat('%H:%M', this.x);
     }
     chart.svg_xText = chart.renderer.text(xString, chart.plotLeft + this.plotX, chart.plotTop + chart.plotHeight + 45).attr({
       zIndex: 100,
@@ -500,19 +465,35 @@
     chart.hoverPoint = null;
   };
   var func_tickPositioner = function() {
-    var chart = this.chart;
-    var result;
+    var chart = this.chart,
+      shows = chart.series[0].xData,
+      result;
+    //todo upper_limit 由option决定
+    var handleShows = function(xArr, upper_limit) {
+      var length = xArr.length,
+        spacing_number = 1,
+        arr = [],
+        i = 0;
+      while (length / spacing_number > upper_limit) {
+        spacing_number++;
+      }
+      for (i = 0; i < length; i += spacing_number) {
+        arr.push(xArr[i]);
+      }
+      return arr;
+    };
     switch (chart.timeType) {
       case 1:
-        if (chart.recentLength < 15) {
-          result = chart.series[0].xData;
-        }
+        result = handleShows(shows, 12);
+        break;
+      case 2:
+        result = handleShows(shows, 16);
         break;
       case 3:
+        result = handleShows(shows, 31);
+        break;
       case 4:
-        if (chart.recentLength < 30) {
-          result = chart.series[0].xData;
-        }
+        result = handleShows(shows, 31);
         break;
       default:
         result = null;
@@ -521,28 +502,20 @@
   };
   var func_axisFormatter = function() {
     var chart = this.chart,
-      prev = chart.prev || '',
-      result;
+      result = null;
     switch (chart.timeType) {
       case 1:
-        // result = Highcharts.dateFormat('%H:%M', this.value);
-        // break;
+        result = highchart.dateFormat('%H:%M', this.value);
+        break;
       case 2:
-        result = Highcharts.dateFormat('%H:%M', this.value);
+        result = highchart.dateFormat('%m.%d', this.value);
         break;
       case 3:
+        result = highchart.dateFormat('%m', this.value);
+        break;
       case 4:
-        result = Highcharts.dateFormat('%m.%d', this.value);
+        result = highchart.dateFormat('%Y', this.value);
         break;
-      case 5:
-        result = Highcharts.dateFormat('%m月', this.value);
-        break;
-      default:
-        result = Highcharts.dateFormat('%H:%M', this.value);
-    }
-    chart.prev = result;
-    if (result === prev) {
-      result = '';
     }
     return result;
   };
@@ -722,24 +695,37 @@
     }
     parentNode.appendChild(chartDiv);
     options.chart.renderTo = chartId;
-    return new Highcharts.Chart(options);
+    return new highchart.Chart(options);
   }
-
-  function calculateTimeType(milliseconds, _ratio) {
-    var ratio = _ratio || 1;
-    switch (true) {
-      case milliseconds <= 10 * MINUTE * ratio:
-        return 1;
-      case milliseconds > 10 * MINUTE * ratio && milliseconds <= HOUR * ratio:
-        return 2;
-      case milliseconds > HOUR * ratio && milliseconds <= DAY * ratio:
-        return 3;
-      case milliseconds > DAY * ratio && milliseconds <= WEEK * ratio:
+  /**
+   * 计算时间类型
+   * @param  {[type]}   prev   前一个
+   * @param  {Function} next   后一个
+   * @param  {[type]}   _ratio 精度
+   * @return {[type]}          返回时间类型(按显示方式分类)   1小时:分钟  2月.天  3 月  4年
+   */
+  function calculateTimeType(prev, next, _ratio) {
+    var ratio = _ratio || 1,
+      milliseconds,
+      time_obj;
+    if (!next) {
+      time_obj = new Date(prev);
+      if (time_obj.getMonth() === 0 && time_obj.getDate() === 1) {
         return 4;
-      case milliseconds > WEEK * ratio:
-        return 5;
-      default:
+      } else {
         return 2;
+      }
+    }
+    milliseconds = next - prev;
+    switch (true) {
+      case milliseconds <= HOUR * ratio:
+        return 1;
+      case milliseconds <= DAY * ratio:
+        return 2;
+      case milliseconds <= MONTH * ratio:
+        return 3;
+      case milliseconds > MONTH * ratio:
+        return 4;
     }
   }
 
@@ -852,16 +838,17 @@
         });
       }
       if (options.autoAxis || options.autoTooltip && isDatetime) {
-        tempData = isArray(yData[0]) ? yData[0] : yData;
+        //不再判断yData个数,只根据时间间隔
+        /*tempData = isArray(yData[0]) ? yData[0] : yData;
         while (i < (tempData.length - 1) && tempData[i] === null || tempData[i + 1] === null) {
           i++;
         }
         if (i >= tempData.length) {
           chart.timeType = 6;
         } else {
-          chart.timeType = calculateTimeType(xData[i + 1] - xData[i], options.axisRatio);
-        }
-        chart.recentLength = xData.length;
+          chart.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
+        }*/
+        chart.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
       }
       if (isArray(yData) && isArray(yData[0])) {
         for (i = 0; i < yData.length; i++) {
@@ -969,7 +956,7 @@
     },
     redraw: function() {
       var sagy = this;
-      sagy.chart = new Highcharts.Chart(sagy.options.chartOption);
+      sagy.chart = new highchart.Chart(sagy.options.chartOption);
       sagy.refresh();
     }
   };
@@ -1031,7 +1018,7 @@
       unit: convertUnit
     };
   };
-  sagyChart.fn.convertUnit = sagyChart.convertUnit = function(value, baseUnit) {
+  sagyChart.fn.convertUnit = sagyChart.convertUnit = function(value, baseUnit, returnNum) {
     var convertUnit = baseUnit,
       baseUnitObj = units[baseUnit],
       len = value < 10 ? -1 : 0,
@@ -1059,9 +1046,13 @@
     } else {
       convertUnit = baseUnitObj.lowerLevel;
     }
-    temp = value * mathPow(ratio, len * -1);
+    if (value == null) {
+      temp = null;
+    } else {
+      temp = value * mathPow(ratio, len * -1);
+    }
     return {
-      data: numFormat(temp, true),
+      data: numFormat(temp, returnNum),
       unit: convertUnit
     };
   };
