@@ -678,6 +678,7 @@
     resourcePath: './images/sagyChart/',
     autoAxis: false,
     autoTooltip: false,
+    needClear: true,
     subline: {
       enabled: false,
       lines: [],
@@ -855,8 +856,7 @@
         xData = json.xData,
         yData = json.yData,
         isDatetime = false,
-        i = 0,
-        tempData;
+        i = 0;
       if (!isArray(yData)) {
         error('返回json格式有误,yData必须是数组.');
       }
@@ -881,6 +881,9 @@
           chart.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
         }*/
         chart.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
+      }
+      if (options.needClear) {
+        sagy.clearData();
       }
       if (isArray(yData) && isArray(yData[0])) {
         for (i = 0; i < yData.length; i++) {
@@ -968,16 +971,25 @@
         error('不存在的series,可能因为错误index.');
       }
     },
-    clearData: function(index, isDeep) {
+    clearData: function( /*index, isDeep*/ ) {
       var series = this.chart.series,
+        args = arguments,
+        index,
         lenSeries = series.length,
         j;
-      index = index > lenSeries || index < lenSeries * -1 ? lenSeries - 1 : index;
-      j = +index + (index < 0 ? lenSeries : 0);
-      if (isDeep) {
-        series[j].destroy();
-      } else {
-        series[j].setData(null);
+      if (args.length === 0) {
+        each(series, function(i, item) {
+          item.setData(null);
+        });
+      } else if (isNumber(args[0])) {
+        index = args[0];
+        index = index > lenSeries || index < lenSeries * -1 ? lenSeries - 1 : index;
+        j = +index + (index < 0 ? lenSeries : 0);
+        if (args[1]) {
+          series[j].destroy();
+        } else {
+          series[j].setData(null);
+        }
       }
     },
     destroy: function() {
