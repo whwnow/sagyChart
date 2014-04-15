@@ -514,6 +514,7 @@
       }
       return arr;
     };
+    //第二个参数为最少显示几个坐标点
     switch (chart.timeType) {
       case 1:
         result = handleShows(shows, 12);
@@ -762,6 +763,39 @@
     }
   }
 
+  function fillAxisEmpty(xArr, yArr, timeType) {
+    var time_interval = 0,
+      last_interval,
+      last_two_value,
+      last_one_value,
+      x_length = xArr.length,
+      for_length,
+      i = 0;
+    if (timeType === 1) {
+      time_interval = HOUR;
+    } else if (timeType === 2) {
+      time_interval = DAY;
+    } else {
+      return;
+    }
+    if (x_length < 2) {
+      log('x轴长度小于2');
+      return;
+    }
+    last_one_value = xArr[x_length - 1];
+    last_two_value = xArr[x_length - 2];
+    last_interval = last_one_value - last_two_value;
+    for_length = parseInt(last_interval / time_interval) - 1;
+    for (i = 0; i < for_length; i++) {
+      last_two_value += time_interval;
+      if (last_two_value >= last_one_value)
+        break;
+      xArr.splice(-1, 0, last_two_value);
+      yArr.splice(-1, 0, null);
+    }
+    return;
+  }
+
   function iterator(name, scope) {
     return function() {
       scope[name].apply(scope, arguments);
@@ -881,6 +915,7 @@
           chart.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
         }*/
         chart.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
+        fillAxisEmpty(xData, yData, chart.timeType);
       }
       if (options.needClear) {
         sagy.clearData();
