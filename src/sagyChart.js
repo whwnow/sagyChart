@@ -786,6 +786,7 @@
     last_two_value = xArr[x_length - 2];
     last_interval = last_one_value - last_two_value;
     for_length = parseInt(last_interval / time_interval) - 1;
+    last_two_value = last_two_value - last_two_value % time_interval;
     for (i = 0; i < for_length; i++) {
       last_two_value += time_interval;
       if (last_two_value >= last_one_value)
