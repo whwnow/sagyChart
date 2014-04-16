@@ -9,7 +9,7 @@
   }
 }).call(this, 'sagyChart', function() {
   //some global variable
-  var im_version = '0.12.1',
+  var im_version = '0.12.2',
     im_obj = {},
     im_string = im_obj.toString,
     // im_hasOwn = im_obj.hasOwnProperty,
@@ -352,6 +352,38 @@
     return ret;
   }
 
+  if (!Array.prototype.filter) {
+    Array.prototype.filter = function(fun /*, thisArg */ ) {
+      "use strict";
+
+      if (this === void 0 || this === null)
+        throw new TypeError();
+
+      var t = Object(this);
+      var len = t.length >>> 0;
+      if (typeof fun !== "function")
+        throw new TypeError();
+
+      var res = [];
+      var thisArg = arguments.length >= 2 ? arguments[1] : void 0;
+      for (var i = 0; i < len; i++) {
+        if (i in t) {
+          var val = t[i];
+
+          // NOTE: Technically this should Object.defineProperty at
+          //       the next index, as push can be affected by
+          //       properties on Object.prototype and Array.prototype.
+          //       But that method's new, and collisions should be
+          //       rare, so use the more-compatible alternative.
+          if (fun.call(thisArg, val, i, t))
+            res.push(val);
+        }
+      }
+
+      return res;
+    };
+  }
+
   function zeroTime(a) {
     a.setHours(0);
     a.setMinutes(0);
@@ -482,6 +514,7 @@
       }
       return arr;
     };
+    //第二个参数为最少显示几个坐标点
     switch (chart.timeType) {
       case 1:
         result = handleShows(shows, 12);
@@ -646,6 +679,7 @@
     resourcePath: './images/sagyChart/',
     autoAxis: false,
     autoTooltip: false,
+    needClear: true,
     subline: {
       enabled: false,
       lines: [],
@@ -727,6 +761,40 @@
       case milliseconds > MONTH * ratio:
         return 4;
     }
+  }
+
+  function fillAxisEmpty(xArr, yArr, timeType) {
+    var time_interval = 0,
+      last_interval,
+      last_two_value,
+      last_one_value,
+      x_length = xArr.length,
+      for_length,
+      i = 0;
+    if (timeType === 1) {
+      time_interval = HOUR;
+    } else if (timeType === 2) {
+      time_interval = DAY;
+    } else {
+      return;
+    }
+    if (x_length < 2) {
+      log('x轴长度小于2');
+      return;
+    }
+    last_one_value = xArr[x_length - 1];
+    last_two_value = xArr[x_length - 2];
+    last_interval = last_one_value - last_two_value;
+    for_length = parseInt(last_interval / time_interval) - 1;
+    last_two_value = last_two_value - last_two_value % time_interval;
+    for (i = 0; i < for_length; i++) {
+      last_two_value += time_interval;
+      if (last_two_value >= last_one_value)
+        break;
+      xArr.splice(-1, 0, last_two_value);
+      yArr.splice(-1, 0, null);
+    }
+    return;
   }
 
   function iterator(name, scope) {
@@ -823,8 +891,7 @@
         xData = json.xData,
         yData = json.yData,
         isDatetime = false,
-        i = 0,
-        tempData;
+        i = 0;
       if (!isArray(yData)) {
         error('返回json格式有误,yData必须是数组.');
       }
@@ -849,6 +916,10 @@
           chart.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
         }*/
         chart.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
+        fillAxisEmpty(xData, yData, chart.timeType);
+      }
+      if (options.needClear) {
+        sagy.clearData();
       }
       if (isArray(yData) && isArray(yData[0])) {
         for (i = 0; i < yData.length; i++) {
@@ -936,16 +1007,25 @@
         error('不存在的series,可能因为错误index.');
       }
     },
-    clearData: function(index, isDeep) {
+    clearData: function( /*index, isDeep*/ ) {
       var series = this.chart.series,
+        args = arguments,
+        index,
         lenSeries = series.length,
         j;
-      index = index > lenSeries || index < lenSeries * -1 ? lenSeries - 1 : index;
-      j = +index + (index < 0 ? lenSeries : 0);
-      if (isDeep) {
-        series[j].destroy();
-      } else {
-        series[j].setData(null);
+      if (args.length === 0) {
+        each(series, function(i, item) {
+          item.setData(null);
+        });
+      } else if (isNumber(args[0])) {
+        index = args[0];
+        index = index > lenSeries || index < lenSeries * -1 ? lenSeries - 1 : index;
+        j = +index + (index < 0 ? lenSeries : 0);
+        if (args[1]) {
+          series[j].destroy();
+        } else {
+          series[j].setData(null);
+        }
       }
     },
     destroy: function() {

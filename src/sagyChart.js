@@ -9,7 +9,7 @@
   }
 }).call(this, 'sagyChart', function() {
   //some global variable
-  var im_version = '0.12.1',
+  var im_version = '0.12.2',
     im_obj = {},
     im_string = im_obj.toString,
     // im_hasOwn = im_obj.hasOwnProperty,
