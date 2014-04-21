@@ -17,6 +17,18 @@
     HOUR = MINUTE * 60,
     DAY = HOUR * 24,
     MONTH = DAY * 31,
+    shortFormater = {
+      hour: '%H',
+      day: '%d',
+      month: '%m',
+      year: '%Y'
+    },
+    longFormater = {
+      hour: '%H:%M',
+      day: '%m.%d',
+      month: '%Y.%m',
+      year: '%Y'
+    },
     math = Math,
     mathRound = math.round,
     mathRandom = math.random,
@@ -535,19 +547,20 @@
   };
   var func_axisFormatter = function() {
     var chart = this.chart,
+      formatter = chart.useShortFormater ? shortFormater : longFormater,
       result = null;
     switch (chart.timeType) {
       case 1:
-        result = highchart.dateFormat('%H:%M', this.value);
+        result = highchart.dateFormat(formatter.hour, this.value);
         break;
       case 2:
-        result = highchart.dateFormat('%m.%d', this.value);
+        result = highchart.dateFormat(formatter.day, this.value);
         break;
       case 3:
-        result = highchart.dateFormat('%m', this.value);
+        result = highchart.dateFormat(formatter.month, this.value);
         break;
       case 4:
-        result = highchart.dateFormat('%Y', this.value);
+        result = highchart.dateFormat(formatter.year, this.value);
         break;
     }
     return result;
@@ -680,6 +693,7 @@
     autoAxis: false,
     autoTooltip: false,
     needClear: true,
+    useShortFormater: true,
     subline: {
       enabled: false,
       lines: [],
@@ -916,6 +930,7 @@
           chart.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
         }*/
         chart.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
+        chart.useShortFormater = options.useShortFormater;
         fillAxisEmpty(xData, yData, chart.timeType);
       }
       if (options.needClear) {
