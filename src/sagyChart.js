@@ -508,63 +508,7 @@
     }
     chart.hoverPoint = null;
   };
-  var func_tickPositioner = function() {
-    var chart = this.chart,
-      shows = chart.series[0].xData,
-      result;
-    //todo upper_limit 由option决定
-    var handleShows = function(xArr, upper_limit) {
-      var length = xArr.length,
-        spacing_number = 1,
-        arr = [],
-        i = 0;
-      while (length / spacing_number > upper_limit) {
-        spacing_number++;
-      }
-      for (i = 0; i < length; i += spacing_number) {
-        arr.push(xArr[i]);
-      }
-      return arr;
-    };
-    //第二个参数为最少显示几个坐标点
-    switch (chart.timeType) {
-      case 1:
-        result = handleShows(shows, 12);
-        break;
-      case 2:
-        result = handleShows(shows, 16);
-        break;
-      case 3:
-        result = handleShows(shows, 31);
-        break;
-      case 4:
-        result = handleShows(shows, 31);
-        break;
-      default:
-        result = null;
-    }
-    return result;
-  };
-  var func_axisFormatter = function() {
-    var chart = this.chart,
-      formatter = chart.useShortFormater ? shortFormater : longFormater,
-      result = null;
-    switch (chart.timeType) {
-      case 1:
-        result = highchart.dateFormat(formatter.hour, this.value);
-        break;
-      case 2:
-        result = highchart.dateFormat(formatter.day, this.value);
-        break;
-      case 3:
-        result = highchart.dateFormat(formatter.month, this.value);
-        break;
-      case 4:
-        result = highchart.dateFormat(formatter.year, this.value);
-        break;
-    }
-    return result;
-  };
+
   var defaultTemplate = {
     chart: {
       backgroundColor: 'rgba(255,0,0,0)',
@@ -692,6 +636,12 @@
     resourcePath: './images/sagyChart/',
     autoAxis: false,
     autoTooltip: false,
+    autoAxisOption: {
+      hour: 6,
+      day: 8,
+      month: 12,
+      year: 12
+    },
     needClear: true,
     useShortFormater: true,
     subline: {
@@ -828,10 +778,10 @@
         error('chartOption为必选项!');
       }
       userOption.chartOption = merge(defaultTemplate, userOption.chartOption);
-      options = merge(defaultOptions, userOption);
+      sagy.options = options = merge(defaultOptions, userOption);
       if (options.autoAxis) {
-        options.chartOption.xAxis.labels.formatter = func_axisFormatter;
-        options.chartOption.xAxis.tickPositioner = func_tickPositioner;
+        options.chartOption.xAxis.labels.formatter = sagy.axisFormatter();
+        options.chartOption.xAxis.tickPositioner = sagy.tickPositioner();
       }
       if (options.autoTooltip) {
         options.chartOption.plotOptions.series.point.events.mouseOver.mouseOut = func_pointMouseover;
@@ -846,7 +796,6 @@
       sagy.adjustLine = iterator('adjust', subline);
       chart = initChartNode(options.chartOption, options.renderTo);
       chart.resourcePath = options.resourcePath;
-      sagy.options = options;
       sagy.chart = chart;
       sagy.transferData = options.ajaxOption.transferData;
       sagy.version = im_version;
@@ -929,9 +878,9 @@
         } else {
           chart.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
         }*/
-        chart.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
+        sagy.options.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
         chart.useShortFormater = options.useShortFormater;
-        fillAxisEmpty(xData, yData, chart.timeType);
+        fillAxisEmpty(xData, yData, sagy.options.timeType);
       }
       if (options.needClear) {
         sagy.clearData();
@@ -1042,6 +991,68 @@
           series[j].setData(null);
         }
       }
+    },
+    axisFormatter: function() {
+      var sagy = this,
+        options = sagy.options,
+        formatter = options.useShortFormater ? shortFormater : longFormater;
+      return function() {
+        var result = null;
+        switch (options.timeType) {
+          case 1:
+            result = highchart.dateFormat(formatter.hour, this.value);
+            break;
+          case 2:
+            result = highchart.dateFormat(formatter.day, this.value);
+            break;
+          case 3:
+            result = highchart.dateFormat(formatter.month, this.value);
+            break;
+          case 4:
+            result = highchart.dateFormat(formatter.year, this.value);
+            break;
+        }
+        return result;
+      };
+    },
+    tickPositioner: function() {
+      var sagy = this,
+        options = sagy.options,
+        autoAxisOption = options.autoAxisOption;
+      var handleShows = function(xArr, upper_limit) {
+        var length = xArr.length,
+          spacing_number = 1,
+          arr = [],
+          i = 0;
+        while (length / spacing_number > upper_limit) {
+          spacing_number++;
+        }
+        for (i = 0; i < length; i += spacing_number) {
+          arr.push(xArr[i]);
+        }
+        return arr;
+      };
+      return function() {
+        var shows = this.chart.series[0].xData,
+          result;
+        switch (options.timeType) {
+          case 1:
+            result = handleShows(shows, autoAxisOption.hour);
+            break;
+          case 2:
+            result = handleShows(shows, autoAxisOption.day);
+            break;
+          case 3:
+            result = handleShows(shows, autoAxisOption.month);
+            break;
+          case 4:
+            result = handleShows(shows, autoAxisOption.year);
+            break;
+          default:
+            result = null;
+        }
+        return result;
+      };
     },
     destroy: function() {
       var sagy = this;
