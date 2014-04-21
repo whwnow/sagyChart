@@ -651,7 +651,7 @@
       deviation: 0
     },
     convertUnit: {
-      enabled: true,
+      enabled: false,
       consistent: false,
       //baseUnit: 'kWh',
       //convertedUnit: null,
@@ -850,6 +850,7 @@
         lines = subline.lines,
         chart = sagy.chart,
         options = sagy.options,
+        convertUnit = options.convertUnit.enabled,
         index = ~~_index,
         xData = json.xData,
         yData = json.yData,
@@ -887,10 +888,10 @@
       }
       if (isArray(yData) && isArray(yData[0])) {
         for (i = 0; i < yData.length; i++) {
-          sagy.setValueOnly(xData, yData[i], i, isDatetime, json.unit, json.optional);
+          sagy.setValueOnly(xData, yData[i], i, isDatetime, convertUnit ? json.unit : null, json.optional);
         }
       } else {
-        sagy.setValueOnly(xData, yData, index, isDatetime, json.unit, json.optional);
+        sagy.setValueOnly(xData, yData, index, isDatetime, convertUnit ? json.unit : null, json.optional);
       }
       if (options.subline.enabled) {
         each(json.lines, function(i, item) {
