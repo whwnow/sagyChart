@@ -1,4 +1,11 @@
 sagyChart
 =========
 
-a highcharts helper...in persagy
+highchart助手。对常用业务进一步封装。来自博锐尚格研发部
+
+
+## 特性
+
+  * 对highchart进行封装，包括赋值预处理、辅助线、单位转换……
+  * 友好的接口
+  * 对ajax的封装
