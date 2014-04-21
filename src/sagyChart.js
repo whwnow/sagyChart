@@ -235,6 +235,10 @@
     return new sagyChart.fn.init(options, callback);
   };
 
+  function isBool(b) {
+    return typeof b === "boolean";
+  }
+
   function isString(s) {
     return typeof s === 'string';
   }
@@ -1068,6 +1072,7 @@
     }
   };
   sagyChart.fn.init.prototype = sagyChart.fn;
+  //添加重置单位转换方法
   sagyChart.fn.convertUnitArr = function(arr, baseUnit) {
     var options = this.options.convertUnit,
       subline = this.subline,
@@ -1160,6 +1165,76 @@
     }
     return {
       data: numFormat(temp, returnNum),
+      unit: convertUnit
+    };
+  };
+  sagyChart.convertUnitArr = function(arr, baseUnit /*, key, returnNum*/ ) {
+    var args = arguments,
+      max,
+      dataArr,
+      baseUnitObj = units[baseUnit],
+      convertUnit = baseUnit,
+      len,
+      temp,
+      tempObj = baseUnitObj,
+      ratio,
+      i,
+      key,
+      returnNum = false;
+    if (!baseUnitObj) {
+      return {
+        data: arr,
+        unit: baseUnit
+      };
+    }
+    if (args.length > 2) {
+      if (isString(args[2])) {
+        key = args[2];
+        returnNum = !! args[3];
+      } else if (isBool(args[2])) {
+        returnNum = args[2];
+      }
+    }
+    dataArr = arr.map(function(item) {
+      if (key) {
+        return item[key];
+      } else {
+        return item;
+      }
+    });
+    max = mathMax.apply(math, dataArr);
+    len = max < 10 ? -1 : 0;
+    temp = max;
+    ratio = baseUnitObj.ratio;
+
+    if (len === 0) {
+      while (temp >= ratio * 10) {
+        temp = temp / ratio;
+        if (units[tempObj.higherLevel]) {
+          convertUnit = tempObj.higherLevel;
+          len++;
+          tempObj = units[tempObj.higherLevel];
+        } else {
+          break;
+        }
+      }
+    } else {
+      convertUnit = baseUnitObj.lowerLevel;
+    }
+
+    for (i = 0; i < arr.length; i++) {
+      if (key) {
+        temp = arr[i][key];
+      } else {
+        temp = arr[i];
+      }
+      if (temp) {
+        temp = numFormat(temp * mathPow(ratio, len * -1), returnNum);
+      }
+    }
+
+    return {
+      data: arr,
       unit: convertUnit
     };
   };
