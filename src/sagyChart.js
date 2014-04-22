@@ -1221,18 +1221,15 @@
     } else {
       convertUnit = baseUnitObj.lowerLevel;
     }
-
     for (i = 0; i < arr.length; i++) {
       if (key) {
         temp = arr[i][key];
+        arr[i][key] = numFormat(temp * mathPow(ratio, len * -1), returnNum);
       } else {
         temp = arr[i];
-      }
-      if (temp) {
-        temp = numFormat(temp * mathPow(ratio, len * -1), returnNum);
+        arr[i] = numFormat(temp * mathPow(ratio, len * -1), returnNum);
       }
     }
-
     return {
       data: arr,
       unit: convertUnit
