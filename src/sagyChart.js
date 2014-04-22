@@ -212,9 +212,14 @@
         higherLevel: null,
         ratio: 1000
       },
-      'L': {
+      'mL': {
         lowerLevel: null,
-        higherLevel: 'T',
+        higherLevel: 'L',
+        ratio: 1000
+      },
+      'L': {
+        lowerLevel: 'mL',
+        higherLevel: 'm³',
         ratio: 1000
       },
       'm³': {
