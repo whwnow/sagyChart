@@ -1181,7 +1181,7 @@
       i,
       key,
       returnNum = false;
-    if (!baseUnitObj) {
+    if (!baseUnitObj || !arr) {
       return {
         data: arr,
         unit: baseUnit
