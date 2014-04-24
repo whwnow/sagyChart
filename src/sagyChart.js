@@ -1170,9 +1170,9 @@
       temp = value,
       tempObj = baseUnitObj,
       ratio;
-    if (!baseUnitObj || isNaN(value)) {
+    if (!baseUnitObj || !value) {
       return {
-        data: value,
+        data: numFormat(value, returnNum),
         unit: baseUnit
       };
     }
