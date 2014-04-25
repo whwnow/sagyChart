@@ -917,7 +917,6 @@
           chart.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
         }*/
         sagy.options.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
-        chart.useShortFormater = options.useShortFormater;
         fillAxisEmpty(xData, yData, sagy.options.timeType);
       }
       if (options.needClear) {
