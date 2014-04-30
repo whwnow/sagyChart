@@ -473,8 +473,6 @@
     }
   }
 
-  //todo 扩展Array的filter,防止低版本IE报错
-
   function Point(x, y) {
     if (x) {
       this.x = x;
@@ -898,7 +896,6 @@
       }
       if (isArray(xData) && isNumber(xData[0])) {
         isDatetime = true;
-        //todo 计算xAxis的index
       } else if (isArray(xData) && isString(xData[0])) {
         isDatetime = false;
         chart.xAxis[0].update({
@@ -906,16 +903,6 @@
         });
       }
       if (options.autoAxis || options.autoTooltip && isDatetime) {
-        //不再判断yData个数,只根据时间间隔
-        /*tempData = isArray(yData[0]) ? yData[0] : yData;
-        while (i < (tempData.length - 1) && tempData[i] === null || tempData[i + 1] === null) {
-          i++;
-        }
-        if (i >= tempData.length) {
-          chart.timeType = 6;
-        } else {
-          chart.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
-        }*/
         sagy.options.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
         fillAxisEmpty(xData, yData, sagy.options.timeType);
       }
@@ -944,7 +931,6 @@
         options = sagy.options,
         pointHandler = options.ajaxOption.pointHandler,
         series = chart.series,
-        // latestX,
         isDoFindLatest = true,
         list = [],
         unitTemp,
@@ -985,13 +971,6 @@
         list.push(point);
       }
       for (i = list.length - 1; i >= 0; i--) {
-        // todo 大于2小时是否加点
-        /*if (isDatetime && latestX) {
-          if((latestX- xData[i])>HOUR*2){
-
-          }
-        }
-        latestX = yData[i] === null ? null : xData[i];*/
         temp = list[i];
         if (isDatetime && isDoFindLatest && temp.y !== null && temp.x > zeroTime(new Date())) {
           isDoFindLatest = false;
@@ -1005,7 +984,7 @@
       if (series[i]) {
         series[i].setData(list);
       } else {
-        error('不存在的series,可能因为错误index.');
+        log('不存在的series,可能因为错误index.');
       }
     },
     clearData: function( /*index, isDeep*/ ) {
@@ -1104,7 +1083,7 @@
     }
   };
   sagyChart.fn.init.prototype = sagyChart.fn;
-  //添加重置单位转换方法
+  //todo 添加重置单位转换方法
   sagyChart.fn.convertUnitArr = function(arr, baseUnit) {
     var options = this.options.convertUnit,
       subline = this.subline,
@@ -1162,44 +1141,7 @@
       unit: convertUnit
     };
   };
-  sagyChart.fn.convertUnit = sagyChart.convertUnit = function(value, baseUnit, returnNum) {
-    var convertUnit = baseUnit,
-      baseUnitObj = units[baseUnit],
-      len = value < 10 ? -1 : 0,
-      temp = value,
-      tempObj = baseUnitObj,
-      ratio;
-    if (!baseUnitObj || !value) {
-      return {
-        data: numFormat(value, returnNum),
-        unit: baseUnit
-      };
-    }
-    ratio = baseUnitObj.ratio;
-    if (len === 0) {
-      while (temp >= ratio * 10) {
-        temp = temp / ratio;
-        if (units[tempObj.higherLevel]) {
-          convertUnit = tempObj.higherLevel;
-          len++;
-          tempObj = units[tempObj.higherLevel];
-        } else {
-          break;
-        }
-      }
-    } else {
-      convertUnit = baseUnitObj.lowerLevel;
-    }
-    if (value == null) {
-      temp = null;
-    } else {
-      temp = value * mathPow(ratio, len * -1);
-    }
-    return {
-      data: numFormat(temp, returnNum),
-      unit: convertUnit
-    };
-  };
+
   sagyChart.convertUnitArr = function(arr, baseUnit /*, key, returnNum*/ ) {
     var args = arguments,
       max,
@@ -1264,6 +1206,45 @@
     }
     return {
       data: arr,
+      unit: convertUnit
+    };
+  };
+
+  sagyChart.fn.convertUnit = sagyChart.convertUnit = function(value, baseUnit, returnNum) {
+    var convertUnit = baseUnit,
+      baseUnitObj = units[baseUnit],
+      len = value < 10 ? -1 : 0,
+      temp = value,
+      tempObj = baseUnitObj,
+      ratio;
+    if (!baseUnitObj || !value) {
+      return {
+        data: numFormat(value, returnNum),
+        unit: baseUnit
+      };
+    }
+    ratio = baseUnitObj.ratio;
+    if (len === 0) {
+      while (temp >= ratio * 10) {
+        temp = temp / ratio;
+        if (units[tempObj.higherLevel]) {
+          convertUnit = tempObj.higherLevel;
+          len++;
+          tempObj = units[tempObj.higherLevel];
+        } else {
+          break;
+        }
+      }
+    } else {
+      convertUnit = baseUnitObj.lowerLevel;
+    }
+    if (value == null) {
+      temp = null;
+    } else {
+      temp = value * mathPow(ratio, len * -1);
+    }
+    return {
+      data: numFormat(temp, returnNum),
       unit: convertUnit
     };
   };
