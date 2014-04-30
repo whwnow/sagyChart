@@ -17,6 +17,7 @@
     HOUR = MINUTE * 60,
     DAY = HOUR * 24,
     MONTH = DAY * 31,
+    YEAR = DAY * 366,
     shortFormater = {
       hour: '%H',
       day: '%d',
@@ -672,10 +673,10 @@
     autoAxis: false,
     autoTooltip: false,
     autoAxisOption: {
-      hour: 6,
-      day: 8,
-      month: 12,
-      year: 12
+      hour: 2,
+      day: 2,
+      month: 1,
+      year: 1
     },
     needClear: true,
     useShortFormater: true,
@@ -760,40 +761,6 @@
       case milliseconds > MONTH * ratio:
         return 4;
     }
-  }
-
-  function fillAxisEmpty(xArr, yArr, timeType) {
-    var time_interval = 0,
-      last_interval,
-      last_two_value,
-      last_one_value,
-      x_length = xArr.length,
-      for_length,
-      i = 0;
-    if (timeType === 1) {
-      time_interval = HOUR;
-    } else if (timeType === 2) {
-      time_interval = DAY;
-    } else {
-      return;
-    }
-    if (x_length < 2) {
-      log('x轴长度小于2');
-      return;
-    }
-    last_one_value = xArr[x_length - 1];
-    last_two_value = xArr[x_length - 2];
-    last_interval = last_one_value - last_two_value;
-    for_length = parseInt(last_interval / time_interval) - 1;
-    last_two_value = last_two_value - last_two_value % time_interval;
-    for (i = 0; i < for_length; i++) {
-      last_two_value += time_interval;
-      if (last_two_value >= last_one_value)
-        break;
-      xArr.splice(-1, 0, last_two_value);
-      yArr.splice(-1, 0, null);
-    }
-    return;
   }
 
   function iterator(name, scope) {
@@ -904,7 +871,7 @@
       }
       if (options.autoAxis || options.autoTooltip && isDatetime) {
         sagy.options.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
-        fillAxisEmpty(xData, yData, sagy.options.timeType);
+        // fillAxisEmpty(xData, yData, sagy.options.timeType);
       }
       if (options.needClear) {
         sagy.clearData();
@@ -1031,20 +998,38 @@
         return result;
       };
     },
+    //todo 将时间类型改写为更优雅的方式,不再使用switch
     tickPositioner: function() {
       var sagy = this,
         options = sagy.options,
         autoAxisOption = options.autoAxisOption;
-      var handleShows = function(xArr, upper_limit) {
-        var length = xArr.length,
-          spacing_number = 1,
-          arr = [],
-          i = 0;
-        while (length / spacing_number > upper_limit) {
-          spacing_number++;
+      var handleShows = function(xArr, intervalCount) {
+        var length = xArr.length;
+        if (length < 1) {
+          return null;
         }
-        for (i = 0; i < length; i += spacing_number) {
-          arr.push(xArr[i]);
+        var start = xArr[0],
+          end = xArr[length - 1],
+          curr = start,
+          interval,
+          arr = [start];
+        switch (options.timeType) {
+          case 1:
+            interval = HOUR;
+            break;
+          case 2:
+            interval = DAY;
+            break;
+          case 3:
+            interval = MONTH;
+            break;
+          case 4:
+            interval = YEAR;
+            break;
+        }
+        while (curr < end) {
+          curr += interval * intervalCount;
+          arr.push(curr);
         }
         return arr;
       };
