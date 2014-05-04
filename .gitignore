@@ -2,7 +2,7 @@
 *.jpg
 *.png
 
-dist/node_modules
+node_modules
 
 # Ignore Sublime project
 *.sublime-project

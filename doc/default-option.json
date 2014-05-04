@@ -8,7 +8,7 @@
    * div的id字符串或者直接传递div的dom元素
    * @type {String} | {Dom}
    */
-  renderTo: '',
+  renderTo: "",
   /**
    * 是否使用框架提供的x轴坐标算法进行显示
    * @type {Bool}
@@ -50,7 +50,7 @@
    */
   subline: {
     enabled: false,
-    renderTo: '',
+    renderTo: "",
     deviation: 0,
     lines: [{
       value: 0,
