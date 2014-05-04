@@ -18,6 +18,12 @@
     DAY = HOUR * 24,
     MONTH = DAY * 31,
     YEAR = DAY * 366,
+    secondTimer = {
+      hour: HOUR,
+      day: DAY,
+      month: MONTH,
+      year: YEAR
+    },
     shortFormater = {
       hour: '%H',
       day: '%d',
@@ -480,7 +486,8 @@
     }
     this.y = y;
   }
-  var func_pointMouseover = function() {
+
+  /*  var func_pointMouseover = function() {
     var chart = this.series.chart;
     if (chart.hoverPoint) {
       func_pointMouseout.call(this);
@@ -543,7 +550,7 @@
       chart.svg_yRect = null;
     }
     chart.hoverPoint = null;
-  };
+  };*/
 
   var defaultTemplate = {
     chart: {
@@ -753,13 +760,13 @@
     milliseconds = next - prev;
     switch (true) {
       case milliseconds <= HOUR * ratio:
-        return 1;
+        return 'hour';
       case milliseconds <= DAY * ratio:
-        return 2;
+        return 'day';
       case milliseconds <= MONTH * ratio:
-        return 3;
+        return 'month';
       case milliseconds > MONTH * ratio:
-        return 4;
+        return 'year';
     }
   }
 
@@ -785,10 +792,10 @@
         options.chartOption.xAxis.labels.formatter = sagy.axisFormatter();
         options.chartOption.xAxis.tickPositioner = sagy.tickPositioner();
       }
-      if (options.autoTooltip) {
-        options.chartOption.plotOptions.series.point.events.mouseOver.mouseOut = func_pointMouseover;
-        options.chartOption.plotOptions.series.point.events.mouseOut = func_pointMouseout;
-      }
+      // if (options.autoTooltip) {
+      //   options.chartOption.plotOptions.series.point.events.mouseOver.mouseOut = func_pointMouseover;
+      //   options.chartOption.plotOptions.series.point.events.mouseOut = func_pointMouseout;
+      // }
       if (isString(options.renderTo) && !document.getElementById(options.renderTo)) {
         error('页面不存在id为' + options.renderTo + '的元素');
       }
@@ -980,22 +987,7 @@
         options = sagy.options,
         formatter = options.useShortFormater ? shortFormater : longFormater;
       return function() {
-        var result = null;
-        switch (options.timeType) {
-          case 1:
-            result = highchart.dateFormat(formatter.hour, this.value);
-            break;
-          case 2:
-            result = highchart.dateFormat(formatter.day, this.value);
-            break;
-          case 3:
-            result = highchart.dateFormat(formatter.month, this.value);
-            break;
-          case 4:
-            result = highchart.dateFormat(formatter.year, this.value);
-            break;
-        }
-        return result;
+        return highchart.dateFormat(formatter[options.timeType], this.value);
       };
     },
     //todo 将时间类型改写为更优雅的方式,不再使用switch
@@ -1011,22 +1003,8 @@
         var start = xArr[0],
           end = xArr[length - 1],
           curr = start,
-          interval,
+          interval = secondTimer[options.timeType],
           arr = [start];
-        switch (options.timeType) {
-          case 1:
-            interval = HOUR;
-            break;
-          case 2:
-            interval = DAY;
-            break;
-          case 3:
-            interval = MONTH;
-            break;
-          case 4:
-            interval = YEAR;
-            break;
-        }
         while (curr < end) {
           curr += interval * intervalCount;
           arr.push(curr);
@@ -1034,25 +1012,8 @@
         return arr;
       };
       return function() {
-        var shows = this.chart.series[0].xData,
-          result;
-        switch (options.timeType) {
-          case 1:
-            result = handleShows(shows, autoAxisOption.hour);
-            break;
-          case 2:
-            result = handleShows(shows, autoAxisOption.day);
-            break;
-          case 3:
-            result = handleShows(shows, autoAxisOption.month);
-            break;
-          case 4:
-            result = handleShows(shows, autoAxisOption.year);
-            break;
-          default:
-            result = null;
-        }
-        return result;
+        var shows = this.series[0].xData;
+        return handleShows(shows, autoAxisOption[options.timeType]);
       };
     },
     destroy: function() {
