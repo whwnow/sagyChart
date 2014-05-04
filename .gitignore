@@ -2,6 +2,8 @@
 *.jpg
 *.png
 
+dist/node_modules
+
 # Ignore Sublime project
 *.sublime-project
 *.sublime-workspace

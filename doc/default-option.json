@@ -1,0 +1,91 @@
+{
+  /**
+   * 向highchart传递的参数,与原生highchart写法一致
+   * @type {Object}
+   */
+  chartOption: {},
+  /**
+   * div的id字符串或者直接传递div的dom元素
+   * @type {String} | {Dom}
+   */
+  renderTo: '',
+  /**
+   * 是否使用框架提供的x轴坐标算法进行显示
+   * @type {Bool}
+   */
+  autoAxis: false,
+  /**
+   * 为算法提供参数,数字为间隔数量,key值不可修改且必须包含4个
+   * @type {Object}
+   */
+  autoAxisOption: {
+    hour: 2,
+    day: 2,
+    month: 1,
+    year: 1
+  },
+  /**
+   * 每次赋值前是否需要清理数据,多series时使用
+   * @type {Bool}
+   */
+  needClear: true,
+  /**
+   * 日期格式化是否使用短文字,例如日期时:长05.01 短01
+   * @type {Bool}
+   */
+  useShortFormater: true,
+  /**
+   * 辅助线设置项
+   * @type {Object}
+   *
+   * enabled     开关
+   * renderTo      辅助线div容器id,多条辅助线公用时使用,独立使用时,放到lines对应属性中
+   * deviation     辅助线div的高度差值
+   * lines         辅助线对象的数组,可包含多条辅助线,line对象可包含以下属性
+   * * value       辅助线的值,用于显示
+   * * color       辅助线颜色
+   * * name        辅助线名称
+   * * renderTo    可选参数,辅助线对应div的id
+   *
+   */
+  subline: {
+    enabled: false,
+    renderTo: '',
+    deviation: 0,
+    lines: [{
+      value: 0,
+      color: "#87B6FE",
+      name: "参考值"
+    }]
+  },
+  /**
+   * 是否转换单位,需要转换单位时,赋值对象中需要带有unit属性
+   * @type {Object}
+   *
+   * enabled       开关
+   * consistent    是否缓存上一次的单位转换结果,多个series时使用
+   */
+  convertUnit: {
+    enabled: false,
+    consistent: false
+  },
+  /**
+   * 与后台交互和数据处理相关选项
+   * @type {Object}
+   *
+   * url           与后台交互的post请求url,推荐为chart独占一个接口,直接使用refresh方法接管与后台交互,否则需要手动维护ajax并调用setData方法
+   * transferData  与后台交互时使用的初始化参数,使用refresh方法时,可以只传变化后的参数,适用于修改某一参数
+   * index         series的index,可使用负数
+   * callback      ajax的callback函数
+   * pointHandler  点处理函数,详见code页
+   * isJson        使用json格式还是json形式的字符串
+   */
+  ajaxOption: {
+    url: './chart',
+    transferData: {},
+    index: 0,
+    callback: null,
+    pointHandler: null,
+    isJson: true
+  }
+}

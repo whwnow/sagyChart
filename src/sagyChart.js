@@ -637,8 +637,6 @@
       // tickPositioner: func_tickPositioner
     },
     yAxis: {
-      // startOnTick: false,
-      // tickPixelInterval: 80,
       tickWidth: 0,
       lineWidth: 0,
       // offset: 150,
@@ -676,7 +674,7 @@
   var defaultOptions = {
     chartOption: defaultTemplate,
     renderTo: '',
-    resourcePath: './images/sagyChart/',
+    // resourcePath: './images/sagyChart/',
     autoAxis: false,
     autoTooltip: false,
     autoAxisOption: {
@@ -695,10 +693,7 @@
     },
     convertUnit: {
       enabled: false,
-      consistent: false,
-      //baseUnit: 'kWh',
-      //convertedUnit: null,
-      //convertedLen: null
+      consistent: false
     },
     ajaxOption: {
       url: './chart',
@@ -804,7 +799,7 @@
       sagy.hideLine = iterator('hide', subline);
       sagy.adjustLine = iterator('adjust', subline);
       chart = initChartNode(options.chartOption, options.renderTo);
-      chart.resourcePath = options.resourcePath;
+      // chart.resourcePath = options.resourcePath;
       sagy.chart = chart;
       sagy.transferData = options.ajaxOption.transferData;
       sagy.version = im_version;
