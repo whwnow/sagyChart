@@ -993,7 +993,7 @@
       var handleShows = function(xArr, intervalCount) {
         var length = xArr.length;
         if (length < 1) {
-          return null;
+          return [];
         }
         var start = xArr[0],
           end = xArr[length - 1],
