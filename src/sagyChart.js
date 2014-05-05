@@ -683,7 +683,7 @@
       month: 1,
       year: 1
     },
-    needClear: true,
+    needClear: false,
     useShortFormater: true,
     subline: {
       enabled: false,
