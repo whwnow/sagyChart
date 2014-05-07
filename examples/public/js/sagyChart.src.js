@@ -9,7 +9,7 @@
   }
 }).call(this, 'sagyChart', function() {
   //some global variable
-  var im_version = '0.12.2',
+  var im_version = '0.13.4',
     im_obj = {},
     im_string = im_obj.toString,
     // im_hasOwn = im_obj.hasOwnProperty,
@@ -17,6 +17,25 @@
     HOUR = MINUTE * 60,
     DAY = HOUR * 24,
     MONTH = DAY * 31,
+    YEAR = DAY * 366,
+    secondTimer = {
+      hour: HOUR,
+      day: DAY,
+      month: MONTH,
+      year: YEAR
+    },
+    shortFormater = {
+      hour: '%H',
+      day: '%d',
+      month: '%m',
+      year: '%Y'
+    },
+    longFormater = {
+      hour: '%H:%M',
+      day: '%m.%d',
+      month: '%Y.%m',
+      year: '%Y'
+    },
     math = Math,
     mathRound = math.round,
     mathRandom = math.random,
@@ -200,9 +219,14 @@
         higherLevel: null,
         ratio: 1000
       },
-      'L': {
+      'mL': {
         lowerLevel: null,
-        higherLevel: 'T',
+        higherLevel: 'L',
+        ratio: 1000
+      },
+      'L': {
+        lowerLevel: 'mL',
+        higherLevel: 'm³',
         ratio: 1000
       },
       'm³': {
@@ -211,6 +235,13 @@
         ratio: 1000
       }
     };
+
+  highchart.setOptions({
+    global: {
+      useUTC: false
+    }
+  });
+
   var sagyChart = function() {
     var args = arguments,
       options = args[0],
@@ -222,6 +253,10 @@
     }
     return new sagyChart.fn.init(options, callback);
   };
+
+  function isBool(b) {
+    return typeof b === "boolean";
+  }
 
   function isString(s) {
     return typeof s === 'string';
@@ -384,6 +419,34 @@
     };
   }
 
+  if (!Array.prototype.map) {
+    Array.prototype.map = function(fun /*, thisArg */ ) {
+      "use strict";
+
+      if (this === void 0 || this === null)
+        throw new TypeError();
+
+      var t = Object(this);
+      var len = t.length >>> 0;
+      if (typeof fun !== "function")
+        throw new TypeError();
+
+      var res = new Array(len);
+      var thisArg = arguments.length >= 2 ? arguments[1] : void 0;
+      for (var i = 0; i < len; i++) {
+        // NOTE: Absolute correctness would demand Object.defineProperty
+        //       be used.  But this method is fairly new, and failure is
+        //       possible only if Object.prototype or Array.prototype
+        //       has a property |i| (very unlikely), so use a less-correct
+        //       but more portable alternative.
+        if (i in t)
+          res[i] = fun.call(thisArg, t[i], i, t);
+      }
+
+      return res;
+    };
+  }
+
   function zeroTime(a) {
     a.setHours(0);
     a.setMinutes(0);
@@ -424,15 +487,14 @@
     }
   }
 
-  //todo 扩展Array的filter,防止低版本IE报错
-
   function Point(x, y) {
     if (x) {
       this.x = x;
     }
     this.y = y;
   }
-  var func_pointMouseover = function() {
+
+  /*  var func_pointMouseover = function() {
     var chart = this.series.chart;
     if (chart.hoverPoint) {
       func_pointMouseout.call(this);
@@ -495,63 +557,8 @@
       chart.svg_yRect = null;
     }
     chart.hoverPoint = null;
-  };
-  var func_tickPositioner = function() {
-    var chart = this.chart,
-      shows = chart.series[0].xData,
-      result;
-    //todo upper_limit 由option决定
-    var handleShows = function(xArr, upper_limit) {
-      var length = xArr.length,
-        spacing_number = 1,
-        arr = [],
-        i = 0;
-      while (length / spacing_number > upper_limit) {
-        spacing_number++;
-      }
-      for (i = 0; i < length; i += spacing_number) {
-        arr.push(xArr[i]);
-      }
-      return arr;
-    };
-    //第二个参数为最少显示几个坐标点
-    switch (chart.timeType) {
-      case 1:
-        result = handleShows(shows, 12);
-        break;
-      case 2:
-        result = handleShows(shows, 16);
-        break;
-      case 3:
-        result = handleShows(shows, 31);
-        break;
-      case 4:
-        result = handleShows(shows, 31);
-        break;
-      default:
-        result = null;
-    }
-    return result;
-  };
-  var func_axisFormatter = function() {
-    var chart = this.chart,
-      result = null;
-    switch (chart.timeType) {
-      case 1:
-        result = highchart.dateFormat('%H:%M', this.value);
-        break;
-      case 2:
-        result = highchart.dateFormat('%m.%d', this.value);
-        break;
-      case 3:
-        result = highchart.dateFormat('%m', this.value);
-        break;
-      case 4:
-        result = highchart.dateFormat('%Y', this.value);
-        break;
-    }
-    return result;
-  };
+  };*/
+
   var defaultTemplate = {
     chart: {
       backgroundColor: 'rgba(255,0,0,0)',
@@ -637,8 +644,6 @@
       // tickPositioner: func_tickPositioner
     },
     yAxis: {
-      // startOnTick: false,
-      // tickPixelInterval: 80,
       tickWidth: 0,
       lineWidth: 0,
       // offset: 150,
@@ -676,10 +681,17 @@
   var defaultOptions = {
     chartOption: defaultTemplate,
     renderTo: '',
-    resourcePath: './images/sagyChart/',
-    autoAxis: false,
+    // resourcePath: './images/sagyChart/',
+    autoAxis: true,
     autoTooltip: false,
-    needClear: true,
+    autoAxisOption: {
+      hour: 2,
+      day: 2,
+      month: 1,
+      year: 1
+    },
+    needClear: false,
+    useShortFormater: true,
     subline: {
       enabled: false,
       lines: [],
@@ -687,11 +699,8 @@
       deviation: 0
     },
     convertUnit: {
-      enabled: true,
-      consistent: false,
-      //baseUnit: 'kWh',
-      //convertedUnit: null,
-      //convertedLen: null
+      enabled: false,
+      consistent: false
     },
     ajaxOption: {
       url: './chart',
@@ -745,56 +754,24 @@
     if (!next) {
       time_obj = new Date(prev);
       if (time_obj.getMonth() === 0 && time_obj.getDate() === 1) {
-        return 4;
+        return 'year';
+      } else if (time_obj.getDate() === 1) {
+        return 'day';
       } else {
-        return 2;
+        return 'hour';
       }
     }
     milliseconds = next - prev;
     switch (true) {
       case milliseconds <= HOUR * ratio:
-        return 1;
+        return 'hour';
       case milliseconds <= DAY * ratio:
-        return 2;
+        return 'day';
       case milliseconds <= MONTH * ratio:
-        return 3;
+        return 'month';
       case milliseconds > MONTH * ratio:
-        return 4;
+        return 'year';
     }
-  }
-
-  function fillAxisEmpty(xArr, yArr, timeType) {
-    var time_interval = 0,
-      last_interval,
-      last_two_value,
-      last_one_value,
-      x_length = xArr.length,
-      for_length,
-      i = 0;
-    if (timeType === 1) {
-      time_interval = HOUR;
-    } else if (timeType === 2) {
-      time_interval = DAY;
-    } else {
-      return;
-    }
-    if (x_length < 2) {
-      log('x轴长度小于2');
-      return;
-    }
-    last_one_value = xArr[x_length - 1];
-    last_two_value = xArr[x_length - 2];
-    last_interval = last_one_value - last_two_value;
-    for_length = parseInt(last_interval / time_interval) - 1;
-    last_two_value = last_two_value - last_two_value % time_interval;
-    for (i = 0; i < for_length; i++) {
-      last_two_value += time_interval;
-      if (last_two_value >= last_one_value)
-        break;
-      xArr.splice(-1, 0, last_two_value);
-      yArr.splice(-1, 0, null);
-    }
-    return;
   }
 
   function iterator(name, scope) {
@@ -814,15 +791,15 @@
         error('chartOption为必选项!');
       }
       userOption.chartOption = merge(defaultTemplate, userOption.chartOption);
-      options = merge(defaultOptions, userOption);
+      sagy.options = options = merge(defaultOptions, userOption);
       if (options.autoAxis) {
-        options.chartOption.xAxis.labels.formatter = func_axisFormatter;
-        options.chartOption.xAxis.tickPositioner = func_tickPositioner;
+        options.chartOption.xAxis.labels.formatter = sagy.axisFormatter();
+        options.chartOption.xAxis.tickPositioner = sagy.tickPositioner();
       }
-      if (options.autoTooltip) {
-        options.chartOption.plotOptions.series.point.events.mouseOver.mouseOut = func_pointMouseover;
-        options.chartOption.plotOptions.series.point.events.mouseOut = func_pointMouseout;
-      }
+      // if (options.autoTooltip) {
+      //   options.chartOption.plotOptions.series.point.events.mouseOver.mouseOut = func_pointMouseover;
+      //   options.chartOption.plotOptions.series.point.events.mouseOut = func_pointMouseout;
+      // }
       if (isString(options.renderTo) && !document.getElementById(options.renderTo)) {
         error('页面不存在id为' + options.renderTo + '的元素');
       }
@@ -831,8 +808,7 @@
       sagy.hideLine = iterator('hide', subline);
       sagy.adjustLine = iterator('adjust', subline);
       chart = initChartNode(options.chartOption, options.renderTo);
-      chart.resourcePath = options.resourcePath;
-      sagy.options = options;
+      // chart.resourcePath = options.resourcePath;
       sagy.chart = chart;
       sagy.transferData = options.ajaxOption.transferData;
       sagy.version = im_version;
@@ -887,6 +863,7 @@
         lines = subline.lines,
         chart = sagy.chart,
         options = sagy.options,
+        unit = options.convertUnit.enabled ? json.unit : null,
         index = ~~_index,
         xData = json.xData,
         yData = json.yData,
@@ -897,7 +874,6 @@
       }
       if (isArray(xData) && isNumber(xData[0])) {
         isDatetime = true;
-        //todo 计算xAxis的index
       } else if (isArray(xData) && isString(xData[0])) {
         isDatetime = false;
         chart.xAxis[0].update({
@@ -905,28 +881,18 @@
         });
       }
       if (options.autoAxis || options.autoTooltip && isDatetime) {
-        //不再判断yData个数,只根据时间间隔
-        /*tempData = isArray(yData[0]) ? yData[0] : yData;
-        while (i < (tempData.length - 1) && tempData[i] === null || tempData[i + 1] === null) {
-          i++;
-        }
-        if (i >= tempData.length) {
-          chart.timeType = 6;
-        } else {
-          chart.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
-        }*/
-        chart.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
-        fillAxisEmpty(xData, yData, chart.timeType);
+        sagy.options.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
+        // fillAxisEmpty(xData, yData, sagy.options.timeType);
       }
       if (options.needClear) {
         sagy.clearData();
       }
       if (isArray(yData) && isArray(yData[0])) {
         for (i = 0; i < yData.length; i++) {
-          sagy.setValueOnly(xData, yData[i], i, isDatetime, json.unit, json.optional);
+          sagy.setValueOnly(xData, yData[i], i, isDatetime, unit, json.optional);
         }
       } else {
-        sagy.setValueOnly(xData, yData, index, isDatetime, json.unit, json.optional);
+        sagy.setValueOnly(xData, yData, index, isDatetime, unit, json.optional);
       }
       if (options.subline.enabled) {
         each(json.lines, function(i, item) {
@@ -943,7 +909,6 @@
         options = sagy.options,
         pointHandler = options.ajaxOption.pointHandler,
         series = chart.series,
-        // latestX,
         isDoFindLatest = true,
         list = [],
         unitTemp,
@@ -975,6 +940,7 @@
         if (isFunction(pointHandler)) {
           point.isMin = point.y === min;
           point.isMax = point.y === max;
+          //TODO 优化optional的算法
           if (optional) {
             each(optional, each_function);
           }
@@ -984,13 +950,6 @@
         list.push(point);
       }
       for (i = list.length - 1; i >= 0; i--) {
-        // todo 大于2小时是否加点
-        /*if (isDatetime && latestX) {
-          if((latestX- xData[i])>HOUR*2){
-
-          }
-        }
-        latestX = yData[i] === null ? null : xData[i];*/
         temp = list[i];
         if (isDatetime && isDoFindLatest && temp.y !== null && temp.x > zeroTime(new Date())) {
           isDoFindLatest = false;
@@ -1004,7 +963,7 @@
       if (series[i]) {
         series[i].setData(list);
       } else {
-        error('不存在的series,可能因为错误index.');
+        log('不存在的series,可能因为错误index.');
       }
     },
     clearData: function( /*index, isDeep*/ ) {
@@ -1028,6 +987,40 @@
         }
       }
     },
+    axisFormatter: function() {
+      var sagy = this,
+        options = sagy.options,
+        formatter = options.useShortFormater ? shortFormater : longFormater;
+      return function() {
+        return highchart.dateFormat(formatter[options.timeType], this.value);
+      };
+    },
+    //todo 将时间类型改写为更优雅的方式,不再使用switch
+    tickPositioner: function() {
+      var sagy = this,
+        options = sagy.options,
+        autoAxisOption = options.autoAxisOption;
+      var handleShows = function(xArr, intervalCount) {
+        var length = xArr.length;
+        if (length < 1) {
+          return [];
+        }
+        var start = xArr[0],
+          end = xArr[length - 1],
+          curr = start,
+          interval = secondTimer[options.timeType],
+          arr = [start];
+        while (curr < end) {
+          curr += interval * intervalCount;
+          arr.push(curr);
+        }
+        return arr;
+      };
+      return function() {
+        var shows = this.series[0].xData;
+        return handleShows(shows, autoAxisOption[options.timeType]);
+      };
+    },
     destroy: function() {
       var sagy = this;
       sagy.chart.destroy();
@@ -1041,6 +1034,7 @@
     }
   };
   sagyChart.fn.init.prototype = sagyChart.fn;
+  //todo 添加重置单位转换方法
   sagyChart.fn.convertUnitArr = function(arr, baseUnit) {
     var options = this.options.convertUnit,
       subline = this.subline,
@@ -1098,6 +1092,75 @@
       unit: convertUnit
     };
   };
+
+  sagyChart.convertUnitArr = function(arr, baseUnit /*, key, returnNum*/ ) {
+    var args = arguments,
+      max,
+      dataArr,
+      baseUnitObj = units[baseUnit],
+      convertUnit = baseUnit,
+      len,
+      temp,
+      tempObj = baseUnitObj,
+      ratio,
+      i,
+      key,
+      returnNum = false;
+    if (!baseUnitObj || !arr) {
+      return {
+        data: arr,
+        unit: baseUnit
+      };
+    }
+    if (args.length > 2) {
+      if (isString(args[2])) {
+        key = args[2];
+        returnNum = !! args[3];
+      } else if (isBool(args[2])) {
+        returnNum = args[2];
+      }
+    }
+    dataArr = arr.map(function(item) {
+      if (key) {
+        return item[key];
+      } else {
+        return item;
+      }
+    });
+    max = mathMax.apply(math, dataArr);
+    len = max < 10 ? -1 : 0;
+    temp = max;
+    ratio = baseUnitObj.ratio;
+
+    if (len === 0) {
+      while (temp >= ratio * 10) {
+        temp = temp / ratio;
+        if (units[tempObj.higherLevel]) {
+          convertUnit = tempObj.higherLevel;
+          len++;
+          tempObj = units[tempObj.higherLevel];
+        } else {
+          break;
+        }
+      }
+    } else {
+      convertUnit = baseUnitObj.lowerLevel;
+    }
+    for (i = 0; i < arr.length; i++) {
+      if (key) {
+        temp = arr[i][key];
+        arr[i][key] = numFormat(temp * mathPow(ratio, len * -1), returnNum);
+      } else {
+        temp = arr[i];
+        arr[i] = numFormat(temp * mathPow(ratio, len * -1), returnNum);
+      }
+    }
+    return {
+      data: arr,
+      unit: convertUnit
+    };
+  };
+
   sagyChart.fn.convertUnit = sagyChart.convertUnit = function(value, baseUnit, returnNum) {
     var convertUnit = baseUnit,
       baseUnitObj = units[baseUnit],
@@ -1105,9 +1168,9 @@
       temp = value,
       tempObj = baseUnitObj,
       ratio;
-    if (!baseUnitObj || isNaN(value)) {
+    if (!baseUnitObj || !value) {
       return {
-        data: value,
+        data: numFormat(value, returnNum),
         unit: baseUnit
       };
     }

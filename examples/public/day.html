@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>当天小时数据</title>
+  <link rel='stylesheet' href='/lib/bootstrap/dist/css/bootstrap.css' />
+  <style type="text/css">
+    body {
+      font-family: "微软雅黑", Helvetica, Arial, sans-serif;
+    }
+  </style>
+  <script src="lib/jquery/dist/jquery.js"></script>
+  <script src="lib/highcharts-release/highcharts.src.js"></script>
+  <script src="js/sagyChart.src.js"></script>
+</head>
+<body>
+<br>
+<div class="container">
+  <div style="min-height:600px" id="container"></div>
+  <div class="col-xs-12">
+    <textarea id="code" style="min-height: 200px;min-width: 600px">
+      chart.refresh();
+    </textarea>
+  </div>
+  <div class="col-xs-2">
+    <button id="run" type="button" class="btn btn-lg btn-block btn-default">run</button>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $(function(){
+    chart = sagyChart({
+      chartOption: {
+        chart: {
+          type: 'line',
+        },
+        legend: {
+          enabled: false
+        },
+        credits: {
+          enabled: false,
+        },
+        title: {
+          text: null
+        },
+        xAxis: {
+          type: "datetime",
+          showFirstLabel: false,
+          showLastLabel: false,
+          tickLength: 0,
+          tickWidth: 0,
+          gridLineColor: "#eaeaea",
+          gridLineDashStyle: "longDash",
+          gridLineWidth: 1,
+          lineColor: '#cacaca',
+          lineWidth: 1,
+          minPadding: 0,
+          maxPadding: 0,
+          title: {
+            text: null
+          },
+          labels: {
+            enabled: true,
+            style: {
+              fontSize: 12,
+              fontFamily: "Arial",
+              color: "#959595"
+            }
+          }
+        },
+        yAxis: {
+          tickWidth: 0,
+          gridLineColor: "#eaeaea",
+          gridLineDashStyle: "longDash",
+          minPadding: 0,
+          title: {
+            text: null
+          },
+          lineWidth: 0,
+          labels: {
+            align: "right",
+            enabled: true,
+            y: 10,
+            style: {
+              fontSize: 12,
+              fontFamily: "Arial",
+              color: "#959595"
+            }
+          }
+        },
+        series: [{
+          color: "#42918d",
+          data: [],
+          zIndex: 9,
+          marker: {
+            enabled: true,
+            radius: 3,
+            fillColor: 'white',
+            lineColor: '#42918d',
+            lineWidth: 3,
+            symbol: 'circle'
+          },
+        }, {
+          color: "#dedede",
+          data: [],
+          zIndex: 8
+        }]
+      },
+      renderTo: 'container',
+      autoAxis: true,
+      subline: {
+        enabled: false
+      },
+      convertUnit: {
+        enabled: false
+      },
+      ajaxOption: {
+        url: "getDay",
+        transferData: {},
+        index: 0,
+        callback: null,
+        pointHandler: null,
+        isJson: true
+      }
+    });
+    $('#run').on('click',function(){
+      eval($("#code").val())
+    });
+  });
+</script>
+</body>
+</html>
