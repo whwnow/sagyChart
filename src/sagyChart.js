@@ -747,9 +747,11 @@
     if (!next) {
       time_obj = new Date(prev);
       if (time_obj.getMonth() === 0 && time_obj.getDate() === 1) {
-        return 4;
+        return 'year';
+      } else if (time_obj.getDate() === 1) {
+        return 'day';
       } else {
-        return 2;
+        return 'hour';
       }
     }
     milliseconds = next - prev;
