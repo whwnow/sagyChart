@@ -235,6 +235,13 @@
         ratio: 1000
       }
     };
+
+  highchart.setOptions({
+    global: {
+      useUTC: false
+    }
+  });
+
   var sagyChart = function() {
     var args = arguments,
       options = args[0],
