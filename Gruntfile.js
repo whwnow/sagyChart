@@ -14,7 +14,7 @@ module.exports = function(grunt) {
     },
     concat: {
       dist: {
-        src: ["../src/sagyChart.js"],
+        src: ["./src/sagyChart.js"],
         dest: "./dist/<%= pkg.name %>.src.js"
       }
     }
