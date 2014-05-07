@@ -675,7 +675,7 @@
     chartOption: defaultTemplate,
     renderTo: '',
     // resourcePath: './images/sagyChart/',
-    autoAxis: false,
+    autoAxis: true,
     autoTooltip: false,
     autoAxisOption: {
       hour: 2,
