@@ -3,6 +3,7 @@
 *.png
 
 node_modules
+examples/public/lib
 
 # Ignore Sublime project
 *.sublime-project

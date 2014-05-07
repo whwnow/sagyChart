@@ -16,6 +16,10 @@ module.exports = function(grunt) {
       dist: {
         src: ["./src/sagyChart.js"],
         dest: "./dist/<%= pkg.name %>.src.js"
+      },
+      js: {
+        src: ["./src/sagyChart.js"],
+        dest: "./examples/public/js/<%= pkg.name %>.src.js"
       }
     }
   });

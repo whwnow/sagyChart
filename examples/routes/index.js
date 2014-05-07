@@ -1,65 +1,11 @@
 var moment = require('moment');
 exports.index = function(req, res) {
-  res.render('index', {
-    title: 'Express'
-  });
+  res.render('index');
 };
 
-function getData(val, time, isRandom) {
-  var first = parseInt(time, 10) || 1377100800000, //1377100800000,
-    i,
-    xArray = [],
-    yArray = [],
-    len = isRandom ? 100 : 24,
-    sum = first,
-    add;
-  val = parseInt(val, 10) || 1;
-  for (i = 0; i < len; i++) {
-    if (i === len - 1) {
-      yArray.push(null);
-    } else {
-      yArray.push(Math.random() * val);
-    }
-    if (isRandom) {
-      add = parseInt(Math.random() * (1000 * 60 * 3 - 1000 * 60 * 1 - 1) + 1000 * 60 * 1, 10);
-    } else {
-      add = 1000 * 60 * 60;
-    }
-    xArray.push(sum);
-    sum += add;
-  }
-  return {
-    xData: xArray,
-    yData: yArray,
-    unit: "kWh"
-  };
-}
 var MINUTE = 60000,
   HOUR = MINUTE * 60,
   DAY = HOUR * 24;
-
-function getDay() {
-  var val = 1000,
-    date = new Date(),
-    year = date.getFullYear(),
-    month = date.getMonth(),
-    day = date.getDate(),
-    seconds = new Date(year, month, day).getTime(),
-    xArr = [],
-    yArr = [],
-    i,
-    length = 24;
-  for (i = 0; i < length; i++) {
-    xArr.push(seconds);
-    seconds += HOUR;
-    yArr.push(Math.round(Math.random() * val * 100) / 100);
-  }
-  return {
-    xData: xArr,
-    yData: yArr,
-    unit: 'kWh'
-  };
-}
 
 exports.getDay = function(req, res) {
   var val = 1000,
@@ -72,7 +18,7 @@ exports.getDay = function(req, res) {
     yArr = [],
     i,
     length = 24;
-  for (i = 0; i < length; i++) {
+  for (i = 0; i <= length; i++) {
     xArr.push(seconds);
     seconds += HOUR;
     yArr.push(Math.round(Math.random() * val * 100) / 100);

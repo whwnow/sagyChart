@@ -1,11 +1,31 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <title>sagyChart示例页</title>
+    <link rel='stylesheet' href='/lib/bootstrap/dist/css/bootstrap.css' />
+    <style type="text/css">
+    body {
+      font-family: "微软雅黑", Helvetica, Arial, sans-serif;
+    }
+    </style>
   </head>
   <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
+    <br>
+    <div class="container">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">示例导航页</h3>
+        </div>
+        <div class="panel-body">
+          <div class="list-group">
+            <a href="day.html" class="list-group-item ">当天小时数据</a>
+            <a href="#" class="list-group-item ">当天随机时间数据</a>
+            <a href="#" class="list-group-item ">当月数据</a>
+            <a href="#" class="list-group-item ">当月包含两个series</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
   </body>
 </html>
