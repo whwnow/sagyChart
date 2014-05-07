@@ -933,6 +933,7 @@
         if (isFunction(pointHandler)) {
           point.isMin = point.y === min;
           point.isMax = point.y === max;
+          //TODO 优化optional的算法
           if (optional) {
             each(optional, each_function);
           }
