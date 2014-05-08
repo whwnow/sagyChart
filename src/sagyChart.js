@@ -690,7 +690,7 @@
       month: 1,
       year: 1
     },
-    needClear: false,
+    needClear: true,
     useShortFormater: true,
     subline: {
       enabled: false,
@@ -909,14 +909,12 @@
         options = sagy.options,
         pointHandler = options.ajaxOption.pointHandler,
         series = chart.series,
-        isDoFindLatest = true,
         list = [],
         unitTemp,
         values,
         min,
         point,
         max,
-        temp,
         latestIndex = null,
         today = zeroTime(new Date()),
         i = 0;
