@@ -917,6 +917,8 @@
         point,
         max,
         temp,
+        latestIndex = null,
+        today = zeroTime(new Date()),
         i = 0;
       var each_function = function(key, value) {
         if (parseInt(key) === i) {
@@ -935,11 +937,23 @@
       });
       min = mathMin.apply(math, values);
       max = mathMax.apply(math, values);
+
+      for (i = yData.length - 1; i >= 0; i--) {
+        if (isDatetime && xData[i] < today)
+          break;
+        if (yData[i] !== null) {
+          latestIndex = i;
+          break;
+        }
+      }
+
       for (i = 0; i < yData.length; i++) {
         point = new Point(isDatetime ? xData[i] : null, yData[i]);
         if (isFunction(pointHandler)) {
           point.isMin = point.y === min;
           point.isMax = point.y === max;
+          if (latestIndex === i)
+            point.isLatest = true;
           //TODO 优化optional的算法
           if (optional) {
             each(optional, each_function);
@@ -949,15 +963,7 @@
         point.y = point.y === null ? null : mathRound(point.y * 100) / 100;
         list.push(point);
       }
-      for (i = list.length - 1; i >= 0; i--) {
-        temp = list[i];
-        if (isDatetime && isDoFindLatest && temp.y !== null && temp.x > zeroTime(new Date())) {
-          isDoFindLatest = false;
-          temp.isLatest = true;
-        } else {
-          temp.isLatest = false;
-        }
-      }
+
       // index = index > lenSeries || index < lenSeries * -1 ? lenSeries - 1 : index;
       i = +index + (index < 0 ? series.length : 0);
       if (series[i]) {
