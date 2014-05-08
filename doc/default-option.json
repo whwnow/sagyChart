@@ -38,7 +38,7 @@
    * 辅助线设置项
    * @type {Object}
    *
-   * enabled     开关
+   * enabled       开关
    * renderTo      辅助线div容器id,多条辅助线公用时使用,独立使用时,放到lines对应属性中
    * deviation     辅助线div的高度差值
    * lines         辅助线对象的数组,可包含多条辅助线,line对象可包含以下属性

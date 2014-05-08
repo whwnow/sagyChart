@@ -14,15 +14,20 @@ exports.getDay = function(req, res) {
     month = date.getMonth(),
     day = date.getDate(),
     seconds = new Date(year, month, day).getTime(),
+    now = new Date().getTime(),
     xArr = [],
     yArr = [],
     i,
     length = 24;
   for (i = 0; i <= length; i++) {
+    if (seconds > now)
+      break;
     xArr.push(seconds);
-    seconds += HOUR;
     yArr.push(Math.round(Math.random() * val * 100) / 100);
+    seconds += HOUR;
   }
+  xArr.push(new Date(year, month, day + 1).getTime());
+  yArr.push(null);
   res.send({
     xData: xArr,
     yData: yArr,
