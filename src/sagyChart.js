@@ -947,6 +947,7 @@
 
       for (i = 0; i < yData.length; i++) {
         point = new Point(isDatetime ? xData[i] : null, yData[i]);
+        //TODO 是否改写point的this信息实现方式
         if (isFunction(pointHandler)) {
           point.isMin = point.y === min;
           point.isMax = point.y === max;
