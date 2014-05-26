@@ -584,14 +584,16 @@
       lineWidth: 0,
       title: {
         text: null
-      }
+      },
+      labels: {}
     },
     yAxis: {
       tickWidth: 0,
       lineWidth: 0,
       title: {
         text: null
-      }
+      },
+      labels: {}
     }
   };
   var defaultOptions = {
