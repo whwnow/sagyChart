@@ -848,7 +848,7 @@
             status = false;
           }
           if (isFunction(_callback)) {
-            _callback.call(sagy, status);
+            _callback.call(sagy, status, json);
           }
         },
         error: function() {
@@ -1120,7 +1120,7 @@
     if (args.length > 2) {
       if (isString(args[2])) {
         key = args[2];
-        returnNum = !! args[3];
+        returnNum = !!args[3];
       } else if (isBool(args[2])) {
         returnNum = args[2];
       }
