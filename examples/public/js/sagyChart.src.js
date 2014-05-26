@@ -9,7 +9,7 @@
   }
 }).call(this, 'sagyChart', function() {
   //some global variable
-  var im_version = '0.13.5',
+  var im_version = '0.13.6',
     im_obj = {},
     im_string = im_obj.toString,
     // im_hasOwn = im_obj.hasOwnProperty,
@@ -848,7 +848,7 @@
             status = false;
           }
           if (isFunction(_callback)) {
-            _callback.call(sagy, status);
+            _callback.call(sagy, status, json);
           }
         },
         error: function() {
@@ -947,6 +947,7 @@
 
       for (i = 0; i < yData.length; i++) {
         point = new Point(isDatetime ? xData[i] : null, yData[i]);
+        //TODO 是否改写point的this信息实现方式
         if (isFunction(pointHandler)) {
           point.isMin = point.y === min;
           point.isMax = point.y === max;
@@ -1119,7 +1120,7 @@
     if (args.length > 2) {
       if (isString(args[2])) {
         key = args[2];
-        returnNum = !! args[3];
+        returnNum = !!args[3];
       } else if (isBool(args[2])) {
         returnNum = args[2];
       }
