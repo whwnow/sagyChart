@@ -76,7 +76,9 @@
    * url           与后台交互的post请求url,推荐为chart独占一个接口,直接使用refresh方法接管与后台交互,否则需要手动维护ajax并调用setData方法
    * transferData  与后台交互时使用的初始化参数,使用refresh方法时,可以只传变化后的参数,适用于修改某一参数
    * index         series的index,可使用负数
-   * callback      ajax的callback函数
+   * callback      ajax的callback函数,接收两个参数
+   *               function(status,json){}
+   *               第一个status是bool值,是否有数据.返回成功没数据也是false,第二个json是ajax返回json数据.
    * pointHandler  点处理函数,详见code页
    * isJson        使用json格式还是json形式的字符串
    */
