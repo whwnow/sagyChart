@@ -562,17 +562,7 @@
   var defaultTemplate = {
     chart: {
       backgroundColor: 'rgba(255,0,0,0)',
-      // spacingBottom: 20,
-      // marginRight: 110,
-      // marginLeft: 110,
-      //marginTop: 110,
-      // spacingLeft: 0,
       renderTo: 'chart_container'
-      // height: 650,
-      //marginBottom: 240,
-      //marginRight:100,
-      // plotBorderWidth: 1,
-      // plotBackgroundColor: '#fffff9'
     },
     legend: {
       enabled: false
@@ -581,102 +571,28 @@
       enabled: false
     },
     plotOptions: {
-      // column: {
-      //   pointPadding: 0,
-      //   borderWidth: 0,
-      //   groupPadding: 0.1,
-      //   pointPlacement: 'on',
-      // },
       series: {
         turboThreshold: 200000,
-        stickyTracking: true,
         shadow: false
-        // point: {
-        //   events: {
-        //     mouseOver: func_pointMouseover,
-        //     mouseOut: func_pointMouseout
-        //   }
-        // }
       }
     },
-    // tooltip: {
-    //   enabled: true,
-    //   animation: false,
-    //   formatter: function() {
-    //     return false;
-    //   },
-    //   crosshairs: [{
-    //     x: true,
-    //     dashStyle: 'ShortDash',
-    //     width: 1
-    //   }, {
-    //     y: true,
-    //     dashStyle: 'ShortDash',
-    //     width: 1,
-    //     zIndex: 10
-    //   }]
-    // },
     title: {
       text: null
     },
     xAxis: {
-      // alternateGridColor: 'rgba(242,253,242,0.5)',
-      tickLength: 0,
       tickWidth: 0,
       lineWidth: 0,
-      // gridLineColor: '#B2EAC7',
-      // gridLineDashStyle: 'longDash',
-      // gridLineWidth: 1,
-      // type: 'datetime',
       title: {
         text: null
       }
-      // labels: {
-      //   enabled: true,
-      //   style: {
-      //     fontSize: 20,
-      //     fontFamily: 'Arial',
-      //     color: '#aaaaaa'
-      //   },
-      //   formatter: func_axisFormatter
-      // },
-      // offset: 25,
-      // tickPositioner: func_tickPositioner
     },
     yAxis: {
       tickWidth: 0,
       lineWidth: 0,
-      // offset: 150,
-      // alternateGridColor: 'rgba(244,248,248,0.5)',
-      // gridLineColor: '#B2EAC7',
-      // gridLineDashStyle: 'longDash',
       title: {
         text: null
       }
-      // labels: {
-      //   align: 'right',
-      //   enabled: true,
-      //   y: 10,
-      //   style: {
-      //     fontSize: 20,
-      //     fontFamily: 'Arial',
-      //     color: '#aaaaaa'
-      //   }
-      // }
     }
-    // series: [{
-    //   turboThreshold: 200000,
-    //   // type: 'column',
-    //   // color: '#e59c9b',
-    //   data: [],
-    //   // states: {
-    //   //   hover: {
-    //   //     enabled: false
-    //   //   }
-    //   // },
-    //   shadow: false,
-    //   // zIndex: 8
-    // }]
   };
   var defaultOptions = {
     chartOption: defaultTemplate,
