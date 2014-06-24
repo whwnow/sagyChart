@@ -672,14 +672,15 @@
   function calculateTimeType(arr, _ratio) {
     var ratio = _ratio || 1,
       length = arr.length,
-      prev = arr[0],
-      next = arr[1],
+      first = arr[0],
+      prev = arr[1],
+      next = arr[2],
       last = arr[length - 1],
       milliseconds,
       time_obj;
     //hack 年度数据
     if (length === 1) {
-      time_obj = new Date(prev);
+      time_obj = new Date(first);
       if (time_obj.getMonth() === 0 && time_obj.getDate() === 1) {
         return 'year';
       }
@@ -689,7 +690,7 @@
       return 'day';
     }
     //hack 报警数据
-    if ((last - prev) < HOUR * 6) {
+    if ((last - first) < HOUR * 6) {
       return 'minute';
     }
 
