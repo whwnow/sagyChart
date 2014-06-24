@@ -650,16 +650,16 @@
    * @return {Highchart} chart obj
    */
   function initChartNode(options, renderTo) {
-    var chartId = generateID(),
-      chartDiv,
-      parentNode = renderTo;
-    chartDiv = document.createElement('div');
-    chartDiv.setAttribute('id', chartId);
-    if (isString(renderTo)) {
-      parentNode = document.getElementById(renderTo);
-    }
-    parentNode.appendChild(chartDiv);
-    options.chart.renderTo = chartId;
+    // var chartId = generateID(),
+    //   chartDiv,
+    //   parentNode = renderTo;
+    // chartDiv = document.createElement('div');
+    // chartDiv.setAttribute('id', chartId);
+    // if (isString(renderTo)) {
+    //   parentNode = document.getElementById(renderTo);
+    // }
+    // parentNode.appendChild(chartDiv);
+    options.chart.renderTo = renderTo;
     return new highchart.Chart(options);
   }
   /**
