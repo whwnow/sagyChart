@@ -9,7 +9,7 @@
   }
 }).call(this, 'sagyChart', function() {
   //some global variable
-  var im_version = '0.13.6',
+  var im_version = '0.13.7',
     im_obj = {},
     im_string = im_obj.toString,
     // im_hasOwn = im_obj.hasOwnProperty,
@@ -19,18 +19,21 @@
     MONTH = DAY * 31,
     YEAR = DAY * 366,
     secondTimer = {
+      minute: MINUTE,
       hour: HOUR,
       day: DAY,
       month: MONTH,
       year: YEAR
     },
     shortFormater = {
+      minute: '%M',
       hour: '%H',
       day: '%d',
       month: '%m',
       year: '%Y'
     },
     longFormater = {
+      minute: '%M:%S',
       hour: '%H:%M',
       day: '%m.%d',
       month: '%Y.%m',
@@ -562,17 +565,7 @@
   var defaultTemplate = {
     chart: {
       backgroundColor: 'rgba(255,0,0,0)',
-      // spacingBottom: 20,
-      // marginRight: 110,
-      // marginLeft: 110,
-      //marginTop: 110,
-      // spacingLeft: 0,
       renderTo: 'chart_container'
-      // height: 650,
-      //marginBottom: 240,
-      //marginRight:100,
-      // plotBorderWidth: 1,
-      // plotBackgroundColor: '#fffff9'
     },
     legend: {
       enabled: false
@@ -581,102 +574,30 @@
       enabled: false
     },
     plotOptions: {
-      // column: {
-      //   pointPadding: 0,
-      //   borderWidth: 0,
-      //   groupPadding: 0.1,
-      //   pointPlacement: 'on',
-      // },
       series: {
         turboThreshold: 200000,
-        stickyTracking: true,
         shadow: false
-        // point: {
-        //   events: {
-        //     mouseOver: func_pointMouseover,
-        //     mouseOut: func_pointMouseout
-        //   }
-        // }
       }
     },
-    // tooltip: {
-    //   enabled: true,
-    //   animation: false,
-    //   formatter: function() {
-    //     return false;
-    //   },
-    //   crosshairs: [{
-    //     x: true,
-    //     dashStyle: 'ShortDash',
-    //     width: 1
-    //   }, {
-    //     y: true,
-    //     dashStyle: 'ShortDash',
-    //     width: 1,
-    //     zIndex: 10
-    //   }]
-    // },
     title: {
       text: null
     },
     xAxis: {
-      // alternateGridColor: 'rgba(242,253,242,0.5)',
-      tickLength: 0,
       tickWidth: 0,
       lineWidth: 0,
-      // gridLineColor: '#B2EAC7',
-      // gridLineDashStyle: 'longDash',
-      // gridLineWidth: 1,
-      // type: 'datetime',
       title: {
         text: null
-      }
-      // labels: {
-      //   enabled: true,
-      //   style: {
-      //     fontSize: 20,
-      //     fontFamily: 'Arial',
-      //     color: '#aaaaaa'
-      //   },
-      //   formatter: func_axisFormatter
-      // },
-      // offset: 25,
-      // tickPositioner: func_tickPositioner
+      },
+      labels: {}
     },
     yAxis: {
       tickWidth: 0,
       lineWidth: 0,
-      // offset: 150,
-      // alternateGridColor: 'rgba(244,248,248,0.5)',
-      // gridLineColor: '#B2EAC7',
-      // gridLineDashStyle: 'longDash',
       title: {
         text: null
-      }
-      // labels: {
-      //   align: 'right',
-      //   enabled: true,
-      //   y: 10,
-      //   style: {
-      //     fontSize: 20,
-      //     fontFamily: 'Arial',
-      //     color: '#aaaaaa'
-      //   }
-      // }
+      },
+      labels: {}
     }
-    // series: [{
-    //   turboThreshold: 200000,
-    //   // type: 'column',
-    //   // color: '#e59c9b',
-    //   data: [],
-    //   // states: {
-    //   //   hover: {
-    //   //     enabled: false
-    //   //   }
-    //   // },
-    //   shadow: false,
-    //   // zIndex: 8
-    // }]
   };
   var defaultOptions = {
     chartOption: defaultTemplate,
@@ -685,6 +606,7 @@
     autoAxis: true,
     autoTooltip: false,
     autoAxisOption: {
+      minute: 10,
       hour: 2,
       day: 2,
       month: 1,
@@ -747,20 +669,30 @@
    * @param  {[type]}   _ratio 精度
    * @return {[type]}          返回时间类型(按显示方式分类)   1小时:分钟  2月.天  3 月  4年
    */
-  function calculateTimeType(prev, next, _ratio) {
+  function calculateTimeType(arr, _ratio) {
     var ratio = _ratio || 1,
+      length = arr.length,
+      prev = arr[0],
+      next = arr[1],
+      last = arr[length - 1],
       milliseconds,
       time_obj;
-    if (!next) {
+    //hack 年度数据
+    if (length === 1) {
       time_obj = new Date(prev);
       if (time_obj.getMonth() === 0 && time_obj.getDate() === 1) {
         return 'year';
-      } else if (time_obj.getDate() === 1) {
-        return 'day';
-      } else {
-        return 'hour';
       }
+      if (time_obj.getDate() === 1) {
+        return 'month';
+      }
+      return 'day';
     }
+    //hack 报警数据
+    if ((last - prev) < HOUR * 6) {
+      return 'minute';
+    }
+
     milliseconds = next - prev;
     switch (true) {
       case milliseconds <= HOUR * ratio:
@@ -881,8 +813,7 @@
         });
       }
       if (options.autoAxis || options.autoTooltip && isDatetime) {
-        sagy.options.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
-        // fillAxisEmpty(xData, yData, sagy.options.timeType);
+        sagy.options.timeType = calculateTimeType(xData, options.axisRatio);
       }
       if (options.needClear) {
         sagy.clearData();
