@@ -669,20 +669,30 @@
    * @param  {[type]}   _ratio 精度
    * @return {[type]}          返回时间类型(按显示方式分类)   1小时:分钟  2月.天  3 月  4年
    */
-  function calculateTimeType(prev, next, _ratio) {
+  function calculateTimeType(arr, _ratio) {
     var ratio = _ratio || 1,
+      length = arr.length,
+      prev = arr[0],
+      next = arr[1],
+      last = arr[length - 1],
       milliseconds,
       time_obj;
-    if (!next) {
+    //hack 年度数据
+    if (length === 1) {
       time_obj = new Date(prev);
       if (time_obj.getMonth() === 0 && time_obj.getDate() === 1) {
         return 'year';
-      } else if (time_obj.getDate() === 1) {
-        return 'day';
-      } else {
-        return 'hour';
       }
+      if (time_obj.getDate() === 1) {
+        return 'month';
+      }
+      return 'day';
     }
+    //hack 报警数据
+    if ((last - prev) < HOUR * 6) {
+      return 'minute';
+    }
+
     milliseconds = next - prev;
     switch (true) {
       case milliseconds <= HOUR * ratio:
@@ -803,11 +813,7 @@
         });
       }
       if (options.autoAxis || options.autoTooltip && isDatetime) {
-        if (xData[xData.length - 1] - xData[0]) {
-          sagy.options.timeType = 'minute';
-        } else {
-          sagy.options.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
-        }
+        sagy.options.timeType = calculateTimeType(xData, options.axisRatio);
       }
       if (options.needClear) {
         sagy.clearData();
