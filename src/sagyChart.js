@@ -19,18 +19,21 @@
     MONTH = DAY * 31,
     YEAR = DAY * 366,
     secondTimer = {
+      minute: MINUTE,
       hour: HOUR,
       day: DAY,
       month: MONTH,
       year: YEAR
     },
     shortFormater = {
+      minute: '%M',
       hour: '%H',
       day: '%d',
       month: '%m',
       year: '%Y'
     },
     longFormater = {
+      minute: '%M:%S',
       hour: '%H:%M',
       day: '%m.%d',
       month: '%Y.%m',
@@ -603,6 +606,7 @@
     autoAxis: true,
     autoTooltip: false,
     autoAxisOption: {
+      minute: 10,
       hour: 2,
       day: 2,
       month: 1,
@@ -799,8 +803,11 @@
         });
       }
       if (options.autoAxis || options.autoTooltip && isDatetime) {
-        sagy.options.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
-        // fillAxisEmpty(xData, yData, sagy.options.timeType);
+        if (xData[xData.length - 1] - xData[0]) {
+          sagy.options.timeType = 'minute';
+        } else {
+          sagy.options.timeType = calculateTimeType(xData[i], xData[i + 1], options.axisRatio);
+        }
       }
       if (options.needClear) {
         sagy.clearData();
