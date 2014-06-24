@@ -26,14 +26,14 @@
       year: YEAR
     },
     shortFormater = {
-      minute: '%M',
+      minute: '%H:%M',
       hour: '%H',
       day: '%d',
       month: '%m',
       year: '%Y'
     },
     longFormater = {
-      minute: '%M:%S',
+      minute: '%H:%M',
       hour: '%H:%M',
       day: '%m.%d',
       month: '%Y.%m',
