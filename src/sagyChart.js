@@ -941,14 +941,17 @@
         if (length < 1) {
           return [];
         }
-        var start = xArr[0],
+        var arr,
+          curr,
+          start = xArr[0],
           end = xArr[length - 1],
-          curr = start,
-          interval = secondTimer[options.timeType],
-          arr = [start];
+          interval = secondTimer[options.timeType] * intervalCount;
+        start = start - start % interval + interval;
+        curr = start;
+        arr = [start];
         while (curr < end) {
-          curr += interval * intervalCount;
-          arr.push(curr);
+          curr += interval;
+          curr < end && arr.push(curr);
         }
         return arr;
       };
