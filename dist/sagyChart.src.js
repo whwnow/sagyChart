@@ -9,7 +9,7 @@
   }
 }).call(this, 'sagyChart', function() {
   //some global variable
-  var im_version = '0.13.7',
+  var im_version = '0.13.8',
     im_obj = {},
     im_string = im_obj.toString,
     // im_hasOwn = im_obj.hasOwnProperty,
@@ -26,14 +26,14 @@
       year: YEAR
     },
     shortFormater = {
-      minute: '%M',
+      minute: '%H:%M',
       hour: '%H',
       day: '%d',
       month: '%m',
       year: '%Y'
     },
     longFormater = {
-      minute: '%M:%S',
+      minute: '%H:%M',
       hour: '%H:%M',
       day: '%m.%d',
       month: '%Y.%m',
@@ -650,16 +650,16 @@
    * @return {Highchart} chart obj
    */
   function initChartNode(options, renderTo) {
-    var chartId = generateID(),
-      chartDiv,
-      parentNode = renderTo;
-    chartDiv = document.createElement('div');
-    chartDiv.setAttribute('id', chartId);
-    if (isString(renderTo)) {
-      parentNode = document.getElementById(renderTo);
-    }
-    parentNode.appendChild(chartDiv);
-    options.chart.renderTo = chartId;
+    // var chartId = generateID(),
+    //   chartDiv,
+    //   parentNode = renderTo;
+    // chartDiv = document.createElement('div');
+    // chartDiv.setAttribute('id', chartId);
+    // if (isString(renderTo)) {
+    //   parentNode = document.getElementById(renderTo);
+    // }
+    // parentNode.appendChild(chartDiv);
+    options.chart.renderTo = renderTo;
     return new highchart.Chart(options);
   }
   /**
@@ -672,14 +672,15 @@
   function calculateTimeType(arr, _ratio) {
     var ratio = _ratio || 1,
       length = arr.length,
-      prev = arr[0],
-      next = arr[1],
+      first = arr[0],
+      prev = arr[1],
+      next = arr[2],
       last = arr[length - 1],
       milliseconds,
       time_obj;
     //hack 年度数据
     if (length === 1) {
-      time_obj = new Date(prev);
+      time_obj = new Date(first);
       if (time_obj.getMonth() === 0 && time_obj.getDate() === 1) {
         return 'year';
       }
@@ -689,7 +690,7 @@
       return 'day';
     }
     //hack 报警数据
-    if ((last - prev) < HOUR * 6) {
+    if ((last - first) < HOUR * 6) {
       return 'minute';
     }
 
@@ -941,14 +942,17 @@
         if (length < 1) {
           return [];
         }
-        var start = xArr[0],
+        var arr,
+          curr,
+          start = xArr[0],
           end = xArr[length - 1],
-          curr = start,
-          interval = secondTimer[options.timeType],
-          arr = [start];
+          interval = secondTimer[options.timeType] * intervalCount;
+        start = start - start % interval + interval;
+        curr = start;
+        arr = [start];
         while (curr < end) {
-          curr += interval * intervalCount;
-          arr.push(curr);
+          curr += interval;
+          curr < end && arr.push(curr);
         }
         return arr;
       };
