@@ -695,6 +695,7 @@
         options = merge(options, _userOption);
         options.transferData = transferData;
         sagy.options.ajaxOption = options;
+        sagy.transferData = transferData;
       }
       _callback = callback ? callback : options.callback;
       $.ajax({
