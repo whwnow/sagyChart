@@ -718,7 +718,6 @@
     init: function(userOption, callback) {
       var sagy = this,
         options,
-        chart,
         subline;
       if (!userOption.chartOption) {
         error('chartOption为必选项!');
@@ -740,9 +739,7 @@
       sagy.showLine = iterator('show', subline);
       sagy.hideLine = iterator('hide', subline);
       sagy.adjustLine = iterator('adjust', subline);
-      chart = initChartNode(options.chartOption, options.renderTo);
-      // chart.resourcePath = options.resourcePath;
-      sagy.chart = chart;
+      sagy.chart = initChartNode(options.chartOption, options.renderTo);
       sagy.transferData = options.ajaxOption.transferData;
       sagy.version = im_version;
       if (isFunction(callback)) {
