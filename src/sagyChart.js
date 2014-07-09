@@ -746,13 +746,16 @@
           categories: xData
         });
       }
-      if (options.autoAxis || options.autoTooltip && isDatetime) {
+      if (options.autoAxis && isDatetime) {
         sagy.options.timeType = calculateTimeType(xData, options.axisRatio);
       }
       if (options.needClear) {
         sagy.clearData();
       }
-      if (isArray(yData) && isArray(yData[0])) {
+      //兼容其它格式
+      if (!xData) {
+        chart.series[index].setData(yData);
+      } else if (isArray(yData) && isArray(yData[0])) {
         for (i = 0; i < yData.length; i++) {
           sagy.setValueOnly(xData, yData[i], i, isDatetime, unit, json.optional);
         }
