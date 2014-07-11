@@ -467,7 +467,7 @@
         isMinus = true;
         num *= -1;
       }
-      decimal = num >= 10000 ? 1 : num >= 1000 ? 10 : num >= 100 ? 100 : num >= 10 ? 1000 : 10000;
+      decimal = num > 10 ? 10 : 100;
       num = mathRound(num * decimal) / decimal;
       if (returnNum) {
         return isMinus ? num * -1 : num;
