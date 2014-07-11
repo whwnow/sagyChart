@@ -827,7 +827,7 @@
           }
           pointHandler.call(point, sagy.options.ajaxOption);
         }
-        point.y = point.y === null ? null : mathRound(point.y * 100) / 100;
+        point.y = numFormat(point.y, true);
         list.push(point);
       }
 
