@@ -9,7 +9,7 @@
   }
 }).call(this, 'sagyChart', function() {
   //some global variable
-  var im_version = '0.13.8',
+  var im_version = '0.13.9',
     im_obj = {},
     im_string = im_obj.toString,
     // im_hasOwn = im_obj.hasOwnProperty,
@@ -467,7 +467,7 @@
         isMinus = true;
         num *= -1;
       }
-      decimal = num >= 10000 ? 1 : num >= 1000 ? 10 : num >= 100 ? 100 : num >= 10 ? 1000 : 10000;
+      decimal = num > 10 ? 10 : 100;
       num = mathRound(num * decimal) / decimal;
       if (returnNum) {
         return isMinus ? num * -1 : num;
@@ -496,71 +496,6 @@
     }
     this.y = y;
   }
-
-  /*  var func_pointMouseover = function() {
-    var chart = this.series.chart;
-    if (chart.hoverPoint) {
-      func_pointMouseout.call(this);
-    }
-    chart.svg_yRect = chart.renderer.image(chart.resourcePath + 'panel_Y.png', chart.plotLeft - 80, this.plotY + chart.plotTop - 21, 80, 50).attr({
-      fill: 'white',
-      zIndex: 99
-    }).add();
-    var yStr = numFormat(this.y);
-    var yfontsize = yStr.length > 4 ? 20 : 28;
-    var yfontsizepx = yfontsize + 'px';
-    var xString;
-    chart.svg_yText = chart.renderer.text(yStr, chart.plotLeft - 43, this.plotY + chart.plotTop + yfontsize / 2).attr({
-      zIndex: 100,
-      'text-anchor': 'middle'
-    }).css({
-      color: 'white',
-      fontSize: yfontsizepx
-    }).add();
-    chart.svg_xRect = chart.renderer.image(chart.resourcePath + 'panel_X.png', chart.plotLeft + this.plotX - 52, chart.plotTop + chart.plotHeight, 102, 60).attr({
-      fill: 'white',
-      zIndex: 99
-    }).add();
-    switch (chart.timeType) {
-      case 1:
-        xString = highchart.dateFormat('%H:%M', this.x);
-        break;
-      case 2:
-        xString = highchart.dateFormat('%H:%M', this.x);
-        break;
-      case 3:
-      case 4:
-        xString = highchart.dateFormat('%m.%d', this.x);
-        break;
-      case 5:
-        xString = highchart.dateFormat('%m', this.x);
-        break;
-      default:
-        xString = highchart.dateFormat('%H:%M', this.x);
-    }
-    chart.svg_xText = chart.renderer.text(xString, chart.plotLeft + this.plotX, chart.plotTop + chart.plotHeight + 45).attr({
-      zIndex: 100,
-      'text-anchor': 'middle'
-    }).css({
-      color: 'white',
-      fontSize: '32px'
-    }).add();
-    chart.hoverPoint = this;
-  };
-  var func_pointMouseout = function() {
-    var chart = this.series.chart;
-    if (chart.svg_xText) {
-      chart.svg_xText.destroy();
-      chart.svg_xRect.destroy();
-      chart.svg_yText.destroy();
-      chart.svg_yRect.destroy();
-      chart.svg_xText = null;
-      chart.svg_xRect = null;
-      chart.svg_yText = null;
-      chart.svg_yRect = null;
-    }
-    chart.hoverPoint = null;
-  };*/
 
   var defaultTemplate = {
     chart: {
@@ -718,7 +653,6 @@
     init: function(userOption, callback) {
       var sagy = this,
         options,
-        chart,
         subline;
       if (!userOption.chartOption) {
         error('chartOption为必选项!');
@@ -740,9 +674,7 @@
       sagy.showLine = iterator('show', subline);
       sagy.hideLine = iterator('hide', subline);
       sagy.adjustLine = iterator('adjust', subline);
-      chart = initChartNode(options.chartOption, options.renderTo);
-      // chart.resourcePath = options.resourcePath;
-      sagy.chart = chart;
+      sagy.chart = initChartNode(options.chartOption, options.renderTo);
       sagy.transferData = options.ajaxOption.transferData;
       sagy.version = im_version;
       if (isFunction(callback)) {
@@ -763,6 +695,7 @@
         options = merge(options, _userOption);
         options.transferData = transferData;
         sagy.options.ajaxOption = options;
+        sagy.transferData = transferData;
       }
       _callback = callback ? callback : options.callback;
       $.ajax({
@@ -813,13 +746,16 @@
           categories: xData
         });
       }
-      if (options.autoAxis || options.autoTooltip && isDatetime) {
+      if (options.autoAxis && isDatetime) {
         sagy.options.timeType = calculateTimeType(xData, options.axisRatio);
       }
       if (options.needClear) {
         sagy.clearData();
       }
-      if (isArray(yData) && isArray(yData[0])) {
+      //兼容其它格式
+      if (!xData) {
+        chart.series[index].setData(yData);
+      } else if (isArray(yData) && isArray(yData[0])) {
         for (i = 0; i < yData.length; i++) {
           sagy.setValueOnly(xData, yData[i], i, isDatetime, unit, json.optional);
         }
