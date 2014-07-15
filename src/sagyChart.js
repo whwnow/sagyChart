@@ -43,7 +43,7 @@
     mathRound = math.round,
     mathRandom = math.random,
     // mathFloor = math.floor,
-    // mathCeil = math.ceil,
+    mathCeil = math.ceil,
     mathMax = math.max,
     mathMin = math.min,
     // mathAbs = math.abs,
@@ -868,7 +868,6 @@
         return highchart.dateFormat(formatter[options.timeType], this.value);
       };
     },
-    //todo 将时间类型改写为更优雅的方式,不再使用switch
     tickPositioner: function() {
       var sagy = this,
         options = sagy.options,
@@ -883,6 +882,9 @@
           start = xArr[0],
           end = xArr[length - 1],
           interval = secondTimer[options.timeType] * intervalCount;
+        if (length / intervalCount > 25) {
+          interval *= mathCeil(length / intervalCount / 25);
+        }
         start = start - start % interval + interval;
         curr = start;
         arr = [start];
