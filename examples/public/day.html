@@ -50,8 +50,6 @@
         },
         xAxis: {
           type: "datetime",
-          showFirstLabel: false,
-          showLastLabel: false,
           tickLength: 0,
           tickWidth: 0,
           gridLineColor: "#eaeaea",
@@ -94,7 +92,12 @@
           }
         },
         series: [{
-          data: []
+          data: [],
+          states:{
+            hover:{
+              enabled:false
+            }
+          }
         }]
       },
       renderTo: 'container',
