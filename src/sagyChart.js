@@ -879,18 +879,34 @@
         }
         var arr,
           curr,
+          date,
           start = xArr[0],
           end = xArr[length - 1],
           interval = secondTimer[options.timeType] * intervalCount;
-        if (length / intervalCount > 25) {
-          interval *= mathCeil(length / intervalCount / 25);
-        }
-        start = start - start % interval + interval;
-        curr = start;
         arr = [start];
-        while (curr < end) {
-          curr += interval;
-          curr < end && arr.push(curr);
+        curr = start;
+        if (options.timeType === 'year') {
+          date = new Date(curr);
+          while (curr < end) {
+            curr = date.setFullYear(date.getFullYear() + 1);
+            date = new Date(curr);
+            curr <= end && arr.push(curr);
+          }
+        } else if (options.timeType === 'month') {
+          date = new Date(curr);
+          while (curr < end) {
+            curr = date.setMonth(date.getMonth() + 1);
+            date = new Date(curr);
+            curr <= end && arr.push(curr);
+          }
+        } else {
+          if (length / intervalCount > 25) {
+            interval *= mathCeil(length / intervalCount / 25);
+          }
+          while (curr < end) {
+            curr += interval;
+            curr <= end && arr.push(curr);
+          }
         }
         return arr;
       };
