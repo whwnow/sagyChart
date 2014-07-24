@@ -8,8 +8,7 @@
     root[name] = factory();
   }
 }).call(this, 'sagyChart', function() {
-  //some global variable
-  var im_version = '0.13.10',
+  var im_version = '0.13.11',
     im_obj = {},
     im_string = im_obj.toString,
     // im_hasOwn = im_obj.hasOwnProperty,
@@ -390,6 +389,7 @@
     return ret;
   }
 
+  /* 语法补丁 filter,map 来自w3c*/
   if (!Array.prototype.filter) {
     Array.prototype.filter = function(fun /*, thisArg */ ) {
       "use strict";
@@ -614,7 +614,7 @@
       milliseconds,
       time_obj;
     //hack 年度数据
-    if (length === 1) {
+    if (length <= 2) {
       time_obj = new Date(first);
       if (time_obj.getMonth() === 0 && time_obj.getDate() === 1) {
         return 'year';
@@ -879,18 +879,34 @@
         }
         var arr,
           curr,
+          date,
           start = xArr[0],
           end = xArr[length - 1],
           interval = secondTimer[options.timeType] * intervalCount;
-        if (length / intervalCount > 25) {
-          interval *= mathCeil(length / intervalCount / 25);
-        }
-        start = start - start % interval + interval;
-        curr = start;
         arr = [start];
-        while (curr < end) {
-          curr += interval;
-          curr < end && arr.push(curr);
+        curr = start;
+        if (options.timeType === 'year') {
+          date = new Date(curr);
+          while (curr < end) {
+            curr = date.setFullYear(date.getFullYear() + 1);
+            date = new Date(curr);
+            curr <= end && arr.push(curr);
+          }
+        } else if (options.timeType === 'month') {
+          date = new Date(curr);
+          while (curr < end) {
+            curr = date.setMonth(date.getMonth() + 1);
+            date = new Date(curr);
+            curr <= end && arr.push(curr);
+          }
+        } else {
+          if (length / intervalCount > 25) {
+            interval *= mathCeil(length / intervalCount / 25);
+          }
+          while (curr < end) {
+            curr += interval;
+            curr <= end && arr.push(curr);
+          }
         }
         return arr;
       };
