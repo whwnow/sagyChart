@@ -8,7 +8,6 @@
     root[name] = factory();
   }
 }).call(this, 'sagyChart', function() {
-  //some global variable
   var im_version = '0.13.10',
     im_obj = {},
     im_string = im_obj.toString,
@@ -390,6 +389,7 @@
     return ret;
   }
 
+  /* 语法补丁 filter,map 来自w3c*/
   if (!Array.prototype.filter) {
     Array.prototype.filter = function(fun /*, thisArg */ ) {
       "use strict";
@@ -614,7 +614,7 @@
       milliseconds,
       time_obj;
     //hack 年度数据
-    if (length === 1) {
+    if (length <= 2) {
       time_obj = new Date(first);
       if (time_obj.getMonth() === 0 && time_obj.getDate() === 1) {
         return 'year';

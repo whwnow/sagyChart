@@ -535,7 +535,7 @@
     }
   };
   var defaultOptions = {
-    chartOption: defaultTemplate,
+    // chartOption: defaultTemplate,
     renderTo: '',
     // resourcePath: './images/sagyChart/',
     autoAxis: true,
