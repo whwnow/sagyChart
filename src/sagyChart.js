@@ -20,9 +20,7 @@
     secondTimer = {
       minute: MINUTE,
       hour: HOUR,
-      day: DAY,
-      month: MONTH,
-      year: YEAR
+      day: DAY
     },
     shortFormater = {
       minute: '%H:%M',
@@ -38,6 +36,7 @@
       month: '%Y.%m',
       year: '%Y'
     },
+    parseInt = parseInt,
     math = Math,
     mathRound = math.round,
     mathRandom = math.random,
@@ -882,7 +881,8 @@
           date,
           start = xArr[0],
           end = xArr[length - 1],
-          interval = secondTimer[options.timeType] * intervalCount;
+          total = end - start,
+          interval;
         arr = [start];
         curr = start;
         if (options.timeType === 'year') {
@@ -900,8 +900,9 @@
             curr <= end && arr.push(curr);
           }
         } else {
-          if (length / intervalCount > 25) {
-            interval *= mathCeil(length / intervalCount / 25);
+          interval = secondTimer[options.timeType] * intervalCount;
+          if (total / intervalCount / secondTimer[options.timeType] > 25) {
+            interval *= mathCeil(total / intervalCount / secondTimer[options.timeType] / 25);
           }
           while (curr < end) {
             curr += interval;
