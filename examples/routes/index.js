@@ -35,6 +35,25 @@ exports.getDay = function(req, res) {
   });
 };
 
+exports.getData = function(req, res) {
+  var val = 1000,
+    seconds = new Date(2014, 6, 1).getTime(),
+    xArr = [],
+    yArr = [],
+    i,
+    length = 100;
+  for (i = 0; i <= length; i++) {
+    xArr.push(seconds);
+    yArr.push(Math.round(Math.random() * val * 100) / 100);
+    seconds += MINUTE*10;
+  }
+  res.send({
+    xData: xArr,
+    yData: yArr,
+    unit: 'kWh'
+  });
+};
+
 exports.getDayRandom = function(req, res) {
   var val = 1000,
     date = new Date(),

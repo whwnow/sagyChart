@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>当天小时数据</title>
+  <link rel='stylesheet' href='/lib/bootstrap/dist/css/bootstrap.css' />
+  <link rel='stylesheet' href='/css/code.css'/>
+  <style type="text/css">
+    body {
+      font-family: "微软雅黑", Helvetica, Arial, sans-serif;
+    }
+  </style>
+  <script src="lib/jquery/dist/jquery.js"></script>
+  <script src="lib/highcharts-release/highcharts.src.js"></script>
+  <script src="js/sagyChart.src.js"></script>
+</head>
+<body>
+<br>
+<div class="container">
+  <div style="height:400px" id="container"></div>
+  <div class="row">
+    <div class="col-xs-6">
+      <textarea id="code" style="min-height: 200px;min-width: 600px">chart.refresh();</textarea>
+      <div class="row">
+        <div class="col-xs-3">
+          <button id="run" type="button" class="btn btn-lg btn-block btn-default">run</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $(function(){
+    chart = sagyChart({
+      chartOption: {
+        chart: {
+          type: 'line',
+        },
+        legend: {
+          enabled: false
+        },
+        credits: {
+          enabled: false,
+        },
+        title: {
+          text: null
+        },
+        xAxis: {
+          type: "datetime",
+          tickLength: 0,
+          tickWidth: 0,
+          gridLineColor: "#eaeaea",
+          gridLineDashStyle: "longDash",
+          gridLineWidth: 1,
+          lineColor: '#cacaca',
+          lineWidth: 1,
+          minPadding: 0,
+          maxPadding: 0,
+          title: {
+            text: null
+          },
+          labels: {
+            enabled: true,
+            style: {
+              fontSize: 12,
+              fontFamily: "Arial",
+              color: "#959595"
+            }
+          }
+        },
+        yAxis: {
+          tickWidth: 0,
+          gridLineColor: "#eaeaea",
+          gridLineDashStyle: "longDash",
+          minPadding: 0,
+          title: {
+            text: null
+          },
+          lineWidth: 0,
+          labels: {
+            align: "right",
+            enabled: true,
+            y: 10,
+            style: {
+              fontSize: 12,
+              fontFamily: "Arial",
+              color: "#959595"
+            }
+          }
+        },
+        series: [{
+          data: [],
+          states:{
+            hover:{
+              enabled:false
+            }
+          }
+        }]
+      },
+      renderTo: 'container',
+      autoAxis: true,
+      autoAxisOption: {
+        minute: 10,
+        hour: 1,
+        day: 2,
+        month: 1,
+        year: 1
+      },
+      subline: {
+        enabled: false
+      },
+      convertUnit: {
+        enabled: false
+      },
+      ajaxOption: {
+        url: "getData",
+        transferData: {},
+        index: 0,
+        callback: null,
+        pointHandler: function(option){
+          if(this.isMin)
+            this.color='blue';
+          if(this.isMax)
+            this.color='red';
+          if (this.isLatest)
+            this.color='green';
+        },
+        isJson: true
+      }
+    });
+    chart.refresh();
+    $('#run').on('click',function(){
+      eval($("#code").val());
+    });
+  });
+</script>
+</body>
+</html>

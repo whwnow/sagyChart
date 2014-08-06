@@ -28,6 +28,7 @@ if ('development' === app.get('env')) {
 
 
 app.get('/', routes.index);
+app.post('/getData', routes.getData);
 app.post('/getDay', routes.getDay);
 app.post('/getDayRandom', routes.getDayRandom);
 app.post('/getMonth', routes.getMonth);
